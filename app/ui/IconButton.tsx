@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
+import Image from 'next/image';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   src: string;
@@ -25,7 +26,9 @@ export default function IconButton({
       `}
       {...props}
     >
-      <img src={src} alt={alt} className="w-12 h-12 object-contain" />
+      <div className="w-12 h-12 relative">
+        <Image src={src} alt={alt} fill className="object-contain" />
+      </div>
       <span>{children}</span>
     </button>
   );

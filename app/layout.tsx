@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { inter, manrope } from "@/app/ui/fonts";
 import "./globals.css";
 import Header from "@/app/ui/header/header";
 
@@ -24,12 +25,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body >
+    <html lang="ru">
+      <body className={`${manrope.className} antialiased text-base font-normal`}>
         <Header />
-          <main className='pt-40'>
+          <main className='pt-40 lg:pt-48'>
             {children}
-            </main>
+          </main>
         </body>
     </html>
   );

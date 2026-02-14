@@ -1,12 +1,14 @@
 export default async function Page() {
-  const res = await fetch('http://localhost:3000/api/hello')
-  const data = await res.json()
-	console.log(data)
+  type User = { id: string | number; name: string; email?: string };
+
+  const res = await fetch('http://localhost:3000/api/hello');
+  const data = (await res.json()) as User[];
+  console.log(data);
   return (
     <ul>
-        {data.map((data: any) => (
-        <li key={data.id}>{data.name} - {data.email}</li>
+      {data.map((user) => (
+        <li key={user.id}>{user.name} - {user.email}</li>
       ))}
     </ul>
-  )
+  );
 }
