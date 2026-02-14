@@ -61,12 +61,22 @@ export default function Header() {
           <div className="w-full max-w-7xl px-2 flex flex-wrap items-center justify-between">
             <div className="flex items-center justify-between gap-4 w-full">
              <GreenPatoLogo />
-             <Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm border border-gray-400 text-foreground w-34 h-12">Каталог</Link>
-						 <Search placeholder="Поиск товаров..." />
+
+							{/* desktop */}
+						 <div className="hidden lg:flex lg:gap-4 w-1/2">
+						    <Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-34 h-12">Каталог</Link>
+								<Search placeholder="Поиск товаров..." />
+						 </div>
              <BottomHeaderLinks />
             </div>
           </div>
+
       </div>
+			{/* mobile */}
+			<div className="flex flex-col gap-4 lg:hidden w-full bg-(--light-main) px-4 pb-4 shadow-lg">        
+				<Search placeholder="Поиск товаров..." />
+				<Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-full h-12">Каталог</Link>
+			</div>
 </header>
     );
 }
