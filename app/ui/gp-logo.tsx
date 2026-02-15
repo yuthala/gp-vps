@@ -3,10 +3,7 @@ import Link from 'next/link';
 
 export default function GreenPatoLogo() {
   return (
-    <div
-      className="flex flex-row items-center gap-3"
-    >
-      <Link href="/" aria-label="Home">
+    <Link href="/" className="flex flex-row items-center gap-3">
         <Image
           loading="eager"
           src="/greenPato-logo.webp"
@@ -15,8 +12,8 @@ export default function GreenPatoLogo() {
           className="hidden md:block"
           alt="Green Pato logo"
         />
-      </Link>
+
       <p className="text-xl font-extrabold text-(--secondary) leading-[1.2] ">green<br/>pato</p>
-    </div>
+    </Link>
   );
 }

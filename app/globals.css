@@ -44,3 +44,25 @@ body {
 a {
 	cursor: pointer;
 }
+
+/* HeroSection dashed decorative lines */
+.hero-dash{
+	position: absolute;
+	border-left: 3px dashed var(--secondary);
+	pointer-events: none;
+}
+.hero-dash.dash-1{ right: 60px; bottom: 0; height: 300px; }
+.hero-dash.dash-2{ right: 110px; bottom: 0; height: 220px; }
+.hero-dash.dash-3{ right: 160px; bottom: 0; height: 90px; }
+
+/* Adjust heights for small screens (sm and below) */
+@media (max-width: 640px){
+	.hero-dash.dash-1{ height: 220px; }
+	.hero-dash.dash-2{ height: 160px; }
+	.hero-dash.dash-3{ height: 60px; }
+}
+
+/* Hide decorative dashed lines on very small screens */
+@media (max-width: 420px) {
+	.hero-dash { display: none !important; }
+}

@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${manrope.className} antialiased text-base font-normal`}>
         <Header />
-          <main className='pt-80'>
+          <main className="pt-72 lg:pt-44">
             {children}
           </main>
         </body>
