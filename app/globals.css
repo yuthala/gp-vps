@@ -66,3 +66,59 @@ a {
 @media (max-width: 420px) {
 	.hero-dash { display: none !important; }
 }
+
+
+/* Soft wrap for advantages descriptions */
+p, span {
+	white-space: normal;
+	overflow-wrap: anywhere;
+	word-break: break-word;
+	hyphens: auto;
+}
+
+/* Global rule for h2 headings */
+h2 {
+	font-size: 48px;
+	font-weight: 800;
+	text-transform: uppercase;
+	color: var(--foreground);
+	line-height: 1.2;
+}
+
+/* Global h4 rule for AdvantagesSection items */
+h4 {
+	font-size: 28px;
+	font-weight: 700;
+	color: var(--secondary);
+	text-align: center;
+	text-transform: uppercase;
+	margin: 0.25rem 0;
+}
+
+
+/* Specific override for AdvantagesSection heading */
+.advantages-heading {
+  font-size: 40px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+/* MEDIA */
+@media(max-width: 1024px) {
+	.advantages-heading {
+		font-size: 32px;
+	}
+	h4 {
+		font-size: 24px;
+	}
+}
+
+@media(max-width: 520px) {
+	.advantages-heading {
+		font-size: 24px;
+	}
+}
+
+
