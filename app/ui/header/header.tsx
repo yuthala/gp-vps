@@ -21,7 +21,7 @@ export default function Header() {
 
     return (
   <header className="fixed top-0 left-0 w-full font-bold">
-      <div className="flex w-full justify-center items-center bg-(--secondary) py-4 px-2 h-10 text-white">
+      <div className="flex w-full justify-center items-center bg-(--secondary) py-4 px-2 h-12 text-white">
         <div className="relative flex max-w-7xl w-full justify-between gap-1">
           <div className="flex items-center gap-1">
             <PhoneIcon className="h-4 w-4 rotate-15" />

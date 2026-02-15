@@ -27,10 +27,10 @@ export default function TopHeaderLinks({ mobile = false, onLinkClick }: { mobile
                  href={link.href}
                  onClick={() => onLinkClick?.()}
                   className={clsx(
-                            'flex items-center justify-center gap-1 rounded-md font-bold lg:py-3 md:flex-none md:justify-start md:p-2 md:px-3',
+                            'flex items-center justify-center gap-1 rounded-md font-bold lg:bg-(--secondary) hover:bg-(--light-main) hover:text-(--secondary) transition-colors lg:py-1 md:p-2 md:px-3',
                             {
-                                'w-full py-2': mobile,
-                                '': pathname === link.href,
+                                'w-full': mobile,
+                                'underline decoration-2 underline-offset-4': pathname === link.href,
                             },
                 )}
                  >
