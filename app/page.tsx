@@ -1,4 +1,5 @@
 import AdvantagesSection from "./(components)/advantagesSection/AdvantagesSection";
+import CropsSection from "./(components)/cropsSection/CropsSection";
 import HeroSection from "./(components)/heroSection/HeroSection";
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
 				<div className="w-full max-w-7xl min-w-xs">
 					<HeroSection />
 					<AdvantagesSection />
+					<CropsSection />
 					<section className="mb-8">
 						<div className="rounded-lg bg-slate-100 p-8">
 							<h1 className="text-3xl md:text-4xl font-semibold mb-2">Green Pato</h1>

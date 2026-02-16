@@ -95,6 +95,13 @@ h4 {
 	margin: 0.25rem 0;
 }
 
+h5 {
+	font-size: 36px;
+	font-weight: 900;
+	line-height: 120%;
+	color: var(--secondary);
+	text-transform: uppercase;
+}
 
 /* Specific override for AdvantagesSection heading */
 .advantages-heading {
@@ -110,14 +117,23 @@ h4 {
 	.advantages-heading {
 		font-size: 32px;
 	}
+	h2 {
+		font-size: 36px;
+	}
 	h4 {
 		font-size: 24px;
+	}
+	h5 {
+		font-size: 32px;
 	}
 }
 
 @media(max-width: 520px) {
 	.advantages-heading {
 		font-size: 24px;
+	}
+	h2 {
+		font-size: 28px;
 	}
 }
 

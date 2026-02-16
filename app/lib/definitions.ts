@@ -86,3 +86,15 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type CardInfo = {
+	imageSrc: string;
+	imagePosition: string;
+	heading: string;
+	popularSorts: string[];
+	generations?: string[];
+	linkSort?: string;
+	linkSortName: string;
+	linkCrops?: string;
+	linkCropsName: string;
+}
