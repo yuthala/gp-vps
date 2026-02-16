@@ -1,5 +1,8 @@
 "use client";
-const cards = [
+
+import { Advantages } from "../../lib/definitions";
+
+const cards: Advantages[] = [
 	{iconSrc: '/advantagesSection/adv-1.svg', iconWidth: 40, iconHeight: 40, heading: 'Собственное производство', description: (
 		<>
 			Мы являемся производителем. Многие люди уже оценили качество нашей продукции и стали нашими постоянными покупателями. На этом сайте вы можете приобрести продукцию <span style={{color: 'var(--secondary)'}}>green pato</span> без посредников, напрямую.

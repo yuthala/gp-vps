@@ -1,6 +1,9 @@
 // This file contains type definitions for your data.
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
+
+import { JSX } from "react/jsx-dev-runtime";
+
 // However, these types are generated automatically if you're using an ORM such as Prisma.
 export type User = {
   id: string;
@@ -97,4 +100,12 @@ export type CardInfo = {
 	linkSortName: string;
 	linkCrops?: string;
 	linkCropsName: string;
+}
+
+export type Advantages = {
+	iconSrc: string;
+	iconWidth?: number;
+	iconHeight?: number;
+	heading: string;
+	description: string | JSX.Element;
 }

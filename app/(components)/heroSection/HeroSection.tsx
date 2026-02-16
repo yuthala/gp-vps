@@ -6,32 +6,32 @@ export default function HeroSection() {
     <section className="w-full pb-16">
       <div className="max-w-7xl px-4">
         <div className="flex flex-col md:flex-row gap-4 md:gap-0 items-stretch">
-		  <div className="flex w-full md:w-[40%] relative bg-(--light-green) pt-4 pl-4">
-			{/* Decorative vertical dashed lines (aria-hidden) implemented via CSS classes */}
-			<div className="absolute right-0 bottom-0">
-			  <span aria-hidden className="hero-dash dash-1" />
-			  <span aria-hidden className="hero-dash dash-2" />
-			  <span aria-hidden className="hero-dash dash-3" />
-			</div>
-
-			<div>
-					<h3 className="text-2xl lg:text-3xl font-bold text-(--secondary) pb-4"><span className="text-red-600">[</span>green pato<span className="text-red-600">]</span></h3>
-					<h1 className="text-3xl lg:text-5xl font-extrabold uppercase text-foreground leading-tight pb-6">
-						Питомник луковичных <br/>культур
-					</h1>
-					<div className="text-4xl lg:text-6xl font-extrabold uppercase text-white sm:pl-8">
-						<h3 className="pb-6">
-							чеснок
-						</h3>
-						<h3 className="pb-6">
-							лук
-						</h3>
-						<h3 className="pb-6">
-							шалот
-						</h3>
+					<div className="flex w-full md:w-[40%] relative bg-(--light-green) pt-4 pl-4">
+					{/* Decorative vertical dashed lines (aria-hidden) implemented via CSS classes */}
+					<div className="absolute right-0 bottom-0">
+						<span aria-hidden className="hero-dash dash-1" />
+						<span aria-hidden className="hero-dash dash-2" />
+						<span aria-hidden className="hero-dash dash-3" />
 					</div>
-				</div>
-			</div>
+
+					<div>
+							<h3 className="text-2xl lg:text-3xl font-bold text-(--secondary) pb-4"><span className="text-red-600">[</span>green pato<span className="text-red-600">]</span></h3>
+							<h1 className="text-3xl lg:text-5xl font-extrabold uppercase text-foreground leading-tight pb-6">
+								Питомник луковичных <br/>культур
+							</h1>
+							<div className="text-4xl lg:text-6xl font-extrabold uppercase text-white sm:pl-8">
+								<h3 className="pb-6">
+									чеснок
+								</h3>
+								<h3 className="pb-6">
+									лук
+								</h3>
+								<h3 className="pb-6">
+									шалот
+								</h3>
+							</div>
+						</div>
+					</div>
 
           <div className="flex-1 relative">
             <div className="w-full h-64 sm:h-80 md:h-130 lg:h-150 relative rounded overflow-hidden">

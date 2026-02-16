@@ -1,6 +1,7 @@
 import AdvantagesSection from "./(components)/advantagesSection/AdvantagesSection";
 import CropsSection from "./(components)/cropsSection/CropsSection";
 import HeroSection from "./(components)/heroSection/HeroSection";
+import BookingSection from "./(components)/bookingSection/BookingSection";
 
 export default function Home() {
 	return (
@@ -10,6 +11,7 @@ export default function Home() {
 					<HeroSection />
 					<AdvantagesSection />
 					<CropsSection />
+					<BookingSection />
 					<section className="mb-8">
 						<div className="rounded-lg bg-slate-100 p-8">
 							<h1 className="text-3xl md:text-4xl font-semibold mb-2">Green Pato</h1>

@@ -112,6 +112,10 @@ h5 {
   line-height: 1.2;
 }
 
+.booking-heading {
+	color: #fff;
+}
+
 /* MEDIA */
 @media(max-width: 1024px) {
 	.advantages-heading {
