@@ -109,3 +109,8 @@ export type Advantages = {
 	heading: string;
 	description: string | JSX.Element;
 }
+
+export type Delivery = {
+	imageSrc: string;
+	imageDescription: string;
+}

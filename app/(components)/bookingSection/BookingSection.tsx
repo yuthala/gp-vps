@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function BookingSection() {
 	return (
-		<section className="w-full pb-16">
+		<section className="w-full pb-8 md:pb-16">
 				<div className="w-full relative bg-(--secondary) px-4 md:px-8 pb-8 md:pb-12 text-base md:text-lg font-light text-white">
 					<h2 className="booking-heading pt-6 md:pt-10 pb-6 text-center">Бронирование</h2>
 					<p className="pb-2">Так бывает, что желаемого  сорта нет в наличии. В этом случае вы можете забронировать понравившийся товар и получить его, когда он появится на складе. Сроки поставки указаны на странице бронирования. Поставки по забронированным заказам осуществляются в приоритете. </p>
