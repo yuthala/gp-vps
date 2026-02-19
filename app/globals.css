@@ -116,6 +116,10 @@ h5 {
 	color: #fff;
 }
 
+.vk-heading {
+	text-align: left;
+}
+
 /* MEDIA */
 @media(max-width: 1024px) {
 	.advantages-heading {

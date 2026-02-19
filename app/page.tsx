@@ -4,6 +4,7 @@ import HeroSection from "./(components)/heroSection/HeroSection";
 import BookingSection from "./(components)/bookingSection/BookingSection";
 import DeliverySection from "./(components)/deliverySection/DeliverySection";
 import OurOzonShop from "./(components)/ourOzonShop/OurOzonShop";
+import VKSection from "./(components)/VKSection/VKSection";
 
 export default function Home() {
 	return (
@@ -16,6 +17,7 @@ export default function Home() {
 					<BookingSection />
 					<DeliverySection />
 					<OurOzonShop />
+					<VKSection />
 					<section className="mb-8">
 						<div className="rounded-lg bg-slate-100 p-8">
 							<h1 className="text-3xl md:text-4xl font-semibold mb-2">Green Pato</h1>
