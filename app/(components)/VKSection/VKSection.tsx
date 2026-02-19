@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function DeliverySection() {
+export default function VKSection() {
 	return(
 				<section className="w-full pb-8 md:pb-16">
 				<div className="max-w-7xl bg-(--accent) px-4 md:px-8 pb-8 md:pb-12 text-base md:text-lg font-light text-foreground">
