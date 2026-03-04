@@ -114,3 +114,13 @@ export type Delivery = {
 	imageSrc: string;
 	imageDescription: string;
 }
+
+export type CatalogSection = {
+	title: string;
+	items: CatalogCard[];
+}
+
+export type CatalogCard = {
+	imageSrc: string;
+	title: string;
+}

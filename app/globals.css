@@ -86,6 +86,16 @@ h2 {
 }
 
 /* Global h4 rule for AdvantagesSection items */
+h3 {
+	font-size: 36px;
+	font-weight: 900;
+	color: var(--secondary);
+	line-height: 1.2;
+	text-align: center;
+	text-transform: uppercase;
+	margin: 1.5rem 0;
+}
+
 h4 {
 	font-size: 28px;
 	font-weight: 700;
@@ -120,6 +130,13 @@ h5 {
 	text-align: left;
 }
 
+.catalog-heading {
+	font-size: 20px;
+	font-weight: 900;
+	text-align: center;
+	color: var(--foreground);
+}
+
 /* MEDIA */
 @media(max-width: 1024px) {
 	.advantages-heading {
@@ -127,6 +144,9 @@ h5 {
 	}
 	h2 {
 		font-size: 36px;
+	}
+	h3 {
+		font-size: 24px;
 	}
 	h4 {
 		font-size: 24px;

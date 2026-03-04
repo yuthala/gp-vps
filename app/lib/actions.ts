@@ -1,4 +1,5 @@
 'use server';
+import { CatalogSection, CatalogCard } from "../lib/definitions";
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
@@ -145,3 +146,37 @@ export async function deleteInvoice(id: string) {
 //     throw error;
 //   }
 // }
+
+export async function getDataForCatalogPage() {
+		const GarlicCards: CatalogCard[] = [
+				{imageSrc: '/catalog/zubok.webp', title: 'Зубок'},
+				{imageSrc: '/catalog/odnozubok.webp', title: 'Однозубок'},
+				{imageSrc: '/catalog/bulb.webp', title: 'Воздушные луковицы'}
+			];
+			const OnionCards: CatalogCard[] = [
+				{imageSrc: '/catalog/sevok.webp', title: 'Лук севок'},
+				{imageSrc: '/catalog/seeds.webp', title: 'Семена'}
+			];
+			const ShalotCards: CatalogCard[] = [
+				{imageSrc: '/catalog/shalot.webp', title: 'Севок'},
+				{imageSrc: '/catalog/seeds.webp', title: 'Семена'},
+			]
+		
+			const sections: CatalogSection[] = [
+				{
+					title: 'чеснок',
+					items: GarlicCards
+				},
+				{
+					title: 'лук',
+					items: OnionCards
+				},
+				{
+					title: 'шалот',
+					items: ShalotCards
+				}
+			];
+		return {
+			sections
+		}
+}
