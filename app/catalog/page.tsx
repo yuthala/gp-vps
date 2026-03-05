@@ -1,4 +1,3 @@
-import { CatalogSection, CatalogCard } from "../lib/definitions";
 import Image from "next/image";
 import Link from "next/link";
 import { getDataForCatalogPage } from "../lib/actions";
@@ -22,7 +21,7 @@ export default async function Catalog() {
 											key={`${item.title}-${index}`}
 											className="bg-(--accent) rounded-lg overflow-hidden transition-transform hover:scale-[1.02] duration-200"
 										>
-											<Link href='/catalog/shopCards' className="block">
+											<Link href={`/catalog/${item.id}`} className="block">
 												<div className="relative w-full" style={{ paddingBottom: '50%' }}> {/* 360x180 aspect ratio (2:1) */}
 													<Image
 														src={item.imageSrc}

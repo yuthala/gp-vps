@@ -121,6 +121,7 @@ export type CatalogSection = {
 }
 
 export type CatalogCard = {
+	id: string; // название на латинице для маршрута в строке поиска
 	imageSrc: string;
 	title: string;
 }

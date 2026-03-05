@@ -149,17 +149,17 @@ export async function deleteInvoice(id: string) {
 
 export async function getDataForCatalogPage() {
 		const GarlicCards: CatalogCard[] = [
-				{imageSrc: '/catalog/zubok.webp', title: 'Зубок'},
-				{imageSrc: '/catalog/odnozubok.webp', title: 'Однозубок'},
-				{imageSrc: '/catalog/bulb.webp', title: 'Воздушные луковицы'}
+				{id: 'zubok', imageSrc: '/catalog/zubok.webp', title: 'Зубок'},
+				{id: 'odnozubok', imageSrc: '/catalog/odnozubok.webp', title: 'Однозубок'},
+				{id: 'airzubok', imageSrc: '/catalog/bulb.webp', title: 'Воздушные луковицы'}
 			];
 			const OnionCards: CatalogCard[] = [
-				{imageSrc: '/catalog/sevok.webp', title: 'Лук севок'},
-				{imageSrc: '/catalog/seeds.webp', title: 'Семена'}
+				{id: 'luksevok', imageSrc: '/catalog/sevok.webp', title: 'Лук севок'},
+				{id: 'luckshernushka', imageSrc: '/catalog/seeds.webp', title: 'Семена'}
 			];
 			const ShalotCards: CatalogCard[] = [
-				{imageSrc: '/catalog/shalot.webp', title: 'Севок'},
-				{imageSrc: '/catalog/seeds.webp', title: 'Семена'},
+				{id: 'shalotsevok', imageSrc: '/catalog/shalot.webp', title: 'Севок'},
+				{id: 'shalotchernushka', imageSrc: '/catalog/seeds.webp', title: 'Семена'},
 			]
 		
 			const sections: CatalogSection[] = [
