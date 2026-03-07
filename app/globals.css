@@ -85,7 +85,6 @@ h2 {
 	line-height: 1.2;
 }
 
-/* Global h4 rule for AdvantagesSection items */
 h3 {
 	font-size: 36px;
 	font-weight: 900;
@@ -113,7 +112,19 @@ h5 {
 	text-transform: uppercase;
 }
 
-/* Specific override for AdvantagesSection heading */
+h6 {
+	font-size: 24px;
+	font-weight: 900;
+	line-height: 120%;
+	color: var(--foreground);
+}
+
+/*General variations for headings*/
+.capital {
+	text-transform: capitalize;
+}
+
+/* Specific override for headings */
 .advantages-heading {
   font-size: 40px;
   font-weight: 800;

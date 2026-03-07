@@ -125,3 +125,20 @@ export type CatalogCard = {
 	imageSrc: string;
 	title: string;
 }
+
+export type ProductCard = {
+	imageSrc: string[];
+	description: string;
+	cropSort: string;
+	cropSize?: 'мелкая' | 'средняя' | 'крупная';
+	cropName: string;
+	pathName: 'zubok' | 'odnozubok' | 'bulb' | 'luksevok' | 'luckshernushka' | 'shalotsevok' | 'shalotchernushka'; //из actions.ts
+	tag?: string[];
+	packageSize: number[];
+	onStockStatus: 'available' | 'not_available' | 'expected';
+	estimatedOnStockDate?: string;
+	price: number;
+	measureUnit: number;
+}
+
+

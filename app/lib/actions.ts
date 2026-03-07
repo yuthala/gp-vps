@@ -1,5 +1,5 @@
 'use server';
-import { CatalogSection, CatalogCard } from "../lib/definitions";
+import { CatalogSection, CatalogCard, ProductCard } from "../lib/definitions";
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
@@ -147,11 +147,12 @@ export async function deleteInvoice(id: string) {
 //   }
 // }
 
+//страница Каталог
 export async function getDataForCatalogPage() {
 		const GarlicCards: CatalogCard[] = [
 				{id: 'zubok', imageSrc: '/catalog/zubok.webp', title: 'Зубок'},
 				{id: 'odnozubok', imageSrc: '/catalog/odnozubok.webp', title: 'Однозубок'},
-				{id: 'airzubok', imageSrc: '/catalog/bulb.webp', title: 'Воздушные луковицы'}
+				{id: 'bulb', imageSrc: '/catalog/bulb.webp', title: 'Воздушные луковицы'}
 			];
 			const OnionCards: CatalogCard[] = [
 				{id: 'luksevok', imageSrc: '/catalog/sevok.webp', title: 'Лук севок'},
@@ -179,4 +180,32 @@ export async function getDataForCatalogPage() {
 		return {
 			sections
 		}
+}
+
+//компонент ProductCard
+export async function getProductCard(pathName: string, cropName?: string) {
+
+	const products: ProductCard[] = [
+		{imageSrc: ['/products/lyubasha_zubok.webp', '/products/lyubasha.webp'], description: 'Описание Любаша зубок Описание Любаша зубок', cropSort: 'Любаша', cropName: 'lyubasha', tag: ['чеснок', 'зубок', 'Любаша'], packageSize: [2.5, 0, 10], cropSize: 'мелкая', pathName: 'zubok', onStockStatus: 'expected', price: 5, measureUnit: 100, estimatedOnStockDate: '10.08.2026'},
+		{imageSrc: ['/products/bogatyr_zubok.webp', '/products/bogatyr.webp'], description: 'описание Богатырь зубок', cropName: 'bogatyr', cropSort: 'Богатырь', tag: ['чеснок', 'зубок', 'Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', pathName: 'zubok', onStockStatus: 'available', price: 6.2, measureUnit: 100},
+		{imageSrc: ['/products/bogatyr_odnozubok.webp', '/products/bogatyr.webp'], description: 'Однозубок чеснока, сорт Богатырь, размер средний', cropName: 'bogatyr', tag: ['чеснок', 'однозубок', 'Богатырь'],packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Богатырь', pathName: 'odnozubok', onStockStatus: 'expected', price: 8, measureUnit: 100, estimatedOnStockDate: '10.08.2026'},
+		{imageSrc: ['/products/shadeyka_odnozubok.webp', '/products/shadeyka.webp'], description: 'описание Шадейка однозубок', cropName: 'shadeyka', cropSort: 'Шадейка', tag: ['чеснок', 'однозубок', 'Шадейка'], packageSize: [2.5, 5, 10], cropSize: 'крупная', pathName: 'odnozubok', onStockStatus: 'not_available', price: 7, measureUnit: 100},
+		{imageSrc: ['/products/lyubasha_bulb.webp', '/products/lyubasha.webp'], description: 'описание Любаша бульбочки', cropSort: 'Любаша', cropName: 'lyubasha', tag: ['чеснок', 'бульбочка', 'Любаша'], packageSize: [0.5, 1, 2], pathName: 'bulb', onStockStatus: 'not_available', price: 3, measureUnit: 100},
+		{imageSrc: ['/products/shadeyka_bulb.webp', '/products/shadeyka.webp'], description: 'описание Шадейка бульбочки', cropSort: 'Шадейка', cropName: 'shadeyka', tag: ['чеснок', 'бульбочка', 'Шадейка'], packageSize: [0.5, 1, 2], pathName: 'bulb', onStockStatus: 'expected', price: 4, measureUnit: 100, estimatedOnStockDate: '10.08.2026'},
+	];
+
+	let res = products.filter((obj) => {
+		return obj.pathName === pathName;
+	});
+
+	if(cropName) {
+		res = res.filter((obj) => {
+			return obj.cropName === cropName;
+		})
+	}
+	const data = res[0]
+
+	return {
+		res, data
+	}
 }
