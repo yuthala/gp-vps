@@ -130,7 +130,7 @@ export type ProductCard = {
 	imageSrc: string[];
 	description: string;
 	cropSort: string;
-	cropSize?: 'мелкая' | 'средняя' | 'крупная';
+	cropSize?: 'мелкая' | 'средняя' | 'крупная' | '4-9 мм';
 	cropName: string;
 	pathName: 'zubok' | 'odnozubok' | 'bulb' | 'luksevok' | 'luckshernushka' | 'shalotsevok' | 'shalotchernushka'; //из actions.ts
 	tag?: string[];

@@ -4,6 +4,8 @@ import  OnStock  from "./status";
 import Image from "next/image";
 import Button from "../Button";
 import Link from "next/link";
+import Pricing from "../Pricing";
+
 
 export default async function ProductCard({ pathName}: { pathName: string}) {
 	
@@ -47,25 +49,15 @@ export default async function ProductCard({ pathName}: { pathName: string}) {
 											product.onStockStatus === 'available' ? 'text-[#40AD52]' : 'text-gray-400'
 										)}>
 											<div className="flex justify-between">
-												<span
-												className="text-2xl font-semibold"
-												>Цена:</span>
-												<span className="text-2xl font-semibold">{product.price * product.measureUnit} р.</span>
+												<Pricing
+													className="text-2xl font-semibold"
+													value={product.price} 
+													prefix="Цена:" 
+												>
+												</Pricing>
 											</div>
 											<div className="text-xl font-light">за {product.measureUnit} г</div>
 										</div>
-                    
-                    {/* Price */}
-                    {/* <div className="mb-4 shrink-0">
-                      <span className="text-xl font-bold text-gray-900">
-                        {product.price?.toFixed(2) || '29.99'} р.
-                      </span>
-                      {product.price && (
-                        <span className="ml-2 text-sm text-gray-500 line-through">
-                          {product.price.toFixed(2)} р.
-                        </span>
-                      )}
-                    </div> */}
                     
                     {/* Button */}
 										<Link href={`/catalog/${product.pathName}/${product.cropName}`} passHref>

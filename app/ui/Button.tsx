@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, ReactNode } from 'react';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   height?: 52 | 58 | 80;
-  color?: '#064929' | '#F2F9ED';
+  color?: '#064929' | '#F2F9ED' | 'text-white';
   borderColor?: '#064929' | 'transparent';
   backgroundColor?: '#D3D34F' | '#40AD52' | '#F2F9ED';
   className?: string;
@@ -28,6 +28,7 @@ export default function Button({
   const colorStyle = {
     '#064929': 'text-[#064929]',
     '#F2F9ED': 'text-[#F2F9ED]',
+		'text-white': 'text-white'
   }[color];
 
   const borderStyle = {
@@ -41,7 +42,7 @@ export default function Button({
     '#F2F9ED': 'bg-[#F2F9ED]',
   }[backgroundColor];
 
-  const buttonClasses = `inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#064929] ${heightStyle} ${colorStyle} ${borderStyle} ${bgStyle} ${className}`;
+  const buttonClasses = `inline-flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#064929] ${heightStyle} ${colorStyle} ${borderStyle} ${bgStyle} ${className}`;
 
   return (
     <button className={buttonClasses} {...props}>
