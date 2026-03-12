@@ -2,7 +2,7 @@ import { ProductCard } from "../../lib/definitions";
 
 export default function AdditionalInfoProduct({ data }: { data: ProductCard }) {
 	return(
-		<div className="flex flex-col gap-2 w-full py-4 sm:py-8">
+		<div className="flex flex-col gap-2 w-full pt-4 sm:pt-8">
 			<div className="flex items-center">
 				<span className="whitespace-nowrap pb-3 pr-2 text-sm sm:text-lg font-semibold">Фракция</span>
 				<div className="flex-1 border-b-2 border-dotted border-gray-800 mx-2"></div>
@@ -39,6 +39,14 @@ export default function AdditionalInfoProduct({ data }: { data: ProductCard }) {
 					<span className="whitespace-nowrap pb-3 pl-2 text-xs xs:text-sm sm:text-lg font-semibold">{data.estimatedOnStockDate}</span>
 				</div>
 			}
+
+			<div className="product-description space-y-4">
+				{data.descriptionDetails && data.descriptionDetails.split('<br/>').map((paragraph: string, index: number) => (
+					<p key={index} className="text-gray-700 pb-2">
+						{paragraph}
+					</p>
+				))}
+			</div>
 		</div>
 	)
 }

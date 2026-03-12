@@ -8,6 +8,7 @@ import Heading from "../../ui/Heading";
 import Button from "../../ui/Button";
 import Pricing from "../../ui/Pricing";
 import Counter from "../counter/Counter";
+import TagList from '../TagList';
 
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
@@ -24,9 +25,15 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 		{/* Блок выбора размера упаковки */}
 		<PackageSelectorWithUrl packaging={data}/>
 
+		{/* Теги */}
+		<div  className=" py-4 sm:py-6" >
+			<TagList tags={data.tags || []}/>
+		</div>
+
 		{/* Product features/additional info */}
 		<AdditionalInfoProduct data={data}/>
 
+		{/* Цена и стоимость */}
 		<div className="flex gap-2">
 			<Pricing
 				className="text-2xl lg:text-3xl text-[#40AD52] font-bold"
@@ -36,7 +43,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 			</Pricing>
 		</div>
 
-		<div className="text-lg font-light text-[#40AD52]  pb-8 sm:pb-12">за упаковку {data.measureUnit * packageSize} г</div>
+		<div className="text-lg font-light text-[#40AD52]  pb-4 sm:pb-8">за упаковку {data.measureUnit * packageSize} г</div>
 
 		<div className="flex gap-2 pb-8 sm:pb-12">
 			<Pricing
@@ -47,6 +54,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 			</Pricing>
 		</div>
 		
+		{/* Кнопка Заказать и Counter */}
 		<div className="flex flex-col sm:flex-row items-center gap-4">
 			<Button backgroundColor="#40AD52" color="text-white" className="text-2xl uppercase font-extrabold px-16">
 				В корзину
