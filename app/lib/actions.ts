@@ -1,5 +1,5 @@
 'use server';
-import { CatalogSection, CatalogCard, ProductCard } from "../lib/definitions";
+import { CatalogSection, CatalogCard, ProductCard, CartItem, ShoppingCart } from "../lib/definitions";
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
@@ -215,3 +215,34 @@ export async function getProductCard(pathName: string, cropName?: string) {
 		res, data
 	}
 }
+
+// Корзина
+export async function createCartItem (data: ProductCard, packageSize: number, qty: number=1) {
+	const cartItem = {
+		imageSrc: data.imageSrc[0],
+		description: data.description,
+		packageSize: packageSize,
+		price: data.price * packageSize,
+		qty: Number(qty),
+		totalSum: data.price * packageSize * (Number(qty) || 1)
+	}
+	return cartItem;
+}
+
+export async function createShoppingCart(cartItem: CartItem) {
+	const savedCartData = localStorage.getItem('cartKey');
+	if (savedCartData) {
+		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
+		parsedCart.cartItems.push(cartItem);
+		localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+
+	} else {
+		//создаем пустую корзину
+			const shoppingCart:ShoppingCart = {
+				cartItems: []
+			}
+			if (typeof window !== 'undefined') {
+				localStorage.setItem('cartKey', JSON.stringify(shoppingCart));
+			}
+		}
+	}

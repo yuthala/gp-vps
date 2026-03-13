@@ -12,6 +12,7 @@ import Counter from "../counter/Counter";
 import TagList from '../TagList';
 import { ShoppingCart } from '../../lib/definitions';
 import { CartItem } from '../../lib/definitions';
+import { createCartItem, createShoppingCart } from '@/app/lib/actions'
 
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
@@ -19,35 +20,6 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
   const packageSize = data.packageSize.filter(packageSize => packageSize > 0)[Number(index)];
 
 	const qty = searchParams.get('qty');
-
-
-const createCartItem = (): CartItem => ({
-  imageSrc: data.imageSrc[0],
-  description: data.description,
-  packageSize: packageSize,
-  price: data.price * packageSize,
-  qty: Number(qty) || 1,
-  totalSum: data.price * packageSize * (Number(qty) || 1)
-})
-
-function createShoppingCart(cartItem: CartItem) {
-	const savedCartData = localStorage.getItem('cartKey');
-	if (savedCartData) {
-		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
-		parsedCart.cartItems.push(cartItem);
-		localStorage.setItem('cartKey', JSON.stringify(parsedCart));
-
-	} else {
-			const shoppingCart:ShoppingCart = {
-				cartItems: []
-			}
-			if (typeof window !== 'undefined') {
-				localStorage.setItem('cartKey', JSON.stringify(shoppingCart));
-			}
-		}
-	}
-
-
 
 	return(
 		<div className="lg:w-1/2 p-8 flex flex-col">
@@ -88,9 +60,24 @@ function createShoppingCart(cartItem: CartItem) {
 		
 		{/* Кнопка Заказать и Counter */}
 		<div className="flex flex-col sm:flex-row items-center gap-4">
-			<Button onClick={() => createShoppingCart(createCartItem())} backgroundColor="#40AD52" color="text-white" className="text-2xl uppercase font-extrabold px-16">
-				В корзину
-			</Button>
+<Button 
+  onClick={async () => {
+    try {
+			const cartItem = await createCartItem(data, packageSize, Number(qty));
+      await createShoppingCart(cartItem);
+      // Optional: Show success message
+      // toast.success('Added to cart!');
+    } catch (error) {
+      // Optional: Handle error
+      console.error('Failed to add to cart:', error);
+    }
+  }} 
+  backgroundColor="#40AD52" 
+  color="text-white" 
+  className="text-2xl uppercase font-extrabold px-16"
+>
+  В корзину
+</Button>
 			<Counter 
 				className="w-55 justify-evenly"
 				initialValue={Number(qty) || 1}
