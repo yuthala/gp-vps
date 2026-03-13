@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductCard } from '../../lib/definitions';
 import PackageSelectorWithUrl from "@/app/ui/productCard/PackageSelector";
@@ -9,6 +10,8 @@ import Button from "../../ui/Button";
 import Pricing from "../../ui/Pricing";
 import Counter from "../counter/Counter";
 import TagList from '../TagList';
+import { ShoppingCart } from '../../lib/definitions';
+import { CartItem } from '../../lib/definitions';
 
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
@@ -16,6 +19,35 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
   const packageSize = data.packageSize.filter(packageSize => packageSize > 0)[Number(index)];
 
 	const qty = searchParams.get('qty');
+
+
+const createCartItem = (): CartItem => ({
+  imageSrc: data.imageSrc[0],
+  description: data.description,
+  packageSize: packageSize,
+  price: data.price * packageSize,
+  qty: Number(qty) || 1,
+  totalSum: data.price * packageSize * (Number(qty) || 1)
+})
+
+function createShoppingCart(cartItem: CartItem) {
+	const savedCartData = localStorage.getItem('cartKey');
+	if (savedCartData) {
+		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
+		parsedCart.cartItems.push(cartItem);
+		localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+
+	} else {
+			const shoppingCart:ShoppingCart = {
+				cartItems: []
+			}
+			if (typeof window !== 'undefined') {
+				localStorage.setItem('cartKey', JSON.stringify(shoppingCart));
+			}
+		}
+	}
+
+
 
 	return(
 		<div className="lg:w-1/2 p-8 flex flex-col">
@@ -56,11 +88,11 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 		
 		{/* Кнопка Заказать и Counter */}
 		<div className="flex flex-col sm:flex-row items-center gap-4">
-			<Button backgroundColor="#40AD52" color="text-white" className="text-2xl uppercase font-extrabold px-16">
+			<Button onClick={() => createShoppingCart(createCartItem())} backgroundColor="#40AD52" color="text-white" className="text-2xl uppercase font-extrabold px-16">
 				В корзину
 			</Button>
 			<Counter 
-			className="w-55 justify-evenly"
+				className="w-55 justify-evenly"
 				initialValue={Number(qty) || 1}
 				min={1}
 				max={10}

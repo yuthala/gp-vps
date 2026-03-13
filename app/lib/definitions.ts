@@ -142,4 +142,17 @@ export type ProductCard = {
 	measureUnit: number;
 }
 
+export type ShoppingCart = {
+	cartItems: CartItem[];
+}
+
+export type CartItem = {
+	imageSrc: string;
+	description: string;
+	packageSize: number;
+	price: number;
+	qty: number;
+	totalSum: number;
+}
+
 
