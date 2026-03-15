@@ -12,7 +12,9 @@ import Counter from "../counter/Counter";
 import TagList from '../TagList';
 import { ShoppingCart } from '../../lib/definitions';
 import { CartItem } from '../../lib/definitions';
-import { createCartItem, createShoppingCart } from '@/app/lib/actions'
+import {createCartItem, createShoppingCart, deleteAllCartItems } from '../../lib/shoppingCartActions';
+
+
 
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
@@ -21,6 +23,9 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 
 	const qty = searchParams.get('qty');
 
+	//const cartItem = createCartItem(data, packageSize, Number(qty));
+
+	//deleteAllCartItems()
 	return(
 		<div className="lg:w-1/2 p-8 flex flex-col">
 		<Heading level={5} className="capital">
@@ -60,24 +65,24 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 		
 		{/* Кнопка Заказать и Counter */}
 		<div className="flex flex-col sm:flex-row items-center gap-4">
-<Button 
-  onClick={async () => {
-    try {
-			const cartItem = await createCartItem(data, packageSize, Number(qty));
-      await createShoppingCart(cartItem);
-      // Optional: Show success message
-      // toast.success('Added to cart!');
-    } catch (error) {
-      // Optional: Handle error
-      console.error('Failed to add to cart:', error);
-    }
-  }} 
-  backgroundColor="#40AD52" 
-  color="text-white" 
-  className="text-2xl uppercase font-extrabold px-16"
->
-  В корзину
-</Button>
+			<Button 
+				onClick={async function () {
+						try {
+							const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
+								await createShoppingCart(cartItem);
+							// Optional: Show success message
+							// toast.success('Added to cart!');
+						} catch (error) {
+							// Optional: Handle error
+							console.error('Failed to add to cart:', error);
+						}
+					}}
+				backgroundColor="#40AD52" 
+				color="text-white" 
+				className="text-2xl uppercase font-extrabold px-16"
+			>
+				В корзину
+			</Button>
 			<Counter 
 				className="w-55 justify-evenly"
 				initialValue={Number(qty) || 1}

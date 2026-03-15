@@ -1,5 +1,4 @@
 
-import clsx from 'clsx';
 import { getProductCard } from "../../../lib/actions";
 import ProductImage from "@/app/ui/productCard/ProductImage";
 import ProductDetails from '../../../ui/productCard/ProductDetails';

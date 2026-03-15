@@ -140,6 +140,7 @@ export type ProductCard = {
 	estimatedOnStockDate?: string;
 	price: number;
 	measureUnit: number;
+	id: number
 }
 
 export type ShoppingCart = {
@@ -147,12 +148,14 @@ export type ShoppingCart = {
 }
 
 export type CartItem = {
+	id: number;
 	imageSrc: string;
 	description: string;
 	packageSize: number;
 	price: number;
 	qty: number;
 	totalSum: number;
+	measureUnit: number;
 }
 
 

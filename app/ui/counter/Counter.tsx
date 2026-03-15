@@ -3,6 +3,8 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { CartItem } from '@/app/lib/definitions';
+import { createShoppingCart } from '@/app/lib/shoppingCartActions';
 
 interface ButtonCounterProps {
   initialValue?: number;
@@ -15,7 +17,7 @@ export default function ButtonCounter({
   initialValue = 0,
   min = 0,
   max = 100,
-  className = ''
+  className = '',
 }: ButtonCounterProps) {
 
   const [count, setCount] = useState(initialValue);
@@ -24,7 +26,7 @@ export default function ButtonCounter({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const handleSelect = (qty: number) => {
+  const handleUpdateParams = (qty: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('qty', qty.toString());
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
@@ -35,7 +37,7 @@ export default function ButtonCounter({
     if (count < max) {
       const newValue = count + 1;
       setCount(newValue);
-			handleSelect(newValue);
+			handleUpdateParams(newValue);
     }
   };
 
@@ -43,7 +45,7 @@ export default function ButtonCounter({
     if (count > min) {
       const newValue = count - 1;
       setCount(newValue);
-			handleSelect(newValue);
+			handleUpdateParams(newValue);
     }
   };
 

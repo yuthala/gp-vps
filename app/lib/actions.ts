@@ -1,10 +1,12 @@
 'use server';
 import { CatalogSection, CatalogCard, ProductCard, CartItem, ShoppingCart } from "../lib/definitions";
+import { cookies } from 'next/headers'
 
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
+
 //import { signIn } from '@/auth';
 //import { AuthError } from 'next-auth';
 
@@ -187,17 +189,17 @@ export async function getProductCard(pathName: string, cropName?: string) {
 
 	const products: ProductCard[] = [
 		{imageSrc: ['/products/lyubasha_zubok.webp', '/products/lyubasha.webp'], description: 'Описание Любаша зубок Описание Любаша зубок', descriptionDetails: '"Любаша" - высокоурожайный, неприхотливый сорт озимого чеснока. Срок созревания 100-110  дней. Головка крупная, весом до 120 г, состоит из 5-7 крупных зубчиков. <br/> Меньше хлопот и мусора, больше посевного материала! Зубки чеснока отборного качества: без мусора, повреждений и некондиции - то, что нужно для осенней посадки. Экономит ваше время и деньги.', 
-			cropSort: 'Любаша', cropName: 'lyubasha', tags: ['#чеснок', '#зубок', '#Любаша'], packageSize: [2.5, 0, 10], cropSize: 'мелкая', pathName: 'zubok', onStockStatus: 'expected', price: 100, measureUnit: 100, estimatedOnStockDate: '10.08.2026'},
+			cropSort: 'Любаша', cropName: 'lyubasha', tags: ['#чеснок', '#зубок', '#Любаша'], packageSize: [2.5, 0, 10], cropSize: 'мелкая', pathName: 'zubok', onStockStatus: 'expected', price: 100, measureUnit: 100, estimatedOnStockDate: '10.08.2026',id: 1},
 		{imageSrc: ['/products/bogatyr_zubok.webp', '/products/bogatyr.webp'], description: 'описание Богатырь зубок', descriptionDetails: 'Сорт “Богатырь” - озимый стрелкующийся сорт чеснока с особо крупной головкой. Сорт подмосковной селекции. Масса головки в среднем 90-100  г при соблюдении агротехники. Самые крупные головки имеют вес 130-150 г.<br/>Меньше хлопот и мусора, больше посевного материала! Зубки чеснока отборного качества: без мусора, повреждений и некондиции - то, что нужно для осенней посадки. Экономит ваше время и деньги.', 
-			cropName: 'bogatyr', cropSort: 'Богатырь', tags: ['#чеснок', '#зубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', pathName: 'zubok', onStockStatus: 'available', price: 120, measureUnit: 100},
+			cropName: 'bogatyr', cropSort: 'Богатырь', tags: ['#чеснок', '#зубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', pathName: 'zubok', onStockStatus: 'available', price: 120, measureUnit: 100, id: 2},
 		{imageSrc: ['/products/bogatyr_odnozubok.webp', '/products/bogatyr.webp'], description: 'Однозубок чеснока, сорт Богатырь, размер средний', descriptionDetails: 'Сорт “Богатырь” - озимый стрелкующийся сорт чеснока с особо крупной головкой. Сорт подмосковной селекции. Масса головки в среднем 90-100  г при соблюдении агротехники. Самые крупные головки имеют вес 130-150 г.<br/> Однозубок - элитный посевной материал для обновления сорта. Представляет собой небольшую луковку, выращенную из воздушных луковиц чеснока.', 
-			cropName: 'bogatyr', tags: ['#чеснок', '#однозубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Богатырь', pathName: 'odnozubok', onStockStatus: 'available', price: 140, measureUnit: 100, estimatedOnStockDate: '10.08.2026'},
+			cropName: 'bogatyr', tags: ['#чеснок', '#однозубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Богатырь', pathName: 'odnozubok', onStockStatus: 'available', price: 140, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 3},
 		{imageSrc: ['/products/shadeyka_odnozubok.webp', '/products/shadeyka.webp'], description: 'описание Шадейка однозубок', descriptionDetails: 'Сорт “Шадейка” - высокоурожайный и неприхотливый озимый сорт чеснока. Один из самых современных сортов чеснока, генетически устойчив к болезням. Сорт специально  выведен  для сурового российского климата.  Срок созревания 110-120 дней. <br/> Однозубок - элитный посевной материал для обновления сорта. Представляет собой небольшую луковку, выращенную из воздушных луковиц чеснока.', 
-			cropName: 'shadeyka', cropSort: 'Шадейка', tags: ['#чеснок', '#однозубок', '#Шадейка'], packageSize: [2.5, 5, 10], cropSize: 'крупная', pathName: 'odnozubok', onStockStatus: 'not_available', price: 160, measureUnit: 100},
+			cropName: 'shadeyka', cropSort: 'Шадейка', tags: ['#чеснок', '#однозубок', '#Шадейка'], packageSize: [2.5, 5, 10], cropSize: 'крупная', pathName: 'odnozubok', onStockStatus: 'not_available', price: 160, measureUnit: 100, id: 4},
 		{imageSrc: ['/products/lyubasha_bulb.webp', '/products/lyubasha.webp'], description: 'описание Любаша бульбочки', descriptionDetails: '"Любаша" - высокоурожайный, неприхотливый сорт озимого чеснока. Срок созревания 100-110  дней. Головка крупная, весом до 120 г, состоит из 5-7 крупных зубчиков. <br/> Рекомендуется раз в 3-4 года обновлять посевной материал путем размножения чеснока через бульбочки, чтобы избежать “вырождения” чеснока  и каждый год получать крупные и здоровые головки.', 
-			cropSort: 'Любаша', cropName: 'lyubasha', tags: ['#чеснок', '#бульбочка', '#Любаша'], packageSize: [0.5, 1, 2], cropSize: '4-9 мм', pathName: 'bulb', onStockStatus: 'available', price: 300, measureUnit: 100},
+			cropSort: 'Любаша', cropName: 'lyubasha', tags: ['#чеснок', '#бульбочка', '#Любаша'], packageSize: [0.5, 1, 2], cropSize: '4-9 мм', pathName: 'bulb', onStockStatus: 'available', price: 300, measureUnit: 100, id: 5},
 		{imageSrc: ['/products/shadeyka_bulb.webp', '/products/shadeyka.webp'], description: 'описание Шадейка бульбочки', descriptionDetails: 'Сорт “Шадейка” - высокоурожайный и неприхотливый озимый сорт чеснока. Один из самых современных сортов чеснока, генетически устойчив к болезням. Сорт специально  выведен  для сурового российского климата.  Срок созревания 110-120 дней. <br/> Рекомендуется раз в 3-4 года обновлять посевной материал путем размножения чеснока через бульбочки, чтобы избежать “вырождения” чеснока  и каждый год получать крупные и здоровые головки.', 
-			cropSort: 'Шадейка', cropName: 'shadeyka', tags: ['#чеснок', '#бульбочка', '#Шадейка'], packageSize: [0.5, 1, 2], cropSize: '4-9 мм', pathName: 'bulb', onStockStatus: 'expected', price: 400, measureUnit: 100, estimatedOnStockDate: '10.08.2026'},
+			cropSort: 'Шадейка', cropName: 'shadeyka', tags: ['#чеснок', '#бульбочка', '#Шадейка'], packageSize: [0.5, 1, 2], cropSize: '4-9 мм', pathName: 'bulb', onStockStatus: 'expected', price: 400, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 6},
 	];
 
 	let res = products.filter((obj) => {
@@ -216,33 +218,60 @@ export async function getProductCard(pathName: string, cropName?: string) {
 	}
 }
 
-// Корзина
-export async function createCartItem (data: ProductCard, packageSize: number, qty: number=1) {
-	const cartItem = {
-		imageSrc: data.imageSrc[0],
-		description: data.description,
-		packageSize: packageSize,
-		price: data.price * packageSize,
-		qty: Number(qty),
-		totalSum: data.price * packageSize * (Number(qty) || 1)
+
+// Функции с использованием cookies
+const CART_NAME = 'shopping_cart'
+
+export async function createNewCart() {
+		const shoppingCart: ShoppingCart = {
+		cartItems: []
 	}
-	return cartItem;
+	const cookiesStore = await cookies()
+	cookiesStore.set(CART_NAME,JSON.stringify(shoppingCart) )
 }
 
-export async function createShoppingCart(cartItem: CartItem) {
-	const savedCartData = localStorage.getItem('cartKey');
-	if (savedCartData) {
-		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
-		parsedCart.cartItems.push(cartItem);
-		localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+// READ: Get the current cart
+export async function getCart(): Promise<CartItem[]> {
+  const cookieStore = await cookies()
+  const cartData = cookieStore.get(CART_NAME)?.value
+	console.log(cartData)
+  return cartData ? JSON.parse(cartData) : []
+}
 
-	} else {
-		//создаем пустую корзину
-			const shoppingCart:ShoppingCart = {
-				cartItems: []
-			}
-			if (typeof window !== 'undefined') {
-				localStorage.setItem('cartKey', JSON.stringify(shoppingCart));
-			}
-		}
-	}
+// CREATE / UPDATE: Add item to cart
+export async function addToCart(product: CartItem) {
+  const cart = await getCart()
+  const existingItem = cart.find(item => item.id === product.id)
+
+  let newCart;
+  if (existingItem) {
+    newCart = cart.map(item => 
+      item.id === product.id ? { ...item, quantity: item.qty + 1 } : item
+    )
+  } else {
+    newCart = [...cart, { ...product, quantity: 1 }]
+  }
+
+  const cookieStore = await cookies()
+  cookieStore.set(CART_NAME, JSON.stringify(newCart), { path: '/' })
+}
+
+// UPDATE: Change quantity
+export async function updateQuantity(id: number, quantity: number) {
+  const cart = await getCart()
+  const newCart = cart.map(item => 
+    item.id === id ? { ...item, quantity } : item
+  ).filter(item => item.qty > 0)
+
+  const cookieStore = await cookies()
+  cookieStore.set(CART_NAME, JSON.stringify(newCart), { path: '/' })
+}
+
+// DELETE: Remove item
+export async function removeFromCart(id: number) {
+  const cart = await getCart()
+  const newCart = cart.filter(item => item.id !== id)
+  
+  const cookieStore = await cookies()
+  cookieStore.set(CART_NAME, JSON.stringify(newCart), { path: '/' })
+}
