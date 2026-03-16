@@ -4,13 +4,15 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { CartItem } from '@/app/lib/definitions';
-import { createShoppingCart } from '@/app/lib/shoppingCartActions';
+import { createShoppingCart, updateCartItemById } from '@/app/lib/shoppingCartActions';
 
 interface ButtonCounterProps {
   initialValue?: number;
   min?: number;
   max?: number;
   className?: string;
+	cartItem?: CartItem;
+	onChange?: (newQty: number) => void; 
 }
 
 export default function ButtonCounter({ 
@@ -18,6 +20,8 @@ export default function ButtonCounter({
   min = 0,
   max = 100,
   className = '',
+	cartItem,
+	onChange 
 }: ButtonCounterProps) {
 
   const [count, setCount] = useState(initialValue);
@@ -38,6 +42,11 @@ export default function ButtonCounter({
       const newValue = count + 1;
       setCount(newValue);
 			handleUpdateParams(newValue);
+			if(cartItem) {
+				cartItem.qty = newValue;
+				updateCartItemById(cartItem);
+			}
+			if (onChange) onChange(newValue);
     }
   };
 
@@ -46,11 +55,16 @@ export default function ButtonCounter({
       const newValue = count - 1;
       setCount(newValue);
 			handleUpdateParams(newValue);
+			if(cartItem) {
+				cartItem.qty = newValue;
+				updateCartItemById(cartItem);
+			}
+			if (onChange) onChange(newValue);
     }
   };
 
   return (
-    <div className={`flex items-center gap-2  border border-green-500 rounded-lg text-xl text-[#064929] ${className}`}>
+    <div className={`flex items-center gap-2 justify-evenly border border-green-500 rounded-lg text-xl text-[#064929] ${className}`}>
       <button
         onClick={handleDecrement}
         disabled={count <= min}

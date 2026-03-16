@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { CartItem } from "@/app/lib/definitions";
 import Heading from "../Heading";
 import ShoppingCartLine from './ShoppingCartLine';
+import { deleteItemFromCart } from "../../lib/shoppingCartActions";
 
 export default function ShoppingCartComponent() {
 		const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]} | null>(null);
@@ -15,9 +16,17 @@ export default function ShoppingCartComponent() {
 				setShoppingCart(JSON.parse(cartData));
 			}
 		}, []); // Empty dependency array means this runs once after mount
-	
-		console.log(shoppingCart);
 
+		 // Define the removal logic here
+   // UPDATED Removal Logic
+  const handleRemoveItem = (item: CartItem) => {
+   deleteItemFromCart(item)
+	 const cartData = localStorage.getItem("cartKey");
+			if (cartData) {
+				setShoppingCart(JSON.parse(cartData));
+			}
+  };
+	
   return (
     <div className="flex flex-col items-center gap-4 sm:gap-8">
       <Heading level={2} className="">Корзина</Heading>
@@ -25,7 +34,7 @@ export default function ShoppingCartComponent() {
         {shoppingCart?.cartItems && shoppingCart.cartItems.length > 0 ? (
           shoppingCart.cartItems.map((item: CartItem, index: number) => (
             <div key={index}>
-							<ShoppingCartLine item={item} index={index}/>
+							<ShoppingCartLine item={item} index={index} onRemove={() => handleRemoveItem(item)}/>
             </div>
           ))
         ) : (

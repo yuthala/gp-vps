@@ -4,7 +4,7 @@ import Image from 'next/image';
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   src: string;
   alt?: string;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export default function IconButton({

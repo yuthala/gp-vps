@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProductCard } from '../../lib/definitions';
 import PackageSelectorWithUrl from "@/app/ui/productCard/PackageSelector";
@@ -10,8 +9,6 @@ import Button from "../../ui/Button";
 import Pricing from "../../ui/Pricing";
 import Counter from "../counter/Counter";
 import TagList from '../TagList';
-import { ShoppingCart } from '../../lib/definitions';
-import { CartItem } from '../../lib/definitions';
 import {createCartItem, createShoppingCart, deleteAllCartItems } from '../../lib/shoppingCartActions';
 
 

@@ -19,7 +19,7 @@ export async function createShoppingCart(cartItem: CartItem) {
 	const savedCartData = localStorage.getItem('cartKey');
 	if (savedCartData) {
 		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
-		const cartItemexists = parsedCart.cartItems.filter(item => item.id === cartItem.id).filter(item => item.packageSize === cartItem.packageSize)
+		const cartItemexists = parsedCart.cartItems.filter(item => item.id === cartItem.id).filter(item => item.packageSize === cartItem.packageSize);
 		console.log('cartItem exists :', cartItemexists )
 
 		if (cartItemexists.length != 0) {
@@ -29,14 +29,11 @@ export async function createShoppingCart(cartItem: CartItem) {
 					parsedCart.cartItems[i].qty += cartItem.qty
 					parsedCart.cartItems[i].totalSum = parsedCart.cartItems[i].qty * parsedCart.cartItems[i].price
 					localStorage.setItem('cartKey', JSON.stringify(parsedCart));
-
-					console.log('Sshopping cart updated')
 				} 
 		  }
 		} else {
 			parsedCart.cartItems.push(cartItem);
 			localStorage.setItem('cartKey', JSON.stringify(parsedCart));
-		  console.log('cartItemAdded')
 		}
 		//localStorage.setItem('cartKey', JSON.stringify(parsedCart));
 	} else {
@@ -50,14 +47,33 @@ export async function createShoppingCart(cartItem: CartItem) {
 		}
 }
 
-export async function updateCartItemByIndex(index: number, qty: number) {
-		console.log('localStorage', localStorage);
+export async function updateCartItemById(cartItem: CartItem) {
 		const savedCartData = localStorage.getItem('cartKey');
 			if (savedCartData) {
 		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
-		parsedCart.cartItems[index].qty = qty;
-		localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+			for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
+			if (parsedCart.cartItems[i].id === cartItem.id && parsedCart.cartItems[i].packageSize === cartItem.packageSize) {
+				parsedCart.cartItems[i].qty = cartItem.qty;
+				parsedCart.cartItems[i].totalSum = parsedCart.cartItems[i].qty * parsedCart.cartItems[i].price;
+				localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+						console.log('from function', parsedCart.cartItems);
+			} 
+		}
 	} 
+}
+
+export async function updateTotalSumInUI(cartItem: CartItem) {
+	let data: number = 0;
+	const savedCartData = localStorage.getItem('cartKey');
+		if (savedCartData) {
+	const parsedCart: ShoppingCart = JSON.parse(savedCartData);
+		for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
+			if (parsedCart.cartItems[i].id === cartItem.id && parsedCart.cartItems[i].packageSize === cartItem.packageSize) {
+				data = parsedCart.cartItems[i].totalSum;
+			}
+		}
+	}
+	return data;
 }
 
 //Удалить все элементы из корзины. Вызывает при добавлении в корзину
@@ -67,4 +83,19 @@ export async function deleteAllCartItems() {
 			const shoppingCart:ShoppingCart = { cartItems: [] };
 			localStorage.setItem('cartKey', JSON.stringify(shoppingCart));
 		}
+}
+
+// Удалить item из корзины по нажатии на кнопку 
+export async function deleteItemFromCart(cartItem: CartItem) {
+	const savedCartData = localStorage.getItem('cartKey');
+		if (savedCartData) {
+			const parsedCart: ShoppingCart = JSON.parse(savedCartData);
+			for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
+			if (parsedCart.cartItems[i].id === cartItem.id && parsedCart.cartItems[i].packageSize === cartItem.packageSize) {
+				parsedCart.cartItems.splice(i, 1)
+				console.log('cart item deleted from cart')
+				localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+			}
+		}
+	}
 }
