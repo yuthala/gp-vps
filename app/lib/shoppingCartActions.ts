@@ -23,8 +23,7 @@ export async function createShoppingCart(cartItem: CartItem) {
 		console.log('cartItem exists :', cartItemexists )
 
 		if (cartItemexists.length != 0) {
-			console.log('changing quantity')
-				for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
+			for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
 				if (parsedCart.cartItems[i].id === cartItem.id && parsedCart.cartItems[i].packageSize === cartItem.packageSize) {
 					parsedCart.cartItems[i].qty += cartItem.qty
 					parsedCart.cartItems[i].totalSum = parsedCart.cartItems[i].qty * parsedCart.cartItems[i].price
@@ -35,7 +34,6 @@ export async function createShoppingCart(cartItem: CartItem) {
 			parsedCart.cartItems.push(cartItem);
 			localStorage.setItem('cartKey', JSON.stringify(parsedCart));
 		}
-		//localStorage.setItem('cartKey', JSON.stringify(parsedCart));
 	} else {
 		//создаем пустую корзину
 			const shoppingCart:ShoppingCart = {
@@ -76,7 +74,7 @@ export async function updateTotalSumInUI(cartItem: CartItem) {
 	return data;
 }
 
-//Удалить все элементы из корзины. Вызывает при добавлении в корзину
+//Удалить все элементы из корзины. Вызываетcz при добавлении в корзину
 export async function deleteAllCartItems() {
 	const savedCartData = localStorage.getItem('cartKey');
 		if (savedCartData) {

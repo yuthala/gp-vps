@@ -13,25 +13,38 @@ export default function BottomHeaderLinks() {
 
     const pathname = usePathname()
 
-    return (
-        <>
-        {links.map((link) => {
-            const LinkIcon = link.icon;
-            return (
-							<a
-							key={link.name}
-							href={link.href}
-							className={clsx ('flex flex-col items-center gap-0 text-normal font-bold text-(--secondary)',
-									{
-											'bg-(--light-green)' : pathname === link.href
-									},
-					)}
-									>
-									<LinkIcon className="w-8 text-(--secondary)" />
-									<p className="hidden md:block">{link.name}</p>
-							</a>
-            );
-        })}
-        </>
-    );
+  return (
+		<>
+			{links.map((link) => {
+				const LinkIcon = link.icon;
+				const isActive = pathname === link.href;
+				
+				return (
+					<a
+						key={link.name}
+						href={link.href}
+						className={clsx(
+							'group flex flex-col items-center gap-0 text-normal font-bold transition-all duration-200 hover:scale-110',
+							{
+								'bg-transparent': isActive,
+								'text-(--secondary)': !isActive,
+								'text-foreground': isActive,
+							},
+						)}
+					>
+						<LinkIcon 
+							className={clsx(
+								'w-8 transition-colors duration-200',
+								{
+									'text-(--secondary)': !isActive,
+									'text-foreground': isActive,
+								}
+							)} 
+						/>
+						<p className="hidden md:block">{link.name}</p>
+					</a>
+				);
+			})}
+		</>
+	);
 }

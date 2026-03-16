@@ -1,33 +1,36 @@
-// components/Price.tsx
-import React from 'react';
-
 interface PricingProps {
   value?: number;
   prefix?: string;
-  suffix?: string;
   className?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  containerClassName?: string; // Optional class for the flex container
+	classNameValue?: string; //Optional class for value span
 }
 
 export default function Pricing({ 
   value,
   prefix,
-  suffix,
   className = '',
-  size = 'xl'
+  containerClassName = '',
+	classNameValue = '',
 }: PricingProps) {
-  const sizeClasses = {
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-lg',
-    xl: 'text-2xl'
-  };
 
   return (
-    <span className={`${sizeClasses[size]} ${className}`}>
-      {prefix && <span>{prefix} </span>}
-      {value !== undefined ? `${value} р` : null}
-      {suffix && <span> {suffix}</span>}
-    </span>
+    <div className={`flex items-center ${containerClassName}`}>
+      {prefix && 
+        <span className={className}>{prefix}</span>
+      }
+      {value !== undefined && 
+        <span className={classNameValue}>{value} р</span>
+      }
+    </div>
   );
 }
+
+//Образец использования:
+	// <Pricing
+	// 	className="text-2xl font-semibold"
+	//containerClassName="justify-between"
+	// 	value={product.price} 
+	// 	prefix="Цена:" 
+	// >
+	// </Pricing>
