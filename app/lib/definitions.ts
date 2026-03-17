@@ -158,4 +158,10 @@ export type CartItem = {
 	measureUnit: number;
 }
 
+export type MiniProductCard = {
+	id?: number;
+	imageSrc: string;
+	description: string;
+	price?: number;
+}
 

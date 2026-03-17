@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { CartItem } from "@/app/lib/definitions";
+import type { CartItem, MiniProductCard } from "@/app/lib/definitions";
 import Heading from "../Heading";
 import Pricing from '@/app/ui/Pricing';
 import Button from '@/app/ui/Button';
 import ShoppingCartLine from './ShoppingCartLine';
 import { deleteItemFromCart } from "../../lib/shoppingCartActions";
+import RecommendedProducts from "../recommendedProducts/RecommendedProducts";
+
 
 export default function ShoppingCartComponent() {
 		const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]} | null>(null);
@@ -84,6 +86,10 @@ export default function ShoppingCartComponent() {
 					>Перейти к оформлению</Button>
 				</Link>
 				</div>
+			</div>
+			
+			<div>
+				<RecommendedProducts />
 			</div>
     </div>
   );

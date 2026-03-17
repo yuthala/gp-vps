@@ -42,7 +42,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 		{/* Цена и стоимость */}
 		<div className="flex gap-2">
 			<Pricing
-				className="text-2xl lg:text-3xl text-[#40AD52] font-bold"
+				containerClassName="text-2xl lg:text-3xl text-[#40AD52] font-bold"
 				value={data.price * packageSize} 
 				prefix="Цена:" 
 				>
@@ -53,7 +53,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 
 		<div className="flex gap-2 pb-8 sm:pb-12">
 			<Pricing
-				className="text-xl lg:text-2xl text-[#064929] font-semibold"
+				containerClassName="text-xl lg:text-2xl text-(--secondary) font-semibold"
 				value={data.price * packageSize * (Number(qty) || 1)}
 				prefix="Стоимость:" 
 				>
