@@ -139,8 +139,11 @@ h6 {
 .vk-heading {
 	text-align: left;
 }
+.catalog-h3 {
+	margin-bottom: 20px;
+}
 
-.catalog-heading {
+.catalog-h4 {
 	font-size: 20px;
 	font-weight: 900;
 	text-align: center;
@@ -169,6 +172,9 @@ h6 {
 @media(max-width: 520px) {
 	.advantages-heading {
 		font-size: 24px;
+	}
+	.catalog-h3 {
+		margin-bottom: 12px;
 	}
 	h2 {
 		font-size: 28px;

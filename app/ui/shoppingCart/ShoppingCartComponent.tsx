@@ -53,7 +53,7 @@ export default function ShoppingCartComponent() {
       </div>
 
 			<div className="flex justify-end w-full">
-				<div className="py-4 sm:py-8 w-1/2 border-b border-gray-200">
+				<div className="py-4 sm:py-8 w-full lg:w-2/3 border-b border-gray-200">
 					<Pricing
 						className="text-2xl sm:text-4xl text-foreground font-semibold uppercase"
 						containerClassName="justify-between w-full"
@@ -65,26 +65,28 @@ export default function ShoppingCartComponent() {
 				</div>
 			</div>
 			<div className="flex justify-end w-full">
-				<div className="w-1/2 text-gray-400 text-normal">Выбор способа доставки и оплаты на следующем шаге</div>
+				<div className="w-full lg:w-2/3 text-gray-400 text-normal">Выбор способа доставки и оплаты на следующем шаге</div>
 			</div>
 			<div className="flex justify-end w-full pb-10">
-				<div className="w-1/2 flex items-center justify-between">
-				<Link href="/catalog">
-					<Button
-						color='#064929'
-						className="text-xl font-extrabold uppercase"
-						borderColor='#064929'
-					>Продолжить покупки</Button>
-				</Link>
+				<div className="w-full lg:w-2/3 flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between">
+					<Link href="/catalog">
+						<Button
+							color='#064929'
+							className="text-lg font-extrabold uppercase w-full"
+							borderColor='#064929'
+							style={{ width: '300px' }}
+						>Продолжить покупки</Button>
+					</Link>
 
-				<Link href="/checkout">
-					<Button
-						backgroundColor='#40AD52'
-						color='text-white'
-						className="text-xl font-extrabold uppercase"
-						borderColor='#064929'
-					>Перейти к оформлению</Button>
-				</Link>
+					<Link href="/checkout">
+						<Button
+							backgroundColor='#40AD52'
+							color='text-white'
+							className="text-lg font-extrabold uppercase w-full"
+							borderColor='#064929'
+							style={{ width: '300px' }}
+						>Перейти к оформлению</Button>
+					</Link>
 				</div>
 			</div>
 			

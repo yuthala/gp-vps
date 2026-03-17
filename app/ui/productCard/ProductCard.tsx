@@ -50,7 +50,7 @@ export default async function ProductCard({ pathName}: { pathName: string}) {
 										)}>
 											<div className="flex justify-between">
 												<Pricing
-													className="text-2xl font-semibold"
+													containerClassName="text-2xl font-semibold"
 													value={product.price} 
 													prefix="Цена:" 
 												>

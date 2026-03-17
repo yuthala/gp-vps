@@ -203,9 +203,9 @@ export async function getProductCard(pathName: string, cropName?: string) {
 		{imageSrc: ['/products/lyubasha_odnozubok.webp', '/products/lyubasha.webp'], description: 'описание Любаша однозубок', descriptionDetails: '"Любаша" - высокоурожайный, неприхотливый сорт озимого чеснока. Срок созревания 100-110  дней. Головка крупная, весом до 120 г, состоит из 5-7 крупных зубчиков. <br/> Меньше хлопот и мусора, больше посевного материала! Зубки чеснока отборного качества: без мусора, повреждений и некондиции - то, что нужно для осенней посадки. Экономит ваше время и деньги.', 
 			cropName: 'lyubasha', cropSort: 'Любаша', tags: ['#чеснок', '#однозубок', '#Любаша'], packageSize: [2.5, 5, 10], cropSize: 'крупная', pathName: 'odnozubok', onStockStatus: 'available', price: 1200, measureUnit: 100, id: 7},
 		{imageSrc: ['/products/komarov_odnozubok.webp', '/products/komarov.webp'], description: 'Однозубок чеснока, сорт Григорий Комаров, размер средний', descriptionDetails: 'Сорт “Григорий Комаров” - озимый стрелкующийся сорт чеснока с крупной головкой. Ароматный, вкус умеренно острый. Масса головки в среднем 90-100 г. Генетически устойчив к болезням. <br/> Однозубок - элитный посевной материал для обновления сорта. Представляет собой небольшую луковку, выращенную из воздушных луковиц чеснока.', 
-			cropName: 'komarov', tags: ['#чеснок', '#однозубок', '#ГригорийКомаров'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Григорий Комаров', pathName: 'odnozubok', onStockStatus: 'expected', price: 150, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 8},
+			cropName: 'komarov', tags: ['#чеснок', '#однозубок', '#ГригорийКомаров'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Григорий Комаров', pathName: 'odnozubok', onStockStatus: 'available', price: 150, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 8},
 		{imageSrc: ['/products/shadeyka_odnozubok.webp', '/products/shadeyka.webp'], description: 'Однозубок чеснока, сорт Шадейка, размер средний', descriptionDetails: 'Сорт “Шадейка” - высокоурожайный и неприхотливый озимый сорт чеснока. Один из самых современных сортов чеснока, генетически устойчив к болезням. Сорт специально  выведен  для сурового российского климата.  Срок созревания 110-120 дней. <br/> Однозубок - элитный посевной материал для обновления сорта. Представляет собой небольшую луковку, выращенную из воздушных луковиц чеснока.', 
-			cropName: 'shadeyka', tags: ['#чеснок', '#однозубок', '#Шадейка'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Шадейка', pathName: 'odnozubok', onStockStatus: 'available', price: 150, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 9},
+			cropName: 'shadeyka', tags: ['#чеснок', '#однозубок', '#Шадейка'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Шадейка', pathName: 'odnozubok', onStockStatus: 'expected', price: 150, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 9},
 		{imageSrc: ['/products/hercules_medium.webp', '/products/hercules.webp'], description: 'Лук-севок, сорт Геркулес, средняя фракция', descriptionDetails: 'Сорт “Геркулес” - сорт лука красивого золотисто-желтого цвета. Обладает великолепным, чуть сладковатым вкусом без горечи. Раннеспелый - вегетационный период 75-90 дней. <br/> Лук-севок средней фракции универсального применения - из него можно получить как луковицу, так и зеленое перо.', 
 			cropName: 'hercules', tags: ['#лук', '#Геркулес'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Геркулес', pathName: 'luksevok', onStockStatus: 'available', price: 100, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 10},
 		{imageSrc: ['/products/redbaron_small.webp', '/products/redbaron.webp'], description: 'Лук-севок, сорт Ред Барон, мелкая фракция', descriptionDetails: 'Сорт “Ред Барон” - сорт салатного лука голландской селекции. Обладает великолепным, чуть сладковатым вкусом и красивым красно-фиолетовым цветом. Используется в салатах и для гриля. Раннеспелый - вегетационный период 75-90 дней. <br/> Лук-севок мелкой фракции используется для выращивания лука на головку. Можно сажать как осенью, так и весной.', 
@@ -293,7 +293,7 @@ export async function removeFromCart(id: number) {
 //Рекомендуемые товары
 export async function getRecommendedProducts(products: ProductCard[]) {
 
-	let recommendedProducts: MiniProductCard[] = []
+	let recommendedProducts: MiniProductCard[] = [];
 
 	recommendedProducts = [
 		{id:9, imageSrc: '/recommendedProducts/rec1.webp', description: 'Однозубок чеснока, сорт Шадейка'},
@@ -310,7 +310,9 @@ export async function getRecommendedProducts(products: ProductCard[]) {
 	products.map((product) => {
 		recommendedProducts.map((recommendedProduct) => {
 			if(product.id === recommendedProduct.id) {
-				recommendedProduct.price = product.packageSize[0] * product.price
+				recommendedProduct.price = product.packageSize[0] * product.price;
+				recommendedProduct.pathName = product.pathName;
+				recommendedProduct.cropName = product.cropName;
 			}
 		})
 	})

@@ -14,7 +14,7 @@ export default async function Catalog() {
 					{sections.map((section, index) => {
 						return(
 							<div key={`${section.title}-${index}`} className="pb-8 lg:pb-12">
-								<h3 className="text-2xl font-semibold mb-4">{section.title}</h3>
+								<h3 className="catalog-h3 text-2xl font-semibold mb-4">{section.title}</h3>
 								<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
 									{section.items.map((item, index) => (
 										<li
@@ -32,7 +32,7 @@ export default async function Catalog() {
 													/>
 												</div>
 												<div className="p-4">
-													<h4 className="catalog-heading">{item.title}</h4>
+													<h4 className="catalog-h4">{item.title}</h4>
 												</div>
 											</Link>
 										</li>

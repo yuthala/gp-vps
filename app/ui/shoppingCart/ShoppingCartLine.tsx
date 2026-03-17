@@ -35,12 +35,14 @@ export default function ShoppingCartLine({ item, index, onRemove }: ShoppingCart
       {/* Image */}
       <div className="w-full sm:w-50 flex justify-center sm:col-span-1">
         <div className="relative w-32 h-32 sm:w-40 sm:h-40 lg:w-50 lg:h-50">
-          <Image
-            src={item.imageSrc}
-            alt={item.description}
-            fill
-            className="rounded-lg object-cover"
-          />
+						<Image
+							src={item.imageSrc}
+							alt={item.description}
+							fill
+							sizes="124px"
+							loading="eager"
+							className="rounded-lg object-cover"
+						/>
         </div>
       </div>
 

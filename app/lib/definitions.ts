@@ -163,5 +163,7 @@ export type MiniProductCard = {
 	imageSrc: string;
 	description: string;
 	price?: number;
+	pathName?: string;
+	cropName?: string;
 }
 
