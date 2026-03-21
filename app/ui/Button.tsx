@@ -19,29 +19,34 @@ export default function Button({
   ...props
 }: ButtonProps) {
   
+	//dвсота кнопки
   const heightStyle = {
     52: 'h-[52px] px-6 py-3 text-base',
     58: 'h-[58px] px-7 py-4 text-lg',
     80: 'h-[80px] px-8 py-5 text-xl',
   }[height];
 
+	//цвет текста кнопки
   const colorStyle = {
     '#064929': 'text-[#064929]',
     '#F2F9ED': 'text-[#F2F9ED]',
 		'text-white': 'text-white'
   }[color];
 
+	//border
   const borderStyle = {
     '#064929': 'border border-[#064929]/60',
     'transparent': 'border border-transparent',
   }[borderColor];
 
+	//фон кнопки
   const bgStyle = {
     '#D3D34F': 'bg-[#D3D34F]',
     '#40AD52': 'bg-[#40AD52]',
     '#F2F9ED': 'bg-[#F2F9ED]',
   }[backgroundColor];
 
+	//постоянные классы
   const buttonClasses = `inline-flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#064929] ${heightStyle} ${colorStyle} ${borderStyle} ${bgStyle} ${className}`;
 
   return (

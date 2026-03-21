@@ -21,7 +21,7 @@ export default function RecommendedProducts() {
   const selected = shuffled.slice(0, 3);
 
   return (
-    <section className="pt-20">
+    <section className="pt-10 sm:pt-20">
 			<div className="flex items-center gap-4 pb-6 sm:pb-10">
 				<h5>Вам может понравиться</h5>
 					<Image

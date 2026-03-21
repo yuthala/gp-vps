@@ -47,7 +47,7 @@ export default function ShoppingCartLine({ item, index, onRemove }: ShoppingCart
       </div>
 
       {/* Description */}
-      <div className="flex text-center text-lg sm:text-2xl text-foreground font-extrabold  sm:col-span-1">
+      <div className="flex text-lg sm:text-2xl text-foreground font-extrabold  sm:col-span-1">
         {item.description}, {item.packageSize * item.measureUnit} г
       </div>
 
