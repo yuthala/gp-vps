@@ -8,6 +8,7 @@ interface CartState {
   items: string[]; // массив ID товаров
   addItem: (id: string) => void;
 	deleteItem: (id: string) => void;
+	clearData: () => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -34,6 +35,15 @@ export const useCartStore = create<CartState>()(
 					setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 });
 					return { items: newItems };
 				}),
+		clearData: () => {
+			// Option A: Set cookie to 0
+			setCookie('cart_count', 0); 
+			
+			// Option B: Completely remove the cookie
+			// deleteCookie('cart_count');
+
+			set({ items: [] }); // Correct way to update state in Zustand
+		},
     }),
     {
       name: 'cart-storage', // Key name in localStorage

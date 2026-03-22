@@ -10,7 +10,7 @@ import Button from "../../ui/Button";
 import Pricing from "../../ui/Pricing";
 import Counter from "../counter/Counter";
 import TagList from '../TagList';
-import {createCartItem, createShoppingCart} from '../../lib/shoppingCartActions';
+import {createCartItem, createShoppingCart, deleteAllCartItems} from '../../lib/shoppingCartActions';
 import { useCartStore } from '../../lib/useCartStore';
 
 export default function ProductDetails({ data }: { data: ProductCard}) {

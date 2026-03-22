@@ -11,6 +11,7 @@ import { deleteItemFromCart } from "../../lib/shoppingCartActions";
 import RecommendedProducts from "../recommendedProducts/RecommendedProducts";
 import CartEmpty from "./cartEmpty";
 import { useCartStore } from "../../lib/useCartStore";
+import { getInitialValueFromCookies, resetCookies } from '@/app/lib/actions';
 
 
 export default function ShoppingCartComponent() {
@@ -18,6 +19,8 @@ export default function ShoppingCartComponent() {
 
 		//обновление count badge при удалении товара из корзины
 		const deleteItem =  useCartStore((state) => state.deleteItem);
+
+		//const clearCookies = useCartStore((state) => state.clearData); //раскомментить чтобы удалить куки
 
 		useEffect(() => {
 			// This only runs on the client after hydration
@@ -32,6 +35,7 @@ export default function ShoppingCartComponent() {
   const handleRemoveItem = (item: CartItem) => {
    deleteItemFromCart(item);
 	 deleteItem(`${item.id}`);
+	 //clearCookies(); //раскомментить чтобы удалить куки
 
 	 const cartData = localStorage.getItem("cartKey");
 			if (cartData) {

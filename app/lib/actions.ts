@@ -325,3 +325,9 @@ export const getInitialValueFromCookies = async () => {
   	const initialCount = cookieStore.get('cart_count')?.value || '0';
 		return initialCount;
 }
+
+//обнуление cookie по ключу 'cart_count'
+export async function resetCookies() {
+	const cookieStore = await cookies();
+	cookieStore.set('cart_count', '');
+}
