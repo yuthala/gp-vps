@@ -3,6 +3,7 @@
 import { PhoneIcon } from '@heroicons/react/24/outline';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+import Link from 'next/link';
 
 // Map of links to display in the header navigation.
 // Depending on the size of the application, this would be stored in a database.
@@ -22,7 +23,7 @@ export default function TopHeaderLinks({ mobile = false, onLinkClick }: { mobile
         <>
         {links.map((link) => {
             return (
-                <a
+                <Link
                  key={link.name}
                  href={link.href}
                  onClick={() => onLinkClick?.()}
@@ -35,7 +36,7 @@ export default function TopHeaderLinks({ mobile = false, onLinkClick }: { mobile
                 )}
                  >
                     <p className={mobile ? 'w-full text-center text-2xl' : 'hidden md:block'}>{link.name}</p>
-                 </a>
+                 </Link>
             );
         })}
         </>

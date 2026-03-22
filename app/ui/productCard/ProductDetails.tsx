@@ -9,7 +9,8 @@ import Button from "../../ui/Button";
 import Pricing from "../../ui/Pricing";
 import Counter from "../counter/Counter";
 import TagList from '../TagList';
-import {createCartItem, createShoppingCart, deleteAllCartItems } from '../../lib/shoppingCartActions';
+import {createCartItem, createShoppingCart} from '../../lib/shoppingCartActions';
+import { useCartStore } from '../../lib/useCartStore';
 
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
@@ -18,7 +19,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 
 	const qty = searchParams.get('qty');
 
-	//const cartItem = createCartItem(data, packageSize, Number(qty));
+	const addItem = useCartStore((state) => state.addItem)
 
 	//deleteAllCartItems()
 	return(
@@ -66,6 +67,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 						try {
 							const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
 								await createShoppingCart(cartItem);
+								addItem(`${cartItem.id}`);
 							// Optional: Show success message
 							// toast.success('Added to cart!');
 						} catch (error) {

@@ -7,6 +7,7 @@ import PriceComponent from '@/app/ui/shoppingCart/priceComponent';
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
+
 interface ShoppingCartLineProps {
   item: CartItem;
 	index: number;
@@ -19,6 +20,7 @@ export default function ShoppingCartLine({ item, index, onRemove }: ShoppingCart
 
   // 2. Derive the updated item object to pass to PriceComponent
   const updatedItem = { ...item, qty: quantity };
+
 
   return (
     <div className="grid 

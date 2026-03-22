@@ -10,12 +10,15 @@ import ShoppingCartLine from './ShoppingCartLine';
 import { deleteItemFromCart } from "../../lib/shoppingCartActions";
 import RecommendedProducts from "../recommendedProducts/RecommendedProducts";
 import CartEmpty from "./cartEmpty";
-
+import { useCartStore } from "../../lib/useCartStore";
 
 
 export default function ShoppingCartComponent() {
 		const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]} | null>(null);
-	
+
+		//обновление count badge при удалении товара из корзины
+		const deleteItem =  useCartStore((state) => state.deleteItem);
+
 		useEffect(() => {
 			// This only runs on the client after hydration
 			const cartData = localStorage.getItem("cartKey");
@@ -27,7 +30,9 @@ export default function ShoppingCartComponent() {
 		 // Define the removal logic here
    // UPDATED Removal Logic
   const handleRemoveItem = (item: CartItem) => {
-   deleteItemFromCart(item)
+   deleteItemFromCart(item);
+	 deleteItem(`${item.id}`);
+
 	 const cartData = localStorage.getItem("cartKey");
 			if (cartData) {
 				setShoppingCart(JSON.parse(cartData));

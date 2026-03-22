@@ -319,3 +319,9 @@ export async function getRecommendedProducts(products: ProductCard[]) {
 	return recommendedProducts;
 }
 
+//получение счетчика в корзине из куков
+export const getInitialValueFromCookies = async () => {
+	  const cookieStore = await cookies();
+  	const initialCount = cookieStore.get('cart_count')?.value || '0';
+		return initialCount;
+}
