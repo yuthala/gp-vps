@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { ProductCard } from '../../lib/definitions';
 import PackageSelectorWithUrl from "@/app/ui/productCard/PackageSelector";
@@ -19,7 +20,11 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 
 	const qty = searchParams.get('qty');
 
+	//увеличение badge counter по клику в Корзину
 	const addItem = useCartStore((state) => state.addItem)
+
+	//дя редиректа в корзину по клику В Корзину
+	const router = useRouter();
 
 	//deleteAllCartItems()
 	return(
@@ -63,24 +68,29 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 		<div className="flex flex-col sm:flex-row items-center gap-4">
 			<Button 
 				onClick={async function () {
-					
 						try {
-							const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
+								const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
 								await createShoppingCart(cartItem);
 								addItem(`${cartItem.id}`);
-							// Optional: Show success message
-							// toast.success('Added to cart!');
+								
+								// Optional: Show success message
+								// toast.success('Added to cart!');
+								
+								// Redirect using Next.js router (client-side navigation)
+								router.push('/shopping-cart');
+								
 						} catch (error) {
-							// Optional: Handle error
-							console.error('Failed to add to cart:', error);
+								console.error('Failed to add to cart:', error);
+								// Optional: Show error message
+								// toast.error('Failed to add to cart');
 						}
-					}}
-				backgroundColor="#40AD52" 
-				color="text-white" 
-				className="text-2xl uppercase font-extrabold px-16"
-			>
-				В корзину
-			</Button>
+				}}
+						backgroundColor="#40AD52" 
+						color="text-white" 
+						className="text-2xl uppercase font-extrabold px-16"
+				>
+						В корзину
+				</Button>
 			<Counter 
 				className="w-55 justify-evenly"
 				initialValue={Number(qty) || 1}
