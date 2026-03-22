@@ -35,7 +35,7 @@ export default function OnStock({ onStockStatus}: { onStockStatus: string }) {
         <div className="flex gap-2 items-center">
 					<Image
 						src='/icons/excl.png'
-						width={3}
+						width={13}
 						height={16}
 						alt='expected'
 						className="object-cover"

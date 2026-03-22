@@ -318,3 +318,4 @@ export async function getRecommendedProducts(products: ProductCard[]) {
 	})
 	return recommendedProducts;
 }
+

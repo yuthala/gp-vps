@@ -28,7 +28,7 @@ export default async function ProductCard({ pathName}: { pathName: string}) {
                       width={360}
                       height={230}
                       alt={product.pathName}
-                      className="w-full h-full object-cover"
+                      className="object-cover"
                     />
                   </div>
                   

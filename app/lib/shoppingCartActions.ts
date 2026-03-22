@@ -1,3 +1,4 @@
+
 import { ProductCard, CartItem, ShoppingCart, MiniProductCard } from "./definitions";
 
 // Корзина
@@ -54,7 +55,6 @@ export async function updateCartItemById(cartItem: CartItem) {
 				parsedCart.cartItems[i].qty = cartItem.qty;
 				parsedCart.cartItems[i].totalSum = parsedCart.cartItems[i].qty * parsedCart.cartItems[i].price;
 				localStorage.setItem('cartKey', JSON.stringify(parsedCart));
-						console.log('from function', parsedCart.cartItems);
 			} 
 		}
 	} 
@@ -145,3 +145,20 @@ export async function deleteItemFromCart(cartItem: CartItem) {
 // 	}
 // }
 
+export async function saveWord(word: string) {
+	
+	if (typeof window !== 'undefined') {
+				localStorage.setItem('wordToSave', JSON.stringify(word));
+			}
+}
+
+
+export async function getWord() {
+	let word = ''
+	
+		if (typeof window !== 'undefined') {
+			word =	localStorage.getItem('wordToSave') || "empty"
+			}
+
+	return word
+}

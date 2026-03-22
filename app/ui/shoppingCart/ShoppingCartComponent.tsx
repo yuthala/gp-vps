@@ -12,6 +12,7 @@ import RecommendedProducts from "../recommendedProducts/RecommendedProducts";
 import CartEmpty from "./cartEmpty";
 
 
+
 export default function ShoppingCartComponent() {
 		const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]} | null>(null);
 	

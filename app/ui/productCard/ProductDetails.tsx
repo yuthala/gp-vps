@@ -11,8 +11,6 @@ import Counter from "../counter/Counter";
 import TagList from '../TagList';
 import {createCartItem, createShoppingCart, deleteAllCartItems } from '../../lib/shoppingCartActions';
 
-
-
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
 	const index = searchParams.get('package');
@@ -64,6 +62,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 		<div className="flex flex-col sm:flex-row items-center gap-4">
 			<Button 
 				onClick={async function () {
+					
 						try {
 							const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
 								await createShoppingCart(cartItem);
