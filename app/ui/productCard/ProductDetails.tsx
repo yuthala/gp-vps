@@ -26,7 +26,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 	//дя редиректа в корзину по клику В Корзину
 	const router = useRouter();
 
-	//deleteAllCartItems()
+	//deleteAllCartItems() //раскомментить, чтобы удалить все из корзины
 	return(
 		<div className="lg:w-1/2 p-8 flex flex-col">
 		<Heading level={5} className="capital">
@@ -77,7 +77,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 								// toast.success('Added to cart!');
 								
 								// Redirect using Next.js router (client-side navigation)
-								router.push('/shopping-cart');
+								router.push('/modal-cart', { scroll: false });
 								
 						} catch (error) {
 								console.error('Failed to add to cart:', error);

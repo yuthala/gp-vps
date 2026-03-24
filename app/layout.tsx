@@ -21,8 +21,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+	modal, // This corresponds to the @modal folder
 }: {
   children: React.ReactNode;
+	modal: React.ReactNode;
 }) {
   return (
     <html lang="ru">
@@ -31,6 +33,7 @@ export default function RootLayout({
           <main className="flex justify-center w-full pt-72 lg:pt-44">
             {children}
           </main>
+					{modal} 
         </body>
     </html>
   );

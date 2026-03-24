@@ -20,7 +20,7 @@ export default function ShoppingCartComponent() {
 		//обновление count badge при удалении товара из корзины
 		const deleteItem =  useCartStore((state) => state.deleteItem);
 
-		//const clearCookies = useCartStore((state) => state.clearData); //раскомментить чтобы удалить куки
+		//const clearCookies = useCartStore((state) => state.clearData); //раскомментить чтобы удалить куки (надо удалить item из корзины)
 
 		useEffect(() => {
 			// This only runs on the client after hydration
