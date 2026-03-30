@@ -18,23 +18,27 @@ export const useCartStore = create<CartState>()(
 
       addItem: (id) =>
         set((state) => {
+			 if (state.items.includes(id)) {
+					return state; // Если есть, ничего не меняем
+				}
           const newItems = [...state.items, id]
           // Sync cookie for the Server
           setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 })
           return { items: newItems }
         }),
 
-			deleteItem: (id) =>
-				set((state) => {
-					const index = state.items.indexOf(id);
-					if (index === -1) return state; // Nothing found
+		deleteItem: (id) =>
+			set((state) => {
+				const index = state.items.indexOf(id);
+				if (index === -1) return state; // Nothing found
 
-					const newItems = [...state.items];
-					newItems.splice(index, 1); // Remove only 1 instance
+				const newItems = [...state.items];
+				newItems.splice(index, 1); // Remove only 1 instance
 
-					setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 });
-					return { items: newItems };
-				}),
+				setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 });
+				return { items: newItems };
+			}),
+
 		clearData: () => {
 			// Option A: Set cookie to 0
 			setCookie('cart_count', 0); 

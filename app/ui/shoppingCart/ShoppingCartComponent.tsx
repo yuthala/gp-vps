@@ -26,6 +26,7 @@ export default function ShoppingCartComponent() {
 			// This only runs on the client after hydration
 			const cartData = localStorage.getItem("cartKey");
 			if (cartData) {
+				// eslint-disable-next-line react-hooks/set-state-in-effect
 				setShoppingCart(JSON.parse(cartData));
 			}
 		}, []); // Empty dependency array means this runs once after mount
