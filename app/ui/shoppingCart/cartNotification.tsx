@@ -6,6 +6,7 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Button from '../Button';
+import Link from 'next/link';
 
 export default function CartNotification() {
   //const [quantity, setQuantity] = useState(2);
@@ -14,11 +15,11 @@ export default function CartNotification() {
 	const router = useRouter();
 
   const handleContinueShopping = () => {
-    router.back(); // Закрывает модальное окно
+    router.push('/catalog');
   };
 
   const handleGoToCart = () => {
-    router.push('/shopping-cart'); // Переходит в корзину
+    window.location.href = '/shopping-cart';
   };
 
   return (
