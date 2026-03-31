@@ -10,8 +10,10 @@ import Button from "../../ui/Button";
 import Pricing from "../../ui/Pricing";
 import Counter from "../counter/Counter";
 import TagList from '../TagList';
-import {createCartItem, createShoppingCart, deleteAllCartItems} from '../../lib/shoppingCartActions';
+import {createCartItem, createShoppingCart } from '../../lib/shoppingCartActions';
 import { useCartStore } from '../../lib/useCartStore';
+//раскомментить, чтобы удалить все из корзины
+//import { deleteAllCartItems } from '../../lib/shoppingCartActions'
 
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
@@ -71,7 +73,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 						try {
 								const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
 								await createShoppingCart(cartItem);
-								addItem(`${cartItem.id}`);
+								addItem(`${cartItem.id}`, cartItem.packageSize);
 								
 								// Optional: Show success message
 								// toast.success('Added to cart!');

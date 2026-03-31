@@ -2,12 +2,13 @@
 // 'use client'
 import { create } from 'zustand';
 import { setCookie } from 'cookies-next';
-import { persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware';
+import { IDPkgSize } from './definitions';
 
 interface CartState {
-  items: string[]; // массив ID товаров
-  addItem: (id: string) => void;
-	deleteItem: (id: string) => void;
+  items: IDPkgSize[]; // массив ID товаров
+  	addItem: (id: string, pkgSize: number) => void;
+	deleteItem: (id: string, pkgSize: number) => void;
 	clearData: () => void;
 }
 
@@ -16,21 +17,25 @@ export const useCartStore = create<CartState>()(
     (set) => ({
       items: [],
 
-      addItem: (id) =>
+      addItem: (id, pkgSize) =>
         set((state) => {
-			 if (state.items.includes(id)) {
-					return state; // Если есть, ничего не меняем
-				}
-          const newItems = [...state.items, id]
+          // Проверяем наличие объекта с ТАКИМ ЖЕ id И ТАКИМ ЖЕ pkgSize
+          const isExist = state.items.filter(item => item.id === id).filter(item => item.pkgSize === pkgSize);
+          if (isExist.length !== 0) {
+            return state; // Если такая комбинация уже есть, ничего не меняем
+          }
+          const newItems = [...state.items, { id, pkgSize }]
           // Sync cookie for the Server
           setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 })
           return { items: newItems }
         }),
 
-		deleteItem: (id) =>
+		deleteItem: (id, pkgSize) =>
 			set((state) => {
-				const index = state.items.indexOf(id);
-				if (index === -1) return state; // Nothing found
+				// Ищем индекс конкретной комбинации товара и фасовки
+				const index = state.items.findIndex(
+					(item) => item.id === id && item.pkgSize === pkgSize
+				);
 
 				const newItems = [...state.items];
 				newItems.splice(index, 1); // Remove only 1 instance

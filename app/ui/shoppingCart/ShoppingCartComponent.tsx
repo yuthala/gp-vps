@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { CartItem, MiniProductCard } from "@/app/lib/definitions";
+import type { CartItem } from "@/app/lib/definitions";
 import Heading from "../Heading";
 import Pricing from '@/app/ui/Pricing';
 import Button from '@/app/ui/Button';
@@ -11,7 +11,8 @@ import { deleteItemFromCart } from "../../lib/shoppingCartActions";
 import RecommendedProducts from "../recommendedProducts/RecommendedProducts";
 import CartEmpty from "./cartEmpty";
 import { useCartStore } from "../../lib/useCartStore";
-import { getInitialValueFromCookies, resetCookies } from '@/app/lib/actions';
+//раскомментить чтобы удалить куки (надо удалить item из корзины)
+//import { getInitialValueFromCookies, resetCookies } from '@/app/lib/actions';
 
 
 export default function ShoppingCartComponent() {
@@ -35,7 +36,7 @@ export default function ShoppingCartComponent() {
    // UPDATED Removal Logic
   const handleRemoveItem = (item: CartItem) => {
    deleteItemFromCart(item);
-	 deleteItem(`${item.id}`);
+	 deleteItem(`${item.id}`, item.packageSize);
 	 //clearCookies(); //раскомментить чтобы удалить куки
 
 	 const cartData = localStorage.getItem("cartKey");

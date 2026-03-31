@@ -140,7 +140,7 @@ export type ProductCard = {
 	estimatedOnStockDate?: string;
 	price: number;
 	measureUnit: number;
-	id: number
+	id: number;
 }
 
 export type ShoppingCart = {
@@ -167,6 +167,9 @@ export type MiniProductCard = {
 	cropName?: string;
 }
 
-
+export type IDPkgSize = {
+  id: string;
+  pkgSize: number;
+}
 
 

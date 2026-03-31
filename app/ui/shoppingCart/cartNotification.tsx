@@ -6,7 +6,7 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Button from '../Button';
-import Link from 'next/link';
+
 
 export default function CartNotification() {
   //const [quantity, setQuantity] = useState(2);
@@ -14,13 +14,8 @@ export default function CartNotification() {
 
 	const router = useRouter();
 
-  const handleContinueShopping = () => {
-    router.push('/catalog');
-  };
-
-  const handleGoToCart = () => {
-    window.location.href = '/shopping-cart';
-  };
+  const handleContinueShopping = () => router.push('/catalog');
+  const handleGoToCart = () => router.push('/shopping-cart');
 
   return (
     <div className="flex items-center justify-center bg-gray-100 p-4">
@@ -46,12 +41,13 @@ export default function CartNotification() {
           {/* Информация о товаре */}
 				<div className="py-8">
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
-            <img 
-              src="https://via.placeholder.com" // Замените на реальное фото чеснока
-              alt="Зубок чеснока"
+            <Image
+              src='/products/bogatyr_zubok.webp'
+              alt='product description'
+              width={96}
+              height={96}
               className="w-24 h-24 object-cover rounded-md border border-gray-100"
             />
-            
             <div className="flex-1">
               <h6 className="leading-tight">
                 Зубок чеснока, сорт Любаша, 500 г

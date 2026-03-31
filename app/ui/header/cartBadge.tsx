@@ -15,6 +15,7 @@ export default function CartBadge({ initialCount = '0', className }: CartBadgePr
 
   // Once this runs, we know the Client Store has loaded from LocalStorage/Cookies
   useEffect(() => {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setIsHydrated(true);
   }, [])
 

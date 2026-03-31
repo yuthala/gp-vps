@@ -1,5 +1,5 @@
 
-import { ProductCard, CartItem, ShoppingCart, MiniProductCard } from "./definitions";
+import { ProductCard, CartItem, ShoppingCart } from "./definitions";
 
 // Корзина
 export async function createCartItem (data: ProductCard, packageSize: number, qty: number) {
@@ -21,7 +21,6 @@ export async function createShoppingCart(cartItem: CartItem) {
 	if (savedCartData) {
 		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
 		const cartItemexists = parsedCart.cartItems.filter(item => item.id === cartItem.id).filter(item => item.packageSize === cartItem.packageSize);
-		console.log('cartItem exists :', cartItemexists )
 
 		if (cartItemexists.length != 0) {
 			for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
