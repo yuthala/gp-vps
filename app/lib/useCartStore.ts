@@ -7,6 +7,7 @@ import { IDPkgSize } from './definitions';
 
 interface CartState {
   items: IDPkgSize[]; // массив ID товаров
+  id_sizeModal: IDPkgSize;
   	addItem: (id: string, pkgSize: number) => void;
 	deleteItem: (id: string, pkgSize: number) => void;
 	clearData: () => void;
@@ -16,9 +17,16 @@ export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
+	  id_sizeModal: {
+		id: '',
+		pkgSize: 0
+	  },
 
       addItem: (id, pkgSize) =>
         set((state) => {
+		  const dataForModal = state.id_sizeModal;
+		  dataForModal.id = id;
+		  dataForModal.pkgSize = pkgSize;
           // Проверяем наличие объекта с ТАКИМ ЖЕ id И ТАКИМ ЖЕ pkgSize
           const isExist = state.items.filter(item => item.id === id).filter(item => item.pkgSize === pkgSize);
           if (isExist.length !== 0) {
@@ -26,8 +34,8 @@ export const useCartStore = create<CartState>()(
           }
           const newItems = [...state.items, { id, pkgSize }]
           // Sync cookie for the Server
-          setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 })
-          return { items: newItems }
+          //setCookie('cart_count', newItems.length, { maxAge: 60 * 60 * 24 * 7 })
+          return { items: newItems, id_sizeModal: dataForModal }
         }),
 
 		deleteItem: (id, pkgSize) =>

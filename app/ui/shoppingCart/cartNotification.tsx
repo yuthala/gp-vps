@@ -1,14 +1,26 @@
 'use client';
 
-//import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Button from '../Button';
-
+import { useCartStore } from '@/app/lib/useCartStore';
+import { CartItem } from '@/app/lib/definitions';
 
 export default function CartNotification() {
+  const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]} | null>(null);
+
+  useEffect(() => {
+    // This only runs on the client after hydration
+    const cartData = localStorage.getItem("cartKey");
+    if (cartData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShoppingCart(JSON.parse(cartData));
+    }
+  }, []); // Empty dependency array means this runs once after mount
+  
   //const [quantity, setQuantity] = useState(2);
   const pricePerUnit = 350;
 
@@ -16,6 +28,11 @@ export default function CartNotification() {
 
   const handleContinueShopping = () => router.push('/catalog');
   const handleGoToCart = () => router.push('/shopping-cart');
+
+  const dataForModal = useCartStore((state) => state.id_sizeModal);
+  const data = shoppingCart?.cartItems.filter(item => item.id === Number(dataForModal.id)).filter(item => item.packageSize === dataForModal.pkgSize);
+  
+  console.log('isExist', data);
 
   return (
     <div className="flex items-center justify-center bg-gray-100 p-4">
@@ -42,7 +59,7 @@ export default function CartNotification() {
 				<div className="py-8">
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
             <Image
-              src='/products/bogatyr_zubok.webp'
+              src={data[0].imageSrc || '/products/bogatyr_zubok.webp'}
               alt='product description'
               width={96}
               height={96}

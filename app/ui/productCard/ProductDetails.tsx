@@ -18,7 +18,7 @@ import { useCartStore } from '../../lib/useCartStore';
 export default function ProductDetails({ data }: { data: ProductCard}) {
 	const searchParams = useSearchParams();
 	const index = searchParams.get('package');
-  const packageSize = data.packageSize.filter(packageSize => packageSize > 0)[Number(index)];
+  	const packageSize = data.packageSize.filter(packageSize => packageSize > 0)[Number(index)];
 
 	const qty = searchParams.get('qty');
 
