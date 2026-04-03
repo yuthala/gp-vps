@@ -35,6 +35,9 @@ export default function CartNotification() {
   // data for image
   const dataForimage = shoppingCart?.cartItems.filter(item => item.id === Number(dataForModal.id)).filter(item => item.packageSize === dataForModal.pkgSize) ?? [];
   const image_src = dataForimage[0]?.imageSrc ?? '/products/bogatyr_zubok.webp'
+  //data for description
+  const descr = dataForimage[0]?.description || 'no description received'
+  const packageSz = dataForimage[0]?.measureUnit * dataForimage[0]?.packageSize
   //data for goods qty in shopping cart
   const cart_qty = data.length ?? 1
   // total sum
@@ -76,7 +79,7 @@ export default function CartNotification() {
             />
             <div className="flex-1">
               <h6 className="leading-tight">
-                Зубок чеснока, сорт Любаша, 500 г
+                {descr}, {packageSz} г.
               </h6>
             </div>
           </div>
