@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Button from '../Button';
 import { useCartStore } from '@/app/lib/useCartStore';
 import { CartItem } from '@/app/lib/definitions';
+import CaseNumber from '@/app/ui/shoppingCart/caseNumber';
 
 export default function CartNotification() {
   const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]}>();
@@ -88,7 +89,8 @@ export default function CartNotification() {
         {/* Футер с кнопками */}
         <div className="bg-[#e9f1e1] p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="text-gray-700">
-            В корзине {cart_qty} товара <br />
+            {/* В корзине {cart_qty} товара <br /> */}
+            <CaseNumber qty={cart_qty}/>
             На сумму <span className="font-medium text-gray-800">{totalSum} р</span>
           </div>
 
