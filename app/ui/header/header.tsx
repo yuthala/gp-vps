@@ -64,7 +64,8 @@ export default function Header() {
 
 							{/* desktop */}
 						 <div className="hidden lg:flex lg:gap-4 w-1/2">
-						    <Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-34 h-12">Каталог</Link>
+						    <Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-34 h-12 border border-[#064929]/30 
+								transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100">Каталог</Link>
 								<Search placeholder="Поиск товаров..." />
 						 </div>
              <BottomHeaderLinks />
@@ -73,7 +74,7 @@ export default function Header() {
 
       </div>
 			{/* mobile */}
-			<div className="flex flex-col gap-4 lg:hidden w-full bg-(--light-main) px-4 pb-4 shadow-lg">        
+			<div className="flex flex-col gap-4 lg:hidden w-full bg-(--light-main) px-4 pb-4 shadow-lg">
 				<Search placeholder="Поиск товаров..." />
 				<Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-full h-12">Каталог</Link>
 			</div>

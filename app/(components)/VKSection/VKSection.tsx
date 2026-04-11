@@ -5,7 +5,7 @@ export default function VKSection() {
 				<section className="w-full pb-8 md:pb-16">
 				<div className="max-w-7xl bg-(--accent) px-4 md:px-8 pb-8 md:pb-12 text-base md:text-lg font-light text-foreground">
 					<div className="flex items-center gap-4 pt-6 md:pt-10 pb-6 ">
-						<h2 className="vk-heading text-center">Наше сообщество</h2>
+						<h2 className="text-center">Наше сообщество</h2>
 						<Image
 							src='/VK/vk-logo.svg'
 							width={66}

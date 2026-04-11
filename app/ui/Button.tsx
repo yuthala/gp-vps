@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  height?: 52 | 58 | 80;
+  height?: 40 | 52 | 58 | 80;
   color?: '#064929' | '#F2F9ED' | 'text-white';
   borderColor?: '#064929' | 'transparent';
   backgroundColor?: '#D3D34F' | '#40AD52' | '#F2F9ED';
@@ -21,6 +21,7 @@ export default function Button({
   
 	//dвсота кнопки
   const heightStyle = {
+		40: 'h-[40px] px-6 py-2 text-base',
     52: 'h-[52px] px-6 py-3 text-base',
     58: 'h-[58px] px-7 py-4 text-lg',
     80: 'h-[80px] px-8 py-5 text-xl',
