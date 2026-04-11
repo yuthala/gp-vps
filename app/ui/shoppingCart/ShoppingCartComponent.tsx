@@ -54,7 +54,7 @@ export default function ShoppingCartComponent() {
 	<div className="flex flex-col items-center gap-4 sm:gap-8 px-2 sm:px-4">
 			{shoppingCart?.cartItems && shoppingCart.cartItems.length > 0 ? (
 				<>
-					<Heading level={2} className="">Корзина</Heading>
+					<Heading level={2}>Корзина</Heading>
 					<div className="w-full rounded-lg border  border-[#064929]/50 px-4 sm:px-8 flex flex-col divide-y divide-gray-200">
 						{shoppingCart.cartItems.map((item: CartItem, index: number) => (
 							<div className="py-4 sm:py-8" key={index}>
