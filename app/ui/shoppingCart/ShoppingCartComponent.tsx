@@ -16,6 +16,7 @@ import { useCartStore } from "../../lib/useCartStore";
 
 
 export default function ShoppingCartComponent() {
+		//получение Shopping cart после загрузки страницы
 		const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]} | null>(null);
 
 		//обновление count badge при удалении товара из корзины
