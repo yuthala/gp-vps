@@ -1,3 +1,6 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from "react";
 import type { CartItem } from "@/app/lib/definitions";
 import Button from "../Button";
@@ -20,6 +23,8 @@ export default function CheckoutTotal() {
 		const cartTotal = shoppingCart?.cartItems.reduce((sum, item) => {
 			return sum + (item.price * item.qty);
 		}, 0) || 0;
+
+		const router = useRouter();
 	
 	return (
 		<div className="py-4 md:py-8">
@@ -33,6 +38,15 @@ export default function CheckoutTotal() {
 					<p className="text-right pt-8 md:pt-12 pb-8 text-green-600 text-2xl md:text-3xl font-extrabold">1020 р</p>
 				</div>
 				<Button
+					onClick={async function () {
+							try {
+									// Redirect using Next.js router (client-side navigation)
+									router.push('/modal-checkout', { scroll: false });
+									
+							} catch (error) {
+									console.error('Failed to checkout:', error);
+							}
+					}}
 					height={58}
 					color="#064929"
 					backgroundColor="#D3D34F"

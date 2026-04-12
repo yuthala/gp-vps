@@ -79,8 +79,7 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 								// toast.success('Added to cart!');
 								
 								// Redirect using Next.js router (client-side navigation)
-								//router.push('/modal-cart', { scroll: false });
-								router.push('/modal-checkout', { scroll: false });
+								router.push('/modal-cart', { scroll: false });
 								
 						} catch (error) {
 								console.error('Failed to add to cart:', error);
