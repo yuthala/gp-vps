@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { inter, manrope } from "@/app/ui/fonts";
-import "./globals.css";
+import "@/app/globals.css";
 import Header from "@/app/ui/header/header";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,9 +23,11 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 	modal, // This corresponds to the @modal folder
+  modalCheckout,
 }: {
   children: React.ReactNode;
 	modal: React.ReactNode;
+  modalCheckout: React.ReactNode;
 }) {
   return (
     <html lang="ru">
@@ -34,6 +37,7 @@ export default function RootLayout({
             {children}
           </main>
 					{modal} 
+          {modalCheckout}
         </body>
     </html>
   );
