@@ -20,27 +20,24 @@ export async function createShoppingCart(cartItem: CartItem) {
 	const savedCartData = localStorage.getItem('cartKey');
 	if (savedCartData) {
 		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
-		const cartItemexists = parsedCart.cartItems.filter(item => item.id === cartItem.id).filter(item => item.packageSize === cartItem.packageSize);
+		const existingItemIndex = parsedCart.cartItems.findIndex(item => item.id === cartItem.id && item.packageSize === cartItem.packageSize);
 
-		if (cartItemexists.length != 0) {
-			for (let i:number = 0; i < parsedCart.cartItems.length; i++) {
-				if (parsedCart.cartItems[i].id === cartItem.id && parsedCart.cartItems[i].packageSize === cartItem.packageSize) {
-					parsedCart.cartItems[i].qty += cartItem.qty
-					parsedCart.cartItems[i].totalSum = parsedCart.cartItems[i].qty * parsedCart.cartItems[i].price
-					localStorage.setItem('cartKey', JSON.stringify(parsedCart));
-				} 
-		  }
-		} else {
-			parsedCart.cartItems.push(cartItem);
-			localStorage.setItem('cartKey', JSON.stringify(parsedCart));
+		if (existingItemIndex != -1) {
+				//check if an identical item already exists in the cart
+					parsedCart.cartItems[existingItemIndex].qty += cartItem.qty //increase qty
+					parsedCart.cartItems[existingItemIndex].totalSum = parsedCart.cartItems[existingItemIndex].qty * parsedCart.cartItems[existingItemIndex].price //update totalSum
+					localStorage.setItem('cartKey', JSON.stringify(parsedCart)); //save the updated cart back to localStorage
+		} else { //if an identical item doesn't exist in the cart
+			parsedCart.cartItems.push(cartItem); //adds the new item to the cart's cartItems array
+			localStorage.setItem('cartKey', JSON.stringify(parsedCart)); //save the updated cart to localStorage
 		}
 	} else {
-		//создаем пустую корзину
+		//создаем пустую корзину, если корзина не создана
 			const shoppingCart:ShoppingCart = {
-				cartItems: []
+				cartItems: [] //Creates a new empty shopping cart
 			}
 			if (typeof window !== 'undefined') {
-				localStorage.setItem('cartKey', JSON.stringify(shoppingCart));
+				localStorage.setItem('cartKey', JSON.stringify(shoppingCart)); //saves cart to localStorage
 			}
 		}
 }
