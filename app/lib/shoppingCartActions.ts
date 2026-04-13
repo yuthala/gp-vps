@@ -16,6 +16,7 @@ export async function createCartItem (data: ProductCard, packageSize: number, qt
 	return cartItem;
 }
 
+//создание корзины и добавление в корзину
 export async function createShoppingCart(cartItem: CartItem) {
 	const savedCartData = localStorage.getItem('cartKey');
 	if (savedCartData) {
@@ -70,7 +71,20 @@ export async function updateTotalSumInUI(cartItem: CartItem) {
 	return data;
 }
 
-//Удалить все элементы из корзины. Вызываетcz при добавлении в корзину
+//очищение корзины после checkout
+export async function clearShoppingCart() {
+    // Check if window is defined to prevent errors during Server-Side Rendering
+    if (typeof window !== 'undefined') {
+        const emptyCart: ShoppingCart = {
+            cartItems: []
+        };
+        
+        // Overwrite the existing cart with the empty one
+        localStorage.setItem('cartKey', JSON.stringify(emptyCart));
+    }
+}
+
+//Удалить все элементы из корзины. Вызываетcя при добавлении в корзину
 export async function deleteAllCartItems() {
 	const savedCartData = localStorage.getItem('cartKey');
 		if (savedCartData) {

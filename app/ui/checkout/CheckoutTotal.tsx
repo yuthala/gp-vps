@@ -3,8 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from "react";
 import type { CartItem } from "@/app/lib/definitions";
+import { clearShoppingCart} from '@/app/lib/shoppingCartActions';
+import { useCartStore } from "../../lib/useCartStore";
 import Button from "../Button";
 import Link from "next/link";
+import { clear } from 'node:console';
 
 export default function CheckoutTotal() {
 	//получение Shopping cart после загрузки страницы
@@ -14,7 +17,6 @@ export default function CheckoutTotal() {
 				// This only runs on the client after hydration
 				const cartData = localStorage.getItem("cartKey");
 				if (cartData) {
-					// eslint-disable-next-line react-hooks/set-state-in-effect
 					setShoppingCart(JSON.parse(cartData));
 				}
 		}, []); // Empty dependency array means this runs once after mount
@@ -24,7 +26,11 @@ export default function CheckoutTotal() {
 			return sum + (item.price * item.qty);
 		}, 0) || 0;
 
+		//для открытия модального окна
 		const router = useRouter();
+
+		//для очистки куков
+		const clearCookies = useCartStore((state) => state.clearData); 
 	
 	return (
 		<div className="py-4 md:py-8">
@@ -40,8 +46,9 @@ export default function CheckoutTotal() {
 				<Button
 					onClick={async function () {
 							try {
-									// Redirect using Next.js router (client-side navigation)
-									router.push('/modal-checkout', { scroll: false });
+									router.push('/modal-checkout', { scroll: false }); // Redirect using Next.js router
+									clearShoppingCart();//очищаем корзину
+									clearCookies();//устанавливаем куки 0 по ключу cart_count
 									
 							} catch (error) {
 									console.error('Failed to checkout:', error);

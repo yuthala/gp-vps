@@ -4,7 +4,7 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { CartItem } from '@/app/lib/definitions';
-import { createShoppingCart, updateCartItemById } from '@/app/lib/shoppingCartActions';
+import { updateCartItemById } from '@/app/lib/shoppingCartActions';
 
 interface ButtonCounterProps {
   initialValue?: number;

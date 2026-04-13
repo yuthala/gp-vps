@@ -74,17 +74,11 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 								const cartItem = await createCartItem(data, packageSize, Number(qty) || 1);
 								await createShoppingCart(cartItem);
 								addItem(`${cartItem.id}`, cartItem.packageSize);
-								
-								// Optional: Show success message
-								// toast.success('Added to cart!');
-								
 								// Redirect using Next.js router (client-side navigation)
 								router.push('/modal-cart', { scroll: false });
 								
 						} catch (error) {
 								console.error('Failed to add to cart:', error);
-								// Optional: Show error message
-								// toast.error('Failed to add to cart');
 						}
 				}}
 						backgroundColor="#40AD52" 

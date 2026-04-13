@@ -17,16 +17,16 @@ export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
-	  id_sizeModal: {
-		id: '',
-		pkgSize: 0
+			id_sizeModal: {
+			id: '',
+			pkgSize: 0
 	  },
 
 		addItem: (id, pkgSize) =>
 			set((state) => {
-		const dataForModal = state.id_sizeModal;
-		dataForModal.id = id;
-		dataForModal.pkgSize = pkgSize;
+				const dataForModal = state.id_sizeModal;
+				dataForModal.id = id;
+				dataForModal.pkgSize = pkgSize;
 				// Проверяем наличие объекта с ТАКИМ ЖЕ id И ТАКИМ ЖЕ pkgSize
 				const isExist = state.items.filter(item => item.id === id).filter(item => item.pkgSize === pkgSize);
 				if (isExist.length !== 0) {
