@@ -1,25 +1,49 @@
+
 'use client';
 
-//import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Button from '../Button';
+import { useCartStore } from '@/app/lib/useCartStore';
+import { CartItem } from '@/app/lib/definitions';
+import CaseNumber from '@/app/ui/shoppingCart/caseNumber';
 
 export default function CartNotification() {
-  //const [quantity, setQuantity] = useState(2);
-  const pricePerUnit = 350;
+  const [shoppingCart, setShoppingCart] = useState<{cartItems: CartItem[]}>();
+
+  useEffect(() => {
+    // This only runs on the client after hydration
+    const cartData = localStorage.getItem("cartKey");
+    if (cartData) {
+      setShoppingCart(JSON.parse(cartData));
+    }
+  }, []); // Empty dependency array means this runs once after mount
 
 	const router = useRouter();
 
-  const handleContinueShopping = () => {
-    router.back(); // Закрывает модальное окно
-  };
+  const handleContinueShopping = () => router.push('/catalog');
+  const handleGoToCart = () => router.push('/shopping-cart');
 
-  const handleGoToCart = () => {
-    router.push('/shopping-cart'); // Переходит в корзину
-  };
+
+   // resources for modal
+  const dataForModal = useCartStore((state) => state.id_sizeModal);
+  const data = shoppingCart?.cartItems ?? []
+  // data for image
+  const dataForimage = shoppingCart?.cartItems.filter(item => item.id === Number(dataForModal.id)).filter(item => item.packageSize === dataForModal.pkgSize) ?? [];
+  const image_src = dataForimage[0]?.imageSrc ?? '/products/bogatyr_zubok.webp'
+  //data for description
+  const descr = dataForimage[0]?.description || 'no description received'
+  const packageSz = dataForimage[0]?.measureUnit * dataForimage[0]?.packageSize
+  //data for goods qty in shopping cart
+  const cart_qty = data.length ?? 1
+  // total sum
+  let totalSum = 0
+  data.map((item) => {
+    totalSum += item.totalSum
+  })
 
   return (
     <div className="flex items-center justify-center bg-gray-100 p-4">
@@ -45,15 +69,16 @@ export default function CartNotification() {
           {/* Информация о товаре */}
 				<div className="py-8">
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
-            <img 
-              src="https://via.placeholder.com" // Замените на реальное фото чеснока
-              alt="Зубок чеснока"
+            <Image
+              src={image_src}
+              alt='product description'
+              width={96}
+              height={96}
               className="w-24 h-24 object-cover rounded-md border border-gray-100"
             />
-            
             <div className="flex-1">
               <h6 className="leading-tight">
-                Зубок чеснока, сорт Любаша, 500 г
+                {descr}, {packageSz} г.
               </h6>
             </div>
           </div>
@@ -62,8 +87,9 @@ export default function CartNotification() {
         {/* Футер с кнопками */}
         <div className="bg-[#e9f1e1] p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="text-gray-700">
-            В корзине x товара <br />
-            На сумму <span className="font-medium text-gray-800">{pricePerUnit} р</span>
+            {/* В корзине {cart_qty} товара <br /> */}
+            <CaseNumber qty={cart_qty}/>
+            На сумму <span className="font-medium text-gray-800">{totalSum} р</span>
           </div>
 
           <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
