@@ -87,7 +87,6 @@ export default function CartNotification() {
         {/* Футер с кнопками */}
         <div className="bg-[#e9f1e1] p-4 flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="text-gray-700">
-            {/* В корзине {cart_qty} товара <br /> */}
             <CaseNumber qty={cart_qty}/>
             На сумму <span className="font-medium text-gray-800">{totalSum} р</span>
           </div>
