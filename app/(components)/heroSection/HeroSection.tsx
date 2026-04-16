@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Heading from "../../ui/Heading";
 
 export default function HeroSection() {
   return (
@@ -15,7 +16,7 @@ export default function HeroSection() {
 					</div>
 
 					<div>
-							<h3 className="text-2xl lg:text-3xl font-bold text-(--secondary) pb-4"><span className="text-red-600">[</span>green pato<span className="text-red-600">]</span></h3>
+							<h3 className="text-2xl lg:text-3xl font-bold text-(--secondary) pb-4 align-left"><span className="text-red-600">[</span>green pato<span className="text-red-600">]</span></h3>
 							<h1 className="text-3xl lg:text-5xl font-extrabold uppercase text-foreground leading-tight pb-6">
 								Питомник луковичных <br/>культур
 							</h1>

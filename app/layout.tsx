@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { inter, manrope } from "@/app/ui/fonts";
 import "@/app/globals.css";
 import Header from "@/app/ui/header/header";
+import Footer from "./ui/footer/Footer";
 
 
 const geistSans = Geist({
@@ -38,7 +39,8 @@ export default function RootLayout({
           </main>
 					{modal} 
           {modalCheckout}
-        </body>
+				<Footer />
+      </body>
     </html>
   );
 }
