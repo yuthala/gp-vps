@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import Heading from '../../ui/Heading';
 import { CardInfo } from '@/app/lib/definitions';
 import cslx from 'clsx';
 
@@ -24,7 +25,7 @@ export default function CropsCards() {
 									/>
 									<div className="w-full gap-4 md:flex md:flex-col md:max-w-140 grid grid-cols-1 sm:grid-cols-2">
 										<div className="sm:col-span-2">
-											<h5>{card.heading}</h5>
+											<Heading level={5}>{card.heading}</Heading>
 										</div>
 										<div>
 												<ul className="pt-2 pb-4 md:pb-0 text-foreground text-xl font-extrabold uppercase">Популярные сорта:

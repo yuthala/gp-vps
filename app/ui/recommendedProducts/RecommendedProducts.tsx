@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Heading from '../Heading';
 import { MiniProductCard } from '../../lib/definitions';
 import MiniProductCardComponent from '@/app/ui/recommendedProducts/MiniProductCardComponent';
 import {getProductCard, getRecommendedProducts} from '@/app/lib/actions';
@@ -23,7 +24,7 @@ export default function RecommendedProducts() {
   return (
     <section className="pt-10 sm:pt-20">
 			<div className="flex items-center gap-4 pb-6 sm:pb-10">
-				<h5>Вам может понравиться</h5>
+				<Heading level={5}>Вам может понравиться</Heading>
 					<Image
 						src='/recommendedProducts/heart-icon.svg'
 						width={75}

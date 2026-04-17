@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
+import Heading from "../../ui/Heading";
 
 export default function OurOzonShop() {
 	return (
 		<section className="w-full pb-8 md:pb-16">
 			<div className="max-w-7xl mx-auto px-4 md:px-8">
 				<div className="flex flex-col md:flex-row items-center justify-center gap-4 pb-8 lg:pb-12">
-					<h2 className="text-3xl md:text-4xl font-bold text-center">Наш магазин на</h2>
+					<Heading level={2} className="text-3xl md:text-4xl font-bold text-center">Наш магазин на</Heading>
 					<Image
 						src='/ozonShop/ozon-logo.png'
 						width={186}
@@ -38,7 +39,6 @@ export default function OurOzonShop() {
 						className="max-w-75 sm:max-w-100 md:max-w-125 lg:max-w-150 h-auto"
 					/>
 				</div>
-
 
 				<div className="flex justify-center">
 					<Link href="https://www.ozon.ru/seller/green-pato/" target="_blank" rel="noopener noreferrer" className="relative bg-(--accent) px-8 sm:px-16 md:px-24 py-3 md:py-4 text-foreground text-xl sm:text-2xl md:text-3xl font-bold uppercase rounded-lg hover:bg-foreground hover:text-(--accent) w-full sm:w-auto text-center transition-colors duration-200">

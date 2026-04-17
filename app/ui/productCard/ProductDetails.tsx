@@ -87,12 +87,12 @@ export default function ProductDetails({ data }: { data: ProductCard}) {
 				>
 						В корзину
 				</Button>
-			<Counter 
-				className="w-55 justify-evenly"
-				initialValue={Number(qty) || 1}
-				min={1}
-				max={10}
-			/>
+				<Counter 
+					className="w-55 justify-evenly"
+					initialValue={Number(qty) || 1}
+					min={1}
+					max={10}
+				/>
 		</div>
 	</div>
 	)

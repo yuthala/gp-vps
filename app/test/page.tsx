@@ -1,6 +1,7 @@
 
 'use client'
 import { useState } from 'react';
+import Heading from '../ui/Heading';
 //import { User, Truck, CreditCard, X } from 'lucide-react'; // Используем lucide-react для иконок
 
 interface CartItem {
@@ -38,7 +39,7 @@ export default function CheckoutPage() {
           {/* ШАГ 1: ПОЛУЧАТЕЛЬ */}
           <section className="border rounded-lg p-6 relative">
             <div className="absolute -left-3 top-6 bg-gray-200 text-gray-500 w-8 h-8 rounded-md flex items-center justify-center font-bold">1</div>
-            <h2 className="text-lg font-medium mb-4 ml-4">Получатель</h2>
+            <Heading level={2} className="text-lg font-medium mb-4 ml-4">Получатель</Heading>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input type="text" placeholder="Фамилия *" className="border p-2 rounded w-full outline-none focus:border-green-500" />
               <input type="text" placeholder="Имя *" className="border p-2 rounded w-full outline-none focus:border-green-500" />
@@ -64,7 +65,7 @@ export default function CheckoutPage() {
           {/* ШАГ 2: ДОСТАВКА */}
           <section className="border rounded-lg p-6 relative opacity-60">
              <div className="absolute -left-3 top-6 bg-gray-200 text-gray-500 w-8 h-8 rounded-md flex items-center justify-center font-bold">2</div>
-             <h2 className="text-lg font-medium mb-4 ml-4">Способ доставки</h2>
+             <Heading level={2} className="text-lg font-medium mb-4 ml-4">Способ доставки</Heading>
              <p className="text-sm text-gray-500 mb-2">Выберите курьерскую службу</p>
              <select className="border p-2 rounded w-full md:w-1/2 mb-4 bg-gray-50">
                <option>Выберите...</option>
@@ -90,7 +91,7 @@ export default function CheckoutPage() {
           {/* ШАГ 3: ОПЛАТА */}
           <section className="border rounded-lg p-6 relative opacity-60">
              <div className="absolute -left-3 top-6 bg-gray-200 text-gray-500 w-8 h-8 rounded-md flex items-center justify-center font-bold">3</div>
-             <h2 className="text-lg font-medium mb-4 ml-4">Способ оплаты</h2>
+             <Heading level={2} className="text-lg font-medium mb-4 ml-4">Способ оплаты</Heading>
              <div className="flex flex-wrap gap-4">
                <div className="border rounded p-3 flex items-center gap-2 cursor-pointer hover:border-blue-400">
                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-[10px] text-white">SBP</div>
@@ -109,7 +110,7 @@ export default function CheckoutPage() {
         {/* ПРАВАЯ КОЛОНКА: ВАШ ЗАКАЗ */}
         <aside className="lg:col-span-1">
           <div className="bg-gray-50 rounded-lg p-6 border sticky top-6">
-            <h2 className="text-xl font-bold uppercase mb-6">Ваш заказ</h2>
+            <Heading level={2} className="text-xl font-bold uppercase mb-6">Ваш заказ</Heading>
             <div className="space-y-6 mb-8">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex gap-3 relative">

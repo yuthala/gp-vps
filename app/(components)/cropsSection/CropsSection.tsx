@@ -1,12 +1,13 @@
 "use client";
 import Image from 'next/image';
 import CropsCards from './CropsCards';
+import Heading from '../../ui/Heading';
 
 export default function CropsSection() {
 	return (
 		<section className="w-full">
 			<div className="max-w-full mx-auto">
-				<h2 className="text-3xl md:text-4xl font-bold text-center pb-8 lg:pb-12">Культуры</h2>
+				<Heading level={2} className="text-3xl md:text-4xl font-bold text-center pb-8 lg:pb-12">Культуры</Heading>
 				<div className="flex items-center justify-center gap-2 sm:gap-4">
 					<Image
 						src="/cropsSection/crops-1.webp"

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Button from "../Button";
 import Link from "next/link";
+import Heading from "../Heading";
 
 export default function CartEmpty() {
 	return(
@@ -20,9 +21,7 @@ export default function CartEmpty() {
 				{/* Right block with text and button */}
 				<div className="flex flex-col gap-6 items-center md:items-start text-center md:text-left">
 					{/* Phrase */}
-					<h2 className="text-2xlfont-semibold text-foreground">
-						Ваша корзина пуста
-					</h2>
+					<Heading level={2} className="text-2xlfont-semibold text-foreground">Ваша корзина пуста</Heading>
 					
 					{/* Button */}
 					<Link href="/catalog">

@@ -7,6 +7,7 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import Button from '../Button';
+import Heading from '../Heading';
 import { useCartStore } from '@/app/lib/useCartStore';
 import { CartItem } from '@/app/lib/definitions';
 import CaseNumber from '@/app/ui/shoppingCart/caseNumber';
@@ -53,9 +54,7 @@ export default function CartNotification() {
           {/* Заголовок */}
           <div className="flex items-center gap-2 mb-6">
             <CheckCircleIcon className="h-12 w-12 text-green-500" />
-            <h5 className="normal-case">
-              Товар добавлен в корзину
-            </h5>
+            <Heading level={5} className="normal-case">Товар добавлен в корзину</Heading>
           </div>
 
 					{/* Кнопка закрытия */}
@@ -77,9 +76,9 @@ export default function CartNotification() {
               className="w-24 h-24 object-cover rounded-md border border-gray-100"
             />
             <div className="flex-1">
-              <h6 className="leading-tight">
+              <Heading level={6} className="leading-tight">
                 {descr}, {packageSz} г.
-              </h6>
+              </Heading>
             </div>
           </div>
         </div>

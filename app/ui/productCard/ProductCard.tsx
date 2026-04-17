@@ -5,6 +5,7 @@ import Image from "next/image";
 import Button from "../Button";
 import Link from "next/link";
 import Pricing from "../Pricing";
+import Heading from "../Heading";
 
 
 export default async function ProductCard({ pathName}: { pathName: string}) {
@@ -35,9 +36,9 @@ export default async function ProductCard({ pathName}: { pathName: string}) {
                   {/* Card Content - flex-grow to fill remaining space */}
                   <div className="p-4 flex flex-col grow">
                     {/* Short Description */}
-                    <h6 className="h-22.5 mb-3 line-clamp-3 shrink-0">
+                    <Heading level={6} className="h-22.5 mb-3 line-clamp-3 shrink-0">
                       {product.description || 'Здесь должно быть описание товара'}
-                    </h6>
+                    </Heading>
 
 										<OnStock onStockStatus={product.onStockStatus}/>
                     

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Delivery } from "../../lib/definitions";
+import Heading from "../../ui/Heading";
 
 const deliveryCards: Delivery[] = [
 	{imageSrc: '/deliverySection/5post.jpg', imageDescription: '5post'},
@@ -14,7 +15,7 @@ export default function DeliverySection() {
 	return (
 		<section className="w-full pb-8 md:pb-16">
 			<div className="max-w-7xl mx-auto grid justify-center">
-				<h2 className="text-3xl md:text-4xl font-bold text-center pb-8 lg:pb-12">Доставка и оплата</h2>
+				<Heading level={2} className="text-3xl md:text-4xl font-bold text-center pb-8 lg:pb-12">Доставка и оплата</Heading>
 				{/* <!-- 3-Column Grid --> */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
 					{/* <!-- Column 1 --> */}
