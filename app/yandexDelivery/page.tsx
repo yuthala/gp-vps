@@ -23,7 +23,7 @@ export default function DeliveryWidget() {
           },
            source_platform_station: "05e809bb-4521-42d9-a936-0fb0744c0fb3",  // Станция отгрузки
                     physical_dims_weight_gross: 10000,                    // Вес отправления
-                    delivery_price: (price) => price + " руб",            // Стоимость доставки
+                    delivery_price: (price: number) => price + " руб",            // Стоимость доставки
                     delivery_term: 3,                                     // Срок доставки
                     show_select_button: true,
           filter: {
