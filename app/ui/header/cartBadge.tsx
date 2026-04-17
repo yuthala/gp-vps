@@ -11,7 +11,7 @@ interface CartBadgeProps {
 export default function CartBadge({ initialCount = '0', className }: CartBadgeProps) {
 	const [isHydrated, setIsHydrated] = useState(false);
   const count = useCartStore((state) => state.items.length)
-  console.log('count', count)
+  //console.log('count', count)
 
   // Once this runs, we know the Client Store has loaded from LocalStorage/Cookies
   useEffect(() => {
