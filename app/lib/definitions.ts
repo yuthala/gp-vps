@@ -143,6 +143,26 @@ export type ProductCard = {
 	id: number;
 }
 
+export type CropCard = {
+	id: string; // название на латинице для маршрута в строке поиска
+	imageSrc: string;
+	title: string;
+	cropChars: string;
+	cropDescr: string;
+	// id: number;
+	// cropType: 'garlic' | 'onion' | 'shalot';
+	// pathName: 'lyubasha' | 'bogatyr' | 'shadeyka' | 'komarov' | 'redbaron' | 'stardust' | 'kwochka' | 'cebrune'; //из actions.ts
+	// imageSrc: string;
+	// title: string;
+	// cropChars: string;//особенности сорта
+	// cropDescr: string;//описание головки
+}
+
+export type CropsSection = {
+	title: string;
+	items: CropCard[];
+}
+
 export type ShoppingCart = {
 	cartItems: CartItem[];
 }

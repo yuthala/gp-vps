@@ -18,7 +18,7 @@ export default function AdvantagesSection() {
   return (
     <section className="flex justify-center w-full pb-16">
       <div className="max-w-6xl mx-auto px-4">
-        <Heading level={2} className="advantages-heading pb-4 sm:pb-8 lg:pb-12">Здесь вы можете приоберсти оригинальную продукцию <span className="text-3xl lg:text-4xl lowercase font-bold text-(--secondary)">green pato</span></Heading>
+        <Heading level={2} className="advantages-heading pb-4 sm:pb-8 lg:pb-12">Здесь вы можете приобрести оригинальную продукцию <span className="text-3xl lg:text-4xl lowercase font-bold text-(--secondary)">green pato</span></Heading>
 
 				<div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-foreground font-light text-lg leading-[1.3] auto-rows-fr">
 						{cards.map((card) => {

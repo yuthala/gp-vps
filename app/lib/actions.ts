@@ -1,5 +1,5 @@
 'use server';
-import { CatalogSection, CatalogCard, ProductCard, CartItem, ShoppingCart, MiniProductCard } from "../lib/definitions";
+import { CatalogSection, CatalogCard, CropsSection, CropCard, ProductCard, CartItem, ShoppingCart, MiniProductCard } from "../lib/definitions";
 import { cookies } from 'next/headers'
 
 import { z } from 'zod';
@@ -163,7 +163,7 @@ export async function getDataForCatalogPage() {
 			const ShalotCards: CatalogCard[] = [
 				{id: 'shalotsevok', imageSrc: '/catalog/shalot.webp', title: 'Севок'},
 				{id: 'shalotchernushka', imageSrc: '/catalog/seeds.webp', title: 'Семена'},
-			]
+			];
 		
 			const sections: CatalogSection[] = [
 				{
@@ -184,6 +184,105 @@ export async function getDataForCatalogPage() {
 		}
 }
 
+export async function getDataForCropPage() {
+	const GarlicCards: CropCard[] = [
+		{id: 'lyubasha', imageSrc: '/products/lyubasha_zubok.webp', title: 'Любаша', cropChars: 'высокоурожайный, средне-ранний (вегетационный период 100-110 дней) сорт. Морозоустойчивый, нетребователен к поливу и качеству почвы. Устойчив к болезням.', cropDescr: 'головка крупная, содержит 6-8 зубков. Вкус острый, аромат насыщенный.'},
+		{id: 'bogatyr', imageSrc: '/products/bogatyr_zubok.webp', title: 'Богатырь', cropChars: 'крупнополодный, средне-поздний (вегетационный период 120 дней) сорт. Неприхотлив в уходе, генетический устойчив ко многим болезням чеснока.', cropDescr: 'один их самых крупных сортов, содержит 5-6 крупных зубков весом до 25 г. Вкус очень острый.'},
+		{id: 'shadeyka', imageSrc: '/products/shadeyka.webp', title: 'Шадейка', cropChars: 'морозоустойчивый, неприхотливый сорт озимого чеснока. Выведен в Пермском Крае, подходит для самых суровых условий выращивания. Великолепный вкус и аромат.', cropDescr: 'головка относительно некрупная, содержит 6-8 зубчиков. Мякоть сочная, имеет сбалансированный вкус.'},
+		{id: 'komarov', imageSrc: '/products/komarov.webp', title: 'Григорий Комаров', cropChars: 'крупноплодный, средне-ранний сорт. Особенно хорошо растет в южных и центральных регионах. Не вымерзает зимой, устойчив к болезням.', cropDescr: 'головка крупная, содержит 5-7 зубчиков. Зубки крупные. Вкус средне-острый, аромат насыщенный.'}
+	];
+	const OnionCards: CropCard[] = [
+		{id: 'redbaron', imageSrc: '/products/redbaron.webp', title: 'Ред Барон', cropChars: 'красный репчатый лук голландской селекции. Вегетационный период -  95-105  дней (раннеспелый). Подходит для выращивания во всех регионах.', cropDescr: 'головка красно-фиолетового цвета весом 70-120 г. Вкус полуострый, сладковатый.'},
+		{id: 'stardust', imageSrc: '/products/hercules.webp', title: 'Стардаст', cropChars: 'белый репчатый лук голландской селекции. Средне-ранний (вегетационный период 100-110 дней). Устойчив ко многим болезням, неприхотлив.', cropDescr: 'головка крупная, весом 150-250 г, с серебристо-белыми чешуями. Вкус полуострый, сладковатый.'}
+	];
+	const ShalotCards: CropCard[] = [
+		{id: 'kwochka', imageSrc: '/products/kwochka.webp', title: 'Квочка', cropChars: 'скороспелый- вегетационный период 70-80 дней.  Растет по 6-9 луковиц в “гнезде”. Отлично хранится до весны.', cropDescr: 'головки некрупные, в среднем 30-40 г. Вкус полуострый, мягкий. Сочные чешуи белые с фиолетовыми стенками.'},
+		{id: 'cebrune', imageSrc: '/products/cebrune_seeds.webp', title: 'Цебруне', cropChars: 'легендарный лук шалот из французской кухни. Средне-поздний (вегетационный период 110-120 дней). Выращивается преимущественно в теплых регионах.', cropDescr: 'головка вытянутая, довольно крупная, мякоть сочная. Используется для гриля и в салатах.'}
+	];
+
+	const sections: CropsSection[] = [
+		{
+			title: 'чеснок',
+			items: GarlicCards
+		},
+		{
+			title: 'лук',
+			items: OnionCards
+		},
+		{
+			title: 'шалот',
+			items: ShalotCards
+		}
+	];
+
+	return {
+		sections
+	}
+}
+
+//страница Культуры
+// export async function getDataForCropsPage() {
+// 	const GarlicCards: CropCard[] = [
+// 		{id: 'lyubasha', imageSrc: '/catalog/zubok.webp', title: 'Любаша', cropChars: 'высокоурожайный, средне-ранний (вегетационный период 100-110 дней) сорт. Морозоустойчивый, нетребователен к поливу и качеству почвы. Устойчив к болезням.', cropDescr: 'головка крупная, содержит 6-8 зубков. Вкус острый, аромат насыщенный.'},
+// 		{id: 'bogatyr', imageSrc: '/products/bogatyr_zubok.webp', title: 'Богатырь', cropChars: 'крупнополодный, средне-поздний (вегетационный период 120 дней) сорт. Неприхотлив в уходе, генетический устойчив ко многим болезням чеснока.', cropDescr: 'один их самых крупных сортов, содержит 5-6 крупных зубков весом до 25 г. Вкус очень острый.' },
+// 		{id: 'shadeyka', imageSrc: '/products/shadeyka.webp', title: 'Шадейка', cropChars: 'морозоустойчивый, неприхотливый сорт озимого чеснока. Выведен в Пермском Крае, подходит для самых суровых условий выращивания. Великолепный вкус и аромат.', cropDescr: 'головка относительно некрупная, содержит 6-8 зубчиков. Мякоть сочная, имеет сбалансированный вкус.'},
+// 		{id: 'grigoriy', imageSrc: '/products/komarov.webp', title: 'Григорий Комаров', cropChars: 'крупноплодный, средне-ранний сорт. Особенно хорошо растет в южных и центральных регионах. Не вымерзает зимой, устойчив к болезням.', cropDescr: 'головка крупная, содержит 5-7 зубчиков. Зубки крупные. Вкус средне-острый, аромат насыщенный.'},
+// 	];
+// 	const OnionCards: CropCard[] = [
+// 		{id: 'redbaron', imageSrc: '/products/redbaron.webp', title: 'Ред Барон', cropChars: 'красный репчатый лук голландской селекции. Вегетационный период -  95-105  дней (раннеспелый). Подходит для выращивания во всех регионах.', cropDescr: 'головка красно-фиолетового цвета весом 70-120 г. Вкус полуострый, сладковатый.'},
+// 		{id: 'stardust', imageSrc: '/products/hercules.webp', title: 'Стардаст', cropChars: 'белый репчатый лук голландской селекции. Средне-ранний (вегетационный период 100-110 дней). Устойчив ко многим болезням, неприхотлив.', cropDescr: 'головка крупная, весом 150-250 г, с серебристо-белыми чешуями. Вкус полуострый, сладковатый.'},
+// 	];
+// 	const ShalotCards: CropCard[] = [
+// 		{id: 'kwochka', imageSrc: '/products/kwochka.webp', title: 'Квочка', cropChars: 'скороспелый- вегетационный период 70-80 дней.  Растет по 6-9 луковиц в “гнезде”. Отлично хранится до весны.', cropDescr: 'головки некрупные, в среднем 30-40 г. Вкус полуострый, мягкий. Сочные чешуи белые с фиолетовыми стенками.'},
+// 		{id: 'cebrune', imageSrc: '/products/cebrune_seeds.webp', title: 'Цебруне', cropChars: 'легендарный лук шалот из французской кухни. Средне-поздний (вегетационный период 110-120 дней). Выращивается преимущественно в теплых регионах.', cropDescr: 'головка вытянутая, довольно крупная, мякоть сочная. Используется для гриля и в салатах.'},
+// 	];
+// 			const sections: CropsSection[] = [
+// 			{
+// 				title: 'чеснок',
+// 				items: GarlicCards
+// 			},
+// 			{
+// 				title: 'лук',
+// 				items: OnionCards
+// 			},
+// 			{
+// 				title: 'шалот',
+// 				items: ShalotCards
+// 			}
+// 		];
+// 		return {
+// 			sections
+// 		}
+// }
+
+//компонент CropCard
+// export async function getCropCard(pathName: string, cropName?: string) {
+// 	const products: CropCard[] = [
+// 		{cropType: 'garlic', pathName: 'lyubasha', id: 0, imageSrc: '/catalog/zubok.webp', title: 'Любаша', cropChars: 'высокоурожайный, средне-ранний (вегетационный период 100-110 дней) сорт. Морозоустойчивый, нетребователен к поливу и качеству почвы. Устойчив к болезням.', cropDescr: 'головка крупная, содержит 6-8 зубков. Вкус острый, аромат насыщенный.'},
+// 		{cropType: 'garlic', pathName: 'bogatyr', id: 1, imageSrc: '/products/bogatyr_zubok.webp', title: 'Богатырь', cropChars: 'крупнополодный, средне-поздний (вегетационный период 120 дней) сорт. Неприхотлив в уходе, генетический устойчив ко многим болезням чеснока.', cropDescr: 'один их самых крупных сортов, содержит 5-6 крупных зубков весом до 25 г. Вкус очень острый.' },
+// 		{cropType: 'garlic', pathName: 'shadeyka', id: 2, imageSrc: '/products/shadeyka.webp', title: 'Шадейка', cropChars: 'морозоустойчивый, неприхотливый сорт озимого чеснока. Выведен в Пермском Крае, подходит для самых суровых условий выращивания. Великолепный вкус и аромат.', cropDescr: 'головка относительно некрупная, содержит 6-8 зубчиков. Мякоть сочная, имеет сбалансированный вкус.'},
+// 		{cropType: 'garlic', pathName: 'komarov', id: 3, imageSrc: '/products/komarov.webp', title: 'Григорий Комаров', cropChars: 'крупноплодный, средне-ранний сорт. Особенно хорошо растет в южных и центральных регионах. Не вымерзает зимой, устойчив к болезням.', cropDescr: 'головка крупная, содержит 5-7 зубчиков. Зубки крупные. Вкус средне-острый, аромат насыщенный.'},
+// 		{cropType: 'onion', pathName: 'redbaron', id: 4, imageSrc: '/products/redbaron.webp', title: 'Ред Барон', cropChars: 'красный репчатый лук голландской селекции. Вегетационный период -  95-105  дней (раннеспелый). Подходит для выращивания во всех регионах.', cropDescr: 'головка красно-фиолетового цвета весом 70-120 г. Вкус полуострый, сладковатый.'},
+// 		{cropType: 'onion', pathName: 'stardust', id: 5, imageSrc: '/products/hercules.webp', title: 'Стардаст', cropChars: 'белый репчатый лук голландской селекции. Средне-ранний (вегетационный период 100-110 дней). Устойчив ко многим болезням, неприхотлив.', cropDescr: 'головка крупная, весом 150-250 г, с серебристо-белыми чешуями. Вкус полуострый, сладковатый.'},
+// 		{cropType: 'shalot', pathName: 'kwochka', id: 6, imageSrc: '/products/kwochka.webp', title: 'Квочка', cropChars: 'скороспелый- вегетационный период 70-80 дней.  Растет по 6-9 луковиц в “гнезде”. Отлично хранится до весны.', cropDescr: 'головки некрупные, в среднем 30-40 г. Вкус полуострый, мягкий. Сочные чешуи белые с фиолетовыми стенками.'},
+// 		{cropType: 'shalot', pathName: 'cebrune', id: 7, imageSrc: '/products/cebrune_seeds.webp', title: 'Цебруне', cropChars: 'легендарный лук шалот из французской кухни. Средне-поздний (вегетационный период 110-120 дней). Выращивается преимущественно в теплых регионах.', cropDescr: 'головка вытянутая, довольно крупная, мякоть сочная. Используется для гриля и в салатах.'},
+// 	];
+// 		let res = products.filter((obj) => {
+// 		return obj.pathName === pathName;
+// 	});
+
+// 	if(cropName) {
+// 		res = res.filter((obj) => {
+// 			return obj.cropName === cropName;
+// 		})
+// 	}
+// 	const data = res[0]
+
+// 	return {
+// 		res, data, products
+// 	}
+// }
+
 //компонент ProductCard
 export async function getProductCard(pathName: string, cropName?: string) {
 
@@ -191,7 +290,7 @@ export async function getProductCard(pathName: string, cropName?: string) {
 		{imageSrc: ['/products/lyubasha_zubok.webp', '/products/lyubasha.webp'], description: 'Описание Любаша зубок Описание Любаша зубок', descriptionDetails: '"Любаша" - высокоурожайный, неприхотливый сорт озимого чеснока. Срок созревания 100-110  дней. Головка крупная, весом до 120 г, состоит из 5-7 крупных зубчиков. <br/> Меньше хлопот и мусора, больше посевного материала! Зубки чеснока отборного качества: без мусора, повреждений и некондиции - то, что нужно для осенней посадки. Экономит ваше время и деньги.', 
 			cropSort: 'Любаша', cropName: 'lyubasha', tags: ['#чеснок', '#зубок', '#Любаша'], packageSize: [2.5, 0, 10], cropSize: 'мелкая', pathName: 'zubok', onStockStatus: 'expected', price: 100, measureUnit: 100, estimatedOnStockDate: '10.08.2026',id: 1},
 		{imageSrc: ['/products/bogatyr_zubok.webp', '/products/bogatyr.webp'], description: 'описание Богатырь зубок', descriptionDetails: 'Сорт “Богатырь” - озимый стрелкующийся сорт чеснока с особо крупной головкой. Сорт подмосковной селекции. Масса головки в среднем 90-100  г при соблюдении агротехники. Самые крупные головки имеют вес 130-150 г.<br/>Меньше хлопот и мусора, больше посевного материала! Зубки чеснока отборного качества: без мусора, повреждений и некондиции - то, что нужно для осенней посадки. Экономит ваше время и деньги.', 
-			cropName: 'bogatyr', cropSort: 'Богатырь', tags: ['#чеснок', '#зубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', pathName: 'zubok', onStockStatus: 'available', price: 120, measureUnit: 100, id: 2},
+		  cropName: 'bogatyr', cropSort: 'Богатырь', tags: ['#чеснок', '#зубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', pathName: 'zubok', onStockStatus: 'available', price: 120, measureUnit: 100, id: 2},
 		{imageSrc: ['/products/bogatyr_odnozubok.webp', '/products/bogatyr.webp'], description: 'Однозубок чеснока, сорт Богатырь, размер средний', descriptionDetails: 'Сорт “Богатырь” - озимый стрелкующийся сорт чеснока с особо крупной головкой. Сорт подмосковной селекции. Масса головки в среднем 90-100  г при соблюдении агротехники. Самые крупные головки имеют вес 130-150 г.<br/> Однозубок - элитный посевной материал для обновления сорта. Представляет собой небольшую луковку, выращенную из воздушных луковиц чеснока.', 
 			cropName: 'bogatyr', tags: ['#чеснок', '#однозубок', '#Богатырь'], packageSize: [2.5, 5, 10], cropSize: 'средняя', cropSort: 'Богатырь', pathName: 'odnozubok', onStockStatus: 'available', price: 140, measureUnit: 100, estimatedOnStockDate: '10.08.2026', id: 3},
 		{imageSrc: ['/products/shadeyka_odnozubok.webp', '/products/shadeyka.webp'], description: 'описание Шадейка однозубок', descriptionDetails: 'Сорт “Шадейка” - высокоурожайный и неприхотливый озимый сорт чеснока. Один из самых современных сортов чеснока, генетически устойчив к болезням. Сорт специально  выведен  для сурового российского климата.  Срок созревания 110-120 дней. <br/> Однозубок - элитный посевной материал для обновления сорта. Представляет собой небольшую луковку, выращенную из воздушных луковиц чеснока.', 
