@@ -63,7 +63,7 @@ export default async function CropsPage() {
 													color="#064929"
 													backgroundColor="#D3D34F"
 													borderColor="#064929"
-													className="w-full font-bold text-xl uppercase transition-all duration-200 hover:scale-110"
+													className="w-full font-bold text-xl uppercase transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100"
 													>Купить
 												</Button>
 											</Link>

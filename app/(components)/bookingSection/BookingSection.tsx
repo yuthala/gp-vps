@@ -15,7 +15,7 @@ export default function BookingSection() {
 					<div className="flex justify-center items-center">
 						<Link 
               href="/booking" 
-              className="relative bg-(--accent) px-16 md:px-24 py-3 md:py-4 text-foreground text-xl sm:text-2xl md:text-3xl font-bold uppercase rounded-lg hover:bg-foreground hover:text-(--accent) w-full sm:w-auto text-center transition-colors duration-200"
+              className="relative bg-(--accent) px-16 md:px-24 py-3 md:py-4 text-foreground text-xl sm:text-2xl md:text-3xl font-bold uppercase rounded-lg  w-full sm:w-auto text-center transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100"
             >
               Забронировать
               <span className="absolute sm:right-4 top-1/2 -translate-y-1/2 text-5xl font-normal hidden sm:inline">›</span>
