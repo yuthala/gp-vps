@@ -41,18 +41,21 @@ export default function Footer() {
 							<Link 
 								href="/pdf/policy.pdf" 
 								className="text-sm md:text-base uppercase hover:underline hover:opacity-80 transition w-fit"
+								target="_blank"
 							>
 								ПОЛИТИКА ОБРАБОТКИ<br /> ПЕРСОНАЛЬНЫХ ДАННЫХ
 							</Link>
 							<Link 
 								href="/pdf/public_offer.pdf" 
 								className="text-sm md:text-base hover:underline hover:opacity-80 transition w-fit"
+								target="_blank"
 							>
 								ПУБЛИЧНАЯ ОФЕРТА
 							</Link>
 							<Link 
 								href="/sitemap" 
 								className="text-sm md:text-base lowercase underline hover:underline hover:opacity-80 transition w-fit"
+								target="_blank"
 							>
 								Карта сайта
 							</Link>
