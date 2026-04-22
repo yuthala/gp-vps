@@ -2,10 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import Heading from "../ui/Heading";
 import { getDataForCatalogPage } from "../lib/actions";
+import { getProductCard } from "../lib/actions";
 
-export default async function Catalog() {
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
 
-	const sections = (await getDataForCatalogPage()).sections;
+export default async function Catalog({ params }: PageProps) {
+
+	// const sections = (await getDataForCatalogPage()).sections;
+	const { sections } = await getDataForCatalogPage();
+	const { id } = await params;
 
 	return (
 		<div className="w-full flex justify-center">
@@ -32,8 +39,8 @@ export default async function Catalog() {
 														className="absolute inset-0 w-full h-full object-cover"
 													/>
 												</div>
-												<div className="p-4 h-24 flex items-center justify-center">
-													<Heading level={4}>{item.title}</Heading>
+												<div className="p-4 h-18 flex items-center justify-center">
+													<Heading level={6} className="uppercase text-center">{item.title}</Heading>
 												</div>
 											</Link>
 										</li>

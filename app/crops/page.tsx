@@ -19,7 +19,7 @@ export default async function CropsPage() {
 							<div key={`${section.title}-${index}`} className="pb-8 lg:pb-12">
 								<div className="flex justify-between flex-col sm:flex-row sm:items-center sm:gap-2">
 									<Heading level={5} className="font-semibold pb-2 sm:pb-4">{section.title}</Heading>
-									<Link href="" className="inline-flex items-center gap-2 text-foreground lowercase text-sm font-extrabold pb-3 sm:pb-0">
+									<Link href="/" className="inline-flex items-center gap-2 text-foreground lowercase text-sm font-extrabold pb-3 sm:pb-0">
 										<span className="underline underline-offset-3">Подробнее о культуре</span>
 										<ChevronDoubleRightIcon className="h-5 w-5" />
 									</Link>
