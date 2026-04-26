@@ -8,6 +8,7 @@ import Button from "../../ui/Button";
 import PaymentOptions from "@/app/ui/checkout/PaymentSelector";
 import ShoppingCartComponent from "./ShoppingCartComponent";
 import CheckoutTotal from "./CheckoutTotal";
+import DeliveryWidget from './../yandexDelivery/YandexDelivery';
 
 export default function CheckoutComponent() {
 	  // Track if steps 2 and 3 are visible
@@ -71,26 +72,28 @@ export default function CheckoutComponent() {
 									<option>Почта России</option>
 									<option>Яндекс Доставка</option>
 								</select>
+
+								<DeliveryWidget />
 								
-								<div className="text-normal md:text-lg text-foreground pt-8">
+								{/* <div className="text-normal md:text-lg text-foreground pt-8">
 									<p>Укажите адрес пункта выдачи выбранной курьерской службы.</p>
 									<p>Посмотреть доступные адреса пунктов выдачи можно по ссылке:</p>
 									<Link href="https://fivepost.ru/point-map/" target="_blank" className="text-green-500 underline">https://fivepost.ru</Link>
-								</div>
+								</div> */}
 
-								<div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+								{/* <div className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
 										<select className="border p-2 rounded w-full bg-gray-50">
 											<option>Выберите...</option>
 										</select>
-								</div>
+								</div> */}
 								{/* 
 								<div>
 									<input type="text" placeholder="Адрес *" className="border p-2 rounded w-full bg-gray-50" />
 								</div> */}
 								
-								<div className="pt-6 text-normal md:text-xl uppercase font-bold text-green-600">
+								{/* <div className="pt-6 text-normal md:text-xl uppercase font-bold text-green-600">
 									Стоимость доставки: <span className="text-red-500 pl-4"> р</span>
-								</div>
+								</div> */}
 							</section>
 
 							{/* ШАГ 3: ОПЛАТА */}

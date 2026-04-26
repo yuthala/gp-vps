@@ -2,6 +2,7 @@
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
 
+import { strict } from "assert";
 import { JSX } from "react/jsx-dev-runtime";
 
 // However, these types are generated automatically if you're using an ORM such as Prisma.
@@ -192,4 +193,15 @@ export type IDPkgSize = {
   pkgSize: number;
 }
 
+export type checkoutInfo = {
+goodsTotalPrice: number;
+deliveryPrice: string;
+userName: string;
+userSecondName: string;
+e_mail: string;
+phoneNumber: string;
+userComments: string;
+deliveryPointID: string;
+deliveryPointAdress: string
+}
 
