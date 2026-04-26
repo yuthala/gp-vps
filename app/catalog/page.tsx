@@ -2,17 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import Heading from "../ui/Heading";
 import { getDataForCatalogPage } from "../lib/actions";
-import { getProductCard } from "../lib/actions";
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+export default async function Catalog() {
 
-export default async function Catalog({ params }: PageProps) {
-
-	// const sections = (await getDataForCatalogPage()).sections;
-	const { sections } = await getDataForCatalogPage();
-	const { id } = await params;
+	const sections = (await getDataForCatalogPage()).sections;
 
 	return (
 		<div className="w-full flex justify-center">
