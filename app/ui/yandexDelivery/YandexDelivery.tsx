@@ -131,8 +131,8 @@ export default function DeliveryWidget() {
 
        {deliveryInfo && (
         <div className="mt-4 p-4 bg-green-50 rounded text-foreground text-lg font-bold">
-          <p>Стоимость доставки: <b>{deliveryInfo.price} ₽</b></p>
-          <p>Срок доставки в днях: <b>{deliveryInfo.days}</b></p>
+          <p>Стоимость доставки: <span className="text-xl">{deliveryInfo.price} ₽</span></p>
+          <p>Срок доставки в днях: <span className="text-xl">{deliveryInfo.days}</span></p>
         </div>
        )}
     </>
