@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; 
 import { useState, useEffect } from "react";
 import type { CartItem } from "@/app/lib/definitions";
 import { clearShoppingCart} from '@/app/lib/shoppingCartActions';
@@ -20,6 +20,7 @@ export default function CheckoutTotal() {
 				if (cartData) {
 					setShoppingCart(JSON.parse(cartData));
 				}
+
 		}, []); // Empty dependency array means this runs once after mount
 	
 		// Calculate total from cart items
@@ -27,8 +28,8 @@ export default function CheckoutTotal() {
 			return sum + (item.price * item.qty);
 		}, 0) || 0;
 
-		//get delivery Price
-		const deliveryPrice = getCheckoutPrice() || 0;
+	//get delivery Price
+		const deliveryPrice = useCartStore((state) => state.deliveryPrice); 
 
 		//подсчет Сумма к оплате
 		const totalSum = cartTotal + deliveryPrice;

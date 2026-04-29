@@ -8,9 +8,11 @@ import { IDPkgSize } from './definitions';
 interface CartState {
   items: IDPkgSize[]; // массив ID товаров
   id_sizeModal: IDPkgSize;
+	deliveryPrice: number;
   	addItem: (id: string, pkgSize: number) => void;
 		deleteItem: (id: string, pkgSize: number) => void;
 		clearData: () => void;
+		setDeliveryPrice: (price: number) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -21,6 +23,9 @@ export const useCartStore = create<CartState>()(
 			id: '',
 			pkgSize: 0
 	  },
+		deliveryPrice: 0,
+
+		 setDeliveryPrice: (price) => set({ deliveryPrice: price }),
 
 		addItem: (id, pkgSize) =>
 			set((state) => {

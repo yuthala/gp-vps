@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Script from 'next/script';
 import { checkoutInfo } from '@/app/lib/definitions'
 import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions'
+import { useCartStore } from '../../lib/useCartStore';
 
 declare global {
   interface Window {
@@ -21,6 +22,7 @@ export default function DeliveryWidget() {
 
     const [deliveryInfo, setDeliveryInfo] = useState<deliveryInfo | null>(null);
 		let info = getCheckoutInfo()
+		const setPrice = useCartStore((state) => state.setDeliveryPrice);
 
     // 1. ФУНКЦИЯ ОБРАБОТКИ (куда отправляем данные ПВЗ)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +42,10 @@ export default function DeliveryWidget() {
       const result = await response.json(); // Цена от Яндекс приходит как строка
 			const priceString: string = result.price.replace(' RUB', ''); //  Убрали RUB из строки
 			const priceNumber = Math.round(parseFloat(priceString)) // Округлили до целого числа
-
+			
+			// update delivery price in zustand
+			setPrice(priceNumber)
+			
       setDeliveryInfo({ price: priceNumber , days: result.delivery_days });
 
 			// Update delivery info in local storage
