@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 const links = [
     { name: 'Корзина', href: '/shopping-cart', icon: ShoppingCartIcon },
-    { name: 'Вход', href: '/user-account', icon: UserCircleIcon }
+    { name: 'Вход', href: '/login-page', icon: UserCircleIcon }
 ]
 
 export default function BottomHeaderLinks() {
