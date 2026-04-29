@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type  Metadata  from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { inter, manrope } from "@/app/ui/fonts";
 import "@/app/globals.css";
