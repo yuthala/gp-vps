@@ -7,6 +7,7 @@ import CartBadge from './cartBadge';
 import { useState, useEffect } from 'react';
 import { getInitialValueFromCookies } from '@/app/lib/actions';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const links = [
     { name: 'Корзина', href: '/shopping-cart', icon: ShoppingCartIcon },
@@ -17,7 +18,7 @@ export default function BottomHeaderLinks() {
     const pathname = usePathname();
     const router = useRouter();
     const [cartCount, setCartCount] = useState<string>('0');
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         const fetchCartCount = async () => {
@@ -27,30 +28,53 @@ export default function BottomHeaderLinks() {
         fetchCartCount();
     }, []);
 
-    useEffect(() => {
-        const checkSession = async () => {
-            try {
-                const res = await fetch('/api/session/validate');
-                const data = await res.json();
-                setIsLoggedIn(data.ok === true);
-            } catch (err) {
-                console.error('Error checking session:', err);
-                setIsLoggedIn(false);
-            }
-        };
-        checkSession();
-    }, []);
-
-    const handleLoginClick = (e: React.MouseEvent, link: typeof links[0]) => {
+    const handleLoginClick = async (e: React.MouseEvent, link: typeof links[0]) => {
         if (link.name === 'Вход') {
             e.preventDefault();
-            const destination = isLoggedIn ? '/dashboard' : '/login-page';
-            router.push(destination);
+            setShowSpinner(true);
+            
+            try {
+                // Fetch fresh session status when button is clicked
+                const res = await fetch('/api/session/validate');
+                const data = await res.json();
+                
+                // Add delay for UX
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const destination = data.ok === true ? '/dashboard' : '/login-page';
+                setShowSpinner(false);
+                router.push(destination);
+            } catch (err) {
+                console.error('Error validating session:', err);
+                setShowSpinner(false);
+                router.push('/login-page');
+            }
         }
     };
 
     return (
         <>
+            {/* Loading Spinner */}
+            {showSpinner && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="relative w-24 h-24 flex items-center justify-center">
+                            {/* Spinning border around logo */}
+                            <div className="absolute w-32 h-32 border-4 border-transparent border-t-white border-r-white rounded-full animate-spin"></div>
+                            {/* Stable logo */}
+                            <Image
+                                src="/greenPato-logo.webp"
+                                width={96}
+                                height={96}
+                                alt="Loading"
+                                className="relative z-10"
+                            />
+                        </div>
+                        <p className="text-white font-semibold">Loading...</p>
+                    </div>
+                </div>
+            )}
+
             {links.map((link) => {
                 const LinkIcon = link.icon;
                 const isActive = pathname === link.href;
