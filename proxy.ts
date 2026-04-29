@@ -14,12 +14,12 @@ export async function proxy(req: NextRequest) {
         const origin = req.nextUrl.origin;
         const validateRes = await fetch(`${origin}/api/session/validate`, { headers: { cookie: req.headers.get('cookie') || '' } });
         if (!validateRes.ok) {
-          const loginUrl = new URL("/login", req.url);
+          const loginUrl = new URL("/login-page", req.url);
           return NextResponse.redirect(loginUrl);
         }
         // valid session — allow
       } catch (e) {
-        const loginUrl = new URL("/login", req.url);
+        const loginUrl = new URL("/login-page", req.url);
         return NextResponse.redirect(loginUrl);
       }
     }

@@ -1,7 +1,7 @@
 'use client'
 
 import { UserCircleIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import CartBadge from './cartBadge';
 import { useState, useEffect } from 'react';
@@ -10,12 +10,14 @@ import Link from 'next/link';
 
 const links = [
     { name: 'Корзина', href: '/shopping-cart', icon: ShoppingCartIcon },
-    { name: 'Вход', href: '/login-page', icon: UserCircleIcon }
+    { name: 'Вход', href: '', icon: UserCircleIcon }
 ]
 
 export default function BottomHeaderLinks() {
     const pathname = usePathname();
+    const router = useRouter();
     const [cartCount, setCartCount] = useState<string>('0');
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchCartCount = async () => {
@@ -24,6 +26,28 @@ export default function BottomHeaderLinks() {
         };
         fetchCartCount();
     }, []);
+
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const res = await fetch('/api/session/validate');
+                const data = await res.json();
+                setIsLoggedIn(data.ok === true);
+            } catch (err) {
+                console.error('Error checking session:', err);
+                setIsLoggedIn(false);
+            }
+        };
+        checkSession();
+    }, []);
+
+    const handleLoginClick = (e: React.MouseEvent, link: typeof links[0]) => {
+        if (link.name === 'Вход') {
+            e.preventDefault();
+            const destination = isLoggedIn ? '/dashboard' : '/login-page';
+            router.push(destination);
+        }
+    };
 
     return (
         <>
@@ -36,6 +60,7 @@ export default function BottomHeaderLinks() {
                     <Link
                         key={link.name}
                         href={link.href}
+                        onClick={(e) => handleLoginClick(e, link)}
                         className={clsx(
                             'group relative flex flex-col items-center gap-0 text-normal font-bold transition-all duration-200 hover:scale-110',
                             {
