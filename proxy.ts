@@ -19,6 +19,7 @@ export async function proxy(req: NextRequest) {
         }
         // valid session — allow
       } catch (e) {
+        console.log(e)
         const loginUrl = new URL("/login-page", req.url);
         return NextResponse.redirect(loginUrl);
       }
