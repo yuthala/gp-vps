@@ -8,6 +8,7 @@ import { useCartStore } from "../../lib/useCartStore";
 import Button from "../Button";
 import Link from "next/link";
 import { clear } from 'node:console';
+import { getCheckoutPrice } from '../../lib/checkoutActions';
 
 export default function CheckoutTotal() {
 	//получение Shopping cart после загрузки страницы
@@ -26,6 +27,12 @@ export default function CheckoutTotal() {
 			return sum + (item.price * item.qty);
 		}, 0) || 0;
 
+		//get delivery Price
+		const deliveryPrice = getCheckoutPrice() || 0;
+
+		//подсчет Сумма к оплате
+		const totalSum = cartTotal + deliveryPrice;
+
 		//для открытия модального окна
 		const router = useRouter();
 
@@ -39,9 +46,9 @@ export default function CheckoutTotal() {
 					<p>Товаров на сумму:</p>
 					<p className="text-right">{cartTotal} p.</p>
 					<p>Стоимость доставки:</p>
-					<p className="text-right">220 р</p>
+					<p className="text-right">{deliveryPrice} p.</p>
 					<p className="pt-8 md:pt-12 pb-8 text-2xl md:text-3xl font-extrabold">К ОПЛАТЕ:</p>
-					<p className="text-right pt-8 md:pt-12 pb-8 text-green-600 text-2xl md:text-3xl font-extrabold">1020 р</p>
+					<p className="text-right pt-8 md:pt-12 pb-8 text-green-600 text-2xl md:text-3xl font-extrabold">{totalSum} р.</p>
 				</div>
 				<Button
 					onClick={async function () {

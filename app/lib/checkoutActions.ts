@@ -1,4 +1,4 @@
-import { checkoutInfo }from '@/app/lib/definitions'
+import { checkoutInfo, ProductCard, CartItem, ShoppingCart }from '@/app/lib/definitions'
 
 
 
@@ -34,4 +34,16 @@ export const getCheckoutInfo = () => {
 				deliveryPointAdress: ""
 				};
 			}
+}
+
+export const getCheckoutPrice = () => {
+	if (typeof window !== 'undefined') {
+	const savedCheoutInfo = localStorage.getItem('checkoutInfo');
+		if (savedCheoutInfo ) {
+			const parsedInfo: checkoutInfo = JSON.parse(savedCheoutInfo);
+			const priceString: string = parsedInfo.deliveryPrice.replace(' RUB', ''); //  Убрали RUB из строки
+			const priceNumber = Math.round(parseFloat(priceString)) // Округлили до целого числа
+			return priceNumber;
+		}
+	}
 }
