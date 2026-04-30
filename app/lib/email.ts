@@ -39,6 +39,7 @@ export async function sendVerificationEmail(to: string, verifyUrl: string, name?
         logger: process.env.NODE_ENV === 'development',
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mail: any = {
         from: process.env.EMAIL_FROM || 'no-reply@example.com',
         to,
