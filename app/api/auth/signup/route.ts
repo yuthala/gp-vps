@@ -1,15 +1,17 @@
 import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
+import { randomBytes } from 'node:crypto';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 function generateToken() {
   try {
     // Node's crypto in edge/runtime
-    const { randomBytes } = require('crypto');
+    //const { randomBytes } = require('crypto');
     return randomBytes(32).toString('hex');
   } catch (e) {
+    console.log(e)
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
   }
 }
