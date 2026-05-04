@@ -1,5 +1,5 @@
 "use client";
-import { lusitana } from '@/app/ui/fonts';
+//import { lusitana } from '@/app/ui/fonts';
 import React from 'react';
 import {
   AtSymbolIcon,
@@ -20,104 +20,106 @@ export default function LoginForm({
 
   return (
     <form onSubmit={isSignUp ? onSignUp : onSubmit} className="space-y-3">
-      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
-        <h1 className={`${lusitana.className} mb-3 text-2xl`}>
-          {isSignUp ? 'Create an account' : 'Please log in to continue.'}
+      <div className="flex-1 rounded-lg bg-gray-50 border border-gray-200 px-6 pb-4 pt-8">
+        <h1 className="pb-3 text-2xl font-semibold text-foreground">
+          {isSignUp ? 'Зарегистрироваться' : 'Введите ваш логин и пароль'}
         </h1>
         {isSignUp && (
           <div>
             <label
-              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              className="py-2 block text-sm font-medium text-foreground"
               htmlFor="name"
             >
-              Name
+              Ваше имя
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-3 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-3 text-sm outline-2 placeholder:text-gray-500"
                 id="name"
                 type="text"
                 name="name"
-                placeholder="Your full name"
+                placeholder="Ваше имя"
                 required
               />
             </div>
           </div>
         )}
-        <div className="w-full">
+        <div className="w-full pt-4">
           <div>
             <label
-              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              className="py-2 block text-sm font-medium text-foreground"
               htmlFor="email"
             >
-              Email
+              Электронная почта
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 text-sm outline-2 placeholder:text-gray-500"
                 id="email"
                 type="email"
                 name="email"
-                placeholder="Enter your email address"
+                placeholder="Введите ваш адрес электронной почты"
                 required
               />
-              <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+              <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
           </div>
-          <div className="mt-4">
+          <div className="pt-4">
             <label
-              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              className="py-2 block text-sm font-medium text-foreground"
               htmlFor="password"
             >
-              Password
+              Пароль
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 text-sm outline-2 placeholder:text-gray-500"
                 id="password"
                 type="password"
                 name="password"
-                placeholder="Enter password"
+                placeholder="Ваш пароль"
                 required
                 minLength={6}
               />
-              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
           </div>
           {isSignUp && (
-            <div className="mt-4">
+            <div className="pt-4">
               <label
-                className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+                className="py-2 block text-sm font-medium text-foreground"
                 htmlFor="confirmPassword"
               >
-                Confirm password
+                Подтверждение пароля
               </label>
               <div className="relative">
                 <input
-                  className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                  className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 text-sm outline-2 placeholder:text-gray-500"
                   id="confirmPassword"
                   type="password"
                   name="confirmPassword"
-                  placeholder="Repeat password"
+                  placeholder="Повторите пароль"
                   required
                   minLength={6}
                 />
-                <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+                <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
               </div>
             </div>
           )}
         </div>
-        <Button type="submit" className="mt-4 w-full">
-          {isSignUp ? 'Create account' : 'Log in'}
-          <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+				<div className="pt-8">
+					<Button type="submit" className="w-full">
+          	{isSignUp ? 'Зарегистрироваться' : 'Войти'}
+          <ArrowRightIcon className="pl-auto h-5 w-5 text-gray-50" />
         </Button>
-        <div className="mt-3 text-center text-sm">
+				</div>
+        <div className="pt-3 text-center text-sm">
           <button
             type="button"
             onClick={() => setIsSignUp((s) => !s)}
-            className="text-blue-600 hover:underline"
+            className="text-green-600 hover:underline"
           >
-            {isSignUp ? 'Back to login' : 'Create an account'}
+            {isSignUp ? 'Назад на страницу входа' : 'Зарегистрироваться'}
           </button>
         </div>
         <div className="flex h-8 items-end space-x-1">

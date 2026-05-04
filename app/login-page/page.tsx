@@ -98,11 +98,11 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
+    <div className="flex min-h-screen justify-center p-6 pt-20 md:pt-30">
       <div className="w-full max-w-md">
         <LoginForm onSubmit={handleSubmit} onSignUp={handleSignUp} />
         {error && (
-          <div className="mt-3">
+          <div className="pt-3">
             <p className="text-sm text-red-600">{error}</p>
             {unverifiedEmail && (
               <button
@@ -130,7 +130,7 @@ export default function LoginPage() {
                   }
                 }}
                 disabled={resendLoading}
-                className="mt-2 text-sm text-indigo-600 hover:text-indigo-500 underline disabled:opacity-50"
+                className="pt-2 text-sm text-indigo-600 hover:text-indigo-500 underline disabled:opacity-50"
               >
                 {resendLoading ? 'Sending...' : 'Resend verification email'}
               </button>
@@ -138,10 +138,10 @@ export default function LoginPage() {
           </div>
         )}
         {info && (
-          <p className="mt-3 text-sm text-green-600">{info}</p>
+          <p className="pt-3 text-sm text-green-600">{info}</p>
         )}
-        {loading && <p className="mt-3 text-sm text-gray-600">Processing…</p>}
+        {loading && <p className="pt-3 text-sm text-gray-600">Processing…</p>}
       </div>
-    </main>
+    </div>
   );
 }
