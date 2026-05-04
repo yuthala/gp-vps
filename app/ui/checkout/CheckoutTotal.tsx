@@ -73,17 +73,8 @@ export default function CheckoutTotal() {
 
 				<div className="pt-4 text-foreground text-sm">
 					Нажимая на кнопку <span className="font-bold">&quot;Оформить заказ&quot;</span>, вы соглашаетесь с условиями
-					<Link href="/pdf/public_offer.pdf" className="text-green-600 underline" target="_blank">&nbsp; Публичной оферты</Link> и &nbsp; 
+					<Link href="/pdf/public_offer.pdf" className="text-green-600 underline" target="_blank">&nbsp; Публичной оферты</Link> &nbsp;&nbsp;и &nbsp; 
 					<Link href="/pdf/policy.pdf" className="text-green-600 underline" target="_blank">&nbsp; Политикой обработки персональных данных</Link>.&nbsp; 
-					<div className="flex pt-3">
-						<label className="inline-flex gap-1 pr-2 pt-1.25">
-							<input type="checkbox" defaultChecked={false} className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500" />
-						</label> 
-						<div>
-							<span className="text-foreground">Подтверждаю свое</span>
-							<Link href="/pdf/agreement_pd.pdf" className="text-green-600 underline" target="_blank">&nbsp;&nbsp;Cогласие на обработку персональных данных</Link>.
-						</div>
-					</div>
 				</div>
 			</section>
 		</div>

@@ -38,16 +38,27 @@ export default function CheckoutForm() {
 					/>
 				</div>
 				{!showRemainingSteps && (
-					<div className="pt-6 flex justify-end">
-						<Button 
-						onClick={() => setShowRemainingSteps(true)}
-						height={40}
-						color="#F2F9ED"
-						backgroundColor="#40AD52"
-						borderColor="#064929"
-						className="text-lg font-bold uppercase transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100">
-							ДАЛЕЕ
-						</Button>
+					<div className="flex flex-col">
+						<div className="pt-6">
+							<Button 
+							onClick={() => setShowRemainingSteps(true)}
+							height={40}
+							color="#F2F9ED"
+							backgroundColor="#40AD52"
+							borderColor="#064929"
+							className="text-lg font-bold uppercase transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100">
+								ДАЛЕЕ
+							</Button>
+						</div>
+						<div className="flex pt-3">
+							<label className="inline-flex gap-1 pr-2 pt-1.25">
+								<input type="checkbox" defaultChecked={false} className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+							</label> 
+							<div>
+								<span className="text-foreground">Подтверждаю свое</span>
+								<Link href="/pdf/agreement_pd.pdf" className="text-green-600 underline" target="_blank">&nbsp;&nbsp;Cогласие на обработку персональных данных</Link>.
+							</div>
+						</div>
 					</div>
 				)}
 			</section>
