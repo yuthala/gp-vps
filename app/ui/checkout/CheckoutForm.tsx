@@ -161,23 +161,23 @@ import Link from "next/link";
 import clsx from "clsx";
 import { z } from "zod";
 
-// Zod Validation Schema
+// Zod Validation Schema with specific user descriptions
 const checkoutSchema = z.object({
-  lastName: z.string().min(1, "Фамилия обязательна для заполнения"),
-  firstName: z.string().min(1, "Имя обязательно для заполнения"),
-  email: z.string().email("Некорректный формат E-mail"),
+  lastName: z.string().min(1, "Поле обязательно: введите вашу фамилию"),
+  firstName: z.string().min(1, "Поле обязательно: введите ваше имя"),
+  email: z.string().min(1, "Поле обязательно").email("Неверный формат: пример email@domain.com"),
   phone: z.string().refine((val) => {
     const digits = val.replace(/\D/g, "");
     return digits.length === 11;
-  }, "Введите полный номер телефона"),
+  }, "Номер телефона заполнен не полностью: должно быть 11 цифр"),
   comment: z.string().optional(),
-  deliveryMethod: z.string().min(1, "Выберите способ доставки"),
 });
 
 type FormData = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutForm() {
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  const [selectedDelivery, setSelectedDelivery] = useState("");
 
   const [formData, setFormData] = useState({
     lastName: "",
@@ -185,9 +185,9 @@ export default function CheckoutForm() {
     email: "",
     phone: "",
     comment: "",
-    deliveryMethod: "",
   });
 
+  // Stores active validation messages displayed to the user
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [showRemainingSteps, setShowRemainingSteps] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -197,7 +197,6 @@ export default function CheckoutForm() {
   const formatPhone = (value: string) => {
     const digits = value.replace(/\D/g, "");
     
-    // Extract raw digits ignoring the initial country code variations
     let cleaned = digits;
     if (cleaned.startsWith("7") || cleaned.startsWith("8")) {
       cleaned = cleaned.substring(1);
@@ -209,7 +208,7 @@ export default function CheckoutForm() {
     if (cleaned.length > 0) {
       formatted += `(${cleaned.substring(0, 3)}`;
     } else {
-      formatted += "("; // Keep bracket open if no numbers typed yet
+      formatted += "(";
     }
     if (cleaned.length >= 3) {
       formatted += `) ${cleaned.substring(3, 6)}`;
@@ -224,50 +223,60 @@ export default function CheckoutForm() {
     return formatted;
   };
 
-  // Real-time validation for Step 1 schema
+  // Continuous background status calculation for button availability
   useEffect(() => {
-    const step1Schema = checkoutSchema.pick({
-      lastName: true,
-      firstName: true,
-      email: true,
-      phone: true,
-    });
-
-    const result = step1Schema.safeParse(formData);
+    const result = checkoutSchema.safeParse(formData);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsStep1Valid(result.success);
   }, [formData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === "phone") {
-      // Prevent user from deleting the "+7(" prefix entirely
-      if (value.length < 3) {
-        setFormData((prev) => ({ ...prev, phone: "+7(" }));
-        return;
-      }
-      setFormData((prev) => ({ ...prev, phone: formatPhone(value) }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+  // Validate an individual field and update its description
+  const validateField = (name: keyof FormData, value: string) => {
+    const fieldSchema = checkoutSchema.pick({ [name]: true } as unknown);
+    const result = fieldSchema.safeParse({ [name]: value });
 
-    if (errors[name as keyof FormData]) {
+    if (!result.success) {
+      const issue = result.error.issues[0];
+      setErrors((prev) => ({ ...prev, [name]: issue.message }));
+    } else {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
-  // Automatically add prefix and lock cursor inside brackets on focus
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    let targetValue = value;
+    
+    if (name === "phone") {
+      if (value.length < 3) {
+        targetValue = "+7(";
+      } else {
+        targetValue = formatPhone(value);
+      }
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: targetValue }));
+
+    // Real-time validation description updates as user types if an error was already visible
+    if (errors[name as keyof FormData]) {
+      validateField(name as keyof FormData, targetValue);
+    }
+  };
+
+  // Instant validation check when user clicks or tabs away from a field
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    validateField(name as keyof FormData, value);
+  };
+
   const handlePhoneFocus = () => {
     if (!formData.phone) {
       setFormData((prev) => ({ ...prev, phone: "+7(" }));
     }
     
-    // Push execution to the next macro task queue loop to ensure value renders first
     setTimeout(() => {
       if (phoneInputRef.current) {
         const currentLength = phoneInputRef.current.value.length;
-        // If it's just the initial template, drop cursor at index 3 (inside brackets)
         const position = currentLength <= 3 ? 3 : currentLength;
         phoneInputRef.current.setSelectionRange(position, position);
       }
@@ -295,7 +304,11 @@ export default function CheckoutForm() {
       setErrors(fieldErrors);
     } else {
       setErrors({});
-      console.log("Form payload approved:", result.data);
+      const submissionPayload = {
+        ...result.data,
+        deliveryMethod: selectedDelivery,
+      };
+      console.log("Form submitted successfully:", submissionPayload);
     }
   };
 
@@ -311,54 +324,74 @@ export default function CheckoutForm() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          {/* Фамилия */}
+          <div className="flex flex-col gap-1">
             <input 
               type="text" 
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder="Фамилия *" 
-              className={clsx("border p-2 rounded w-full outline-none focus:border-green-500", errors.lastName && "border-red-500")} 
+              className={clsx(
+                "border p-2 rounded w-full outline-none transition-colors",
+                errors.lastName ? "border-red-500 focus:border-red-500 bg-red-50/30" : "focus:border-green-500 border-gray-300"
+              )} 
             />
-            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+            {errors.lastName && <span className="text-red-500 text-xs pl-1 font-medium">{errors.lastName}</span>}
           </div>
 
-          <div>
+          {/* Имя */}
+          <div className="flex flex-col gap-1">
             <input 
               type="text" 
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder="Имя *" 
-              className={clsx("border p-2 rounded w-full outline-none focus:border-green-500", errors.firstName && "border-red-500")} 
+              className={clsx(
+                "border p-2 rounded w-full outline-none transition-colors",
+                errors.firstName ? "border-red-500 focus:border-red-500 bg-red-50/30" : "focus:border-green-500 border-gray-300"
+              )} 
             />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+            {errors.firstName && <span className="text-red-500 text-xs pl-1 font-medium">{errors.firstName}</span>}
           </div>
 
-          <div>
+          {/* E-mail */}
+          <div className="flex flex-col gap-1">
             <input 
               type="email" 
               name="email"
               value={formData.email}
               onChange={handleChange}
+              onBlur={handleBlur}
               placeholder="E-mail *" 
-              className={clsx("border p-2 rounded w-full outline-none focus:border-green-500", errors.email && "border-red-500")} 
+              className={clsx(
+                "border p-2 rounded w-full outline-none transition-colors",
+                errors.email ? "border-red-500 focus:border-red-500 bg-red-50/30" : "focus:border-green-500 border-gray-300"
+              )} 
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && <span className="text-red-500 text-xs pl-1 font-medium">{errors.email}</span>}
           </div>
 
-          <div>
+          {/* Телефон */}
+          <div className="flex flex-col gap-1">
             <input 
               ref={phoneInputRef}
               type="tel" 
               name="phone"
               value={formData.phone}
               onChange={handleChange}
+              onBlur={handleBlur}
               onFocus={handlePhoneFocus}
               placeholder="+7(xxx) xxx - xx - xx *" 
-              className={clsx("border p-2 rounded w-full outline-none focus:border-green-500", errors.phone && "border-red-500")} 
+              className={clsx(
+                "border p-2 rounded w-full outline-none transition-colors",
+                errors.phone ? "border-red-500 focus:border-red-500 bg-red-50/30" : "focus:border-green-500 border-gray-300"
+              )} 
             />
-            {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+            {errors.phone && <span className="text-red-500 text-xs pl-1 font-medium">{errors.phone}</span>}
           </div>
         </div>
 
@@ -368,7 +401,7 @@ export default function CheckoutForm() {
             value={formData.comment}
             onChange={handleChange}
             placeholder="Комментарий к заказу" 
-            className="border p-2 rounded w-full h-32 resize-none outline-none focus:border-green-500" 
+            className="border p-2 rounded w-full h-32 resize-none outline-none focus:border-green-500 border-gray-300" 
           />
         </div>
 
@@ -415,10 +448,9 @@ export default function CheckoutForm() {
             <p className="text-lg text-foreground">Выберите курьерскую службу</p>
             <div className="relative">
               <select 
-                name="deliveryMethod"
-                value={formData.deliveryMethod} 
-                onChange={handleChange} 
-                className={clsx("appearance-none border p-3 rounded w-full md:w-1/2 bg-gray-50", errors.deliveryMethod && "border-red-500")}
+                value={selectedDelivery} 
+                onChange={(e) => setSelectedDelivery(e.target.value)} 
+                className="appearance-none border p-3 rounded w-full md:w-1/2 bg-gray-50 border-gray-300"
               >
                 <option value="">Выберите...</option>
                 <option value="5post">5POST</option>
@@ -428,9 +460,8 @@ export default function CheckoutForm() {
               </select>
               <ChevronDownIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none right-2.5 md:right-[calc(50%+10px)]" />
             </div>
-            {errors.deliveryMethod && <p className="text-red-500 text-sm">{errors.deliveryMethod}</p>}
 
-            {formData.deliveryMethod === 'yandex' && <DeliveryWidget />}
+            {selectedDelivery === 'yandex' && <DeliveryWidget />}
           </section>
 
           {/* ШАГ 3: ОПЛАТА */}
