@@ -7,12 +7,15 @@ import PaymentOptions from "@/app/ui/checkout/PaymentSelector";
 import DeliveryWidget from "../yandexDelivery/YandexDelivery";
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from "next/link";
+import clsx from "clsx";
 
 export default function CheckoutForm() {
 		// Track if steps 2 and 3 are visible
 	  const [showRemainingSteps, setShowRemainingSteps] = useState(false);
 		//show Delivery Widget if respective option selected
 		const [selectedDelivery, setSelectedDelivery] = useState('');
+		//btn Далее disabled, если не подтверждено согласие на обработку ПД
+		const [isChecked, setIsChecked] = useState(false);
 
 	return (
 		<form>
@@ -41,21 +44,32 @@ export default function CheckoutForm() {
 					<div className="flex flex-col">
 						<div className="pt-6">
 							<Button 
-							onClick={() => setShowRemainingSteps(true)}
-							height={40}
-							color="#F2F9ED"
-							backgroundColor="#40AD52"
-							borderColor="#064929"
-							className="text-lg font-bold uppercase transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100">
+								onClick={() => setShowRemainingSteps(true)}
+								height={40}
+								color="#F2F9ED"
+								backgroundColor="#40AD52"
+								borderColor="#064929"
+								className={clsx(
+									"text-lg font-bold uppercase transition-all duration-200",
+									isChecked && "hover:opacity-90 hover:shadow-md active:opacity-100 cursor-pointer",
+									!isChecked && "opacity-50 cursor-not-allowed"
+								)}
+								disabled={!isChecked}
+							>
 								ДАЛЕЕ
 							</Button>
 						</div>
 						<div className="flex pt-3">
 							<label className="inline-flex gap-1 pr-2 pt-1.25">
-								<input type="checkbox" defaultChecked={false} className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+								<input 
+									type="checkbox" 
+									checked={isChecked}
+									onChange={(e) => setIsChecked(e.target.checked)}
+									className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500" 
+								/>
 							</label> 
 							<div>
-								<span className="text-foreground">Подтверждаю свое</span>
+								<span className="text-foreground">Нажимая на кнопку <span className="font-bold">&quot;Далее&quot;</span>, подтверждаю свое</span>
 								<Link href="/pdf/agreement_pd.pdf" className="text-green-600 underline" target="_blank">&nbsp;&nbsp;Cогласие на обработку персональных данных</Link>.
 							</div>
 						</div>
