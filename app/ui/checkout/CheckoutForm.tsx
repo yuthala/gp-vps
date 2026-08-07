@@ -194,7 +194,58 @@ export default function CheckoutForm() {
   const [isStep1Valid, setIsStep1Valid] = useState(false);
   const [consentLogError, setConsentLogError] = useState<string | null>(null);
   const [consentLogSent, setConsentLogSent] = useState(false);
+  const [accountMessage, setAccountMessage] = useState<string | null>(null);
+  const [accountError, setAccountError] = useState<string | null>(null);
   const [isLoggingConsent, setIsLoggingConsent] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+
+  const createOrEnsureAccount = async () => {
+    if (!formData.email) {
+      setAccountError('Введите email для создания аккаунта.');
+      return false;
+    }
+
+    setIsCreatingAccount(true);
+    setAccountError(null);
+    setAccountMessage(null);
+
+    try {
+      const resp = await fetch('/api/checkout/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+        }),
+      });
+
+      const body = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        const message = body?.error || 'Не удалось создать аккаунт. Попробуйте позже.';
+        setAccountError(message);
+        return false;
+      }
+
+      if (body?.error) {
+        setAccountError(body.error);
+        return false;
+      }
+
+      if (body?.created) {
+        setAccountMessage('Пользователь создан. Данные для входа отправлены на email.');
+      } else {
+        setAccountMessage('Найден существующий аккаунт. Продолжайте оформление заказа.');
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Create account error', error);
+      setAccountError('Серверная ошибка при создании аккаунта. Попробуйте позже.');
+      return false;
+    } finally {
+      setIsCreatingAccount(false);
+    }
+  };
 
   const sendConsentLog = async () => {
     setIsLoggingConsent(true);
@@ -338,7 +389,7 @@ export default function CheckoutForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const result = checkoutSchema.safeParse(formData);
@@ -350,13 +401,44 @@ export default function CheckoutForm() {
         fieldErrors[path] = issue.message;
       });
       setErrors(fieldErrors);
-    } else {
-      setErrors({});
-      const submissionPayload = {
-        ...result.data,
-        deliveryMethod: selectedDelivery,
-      };
-      console.log("Form submitted successfully:", submissionPayload);
+      return;
+    }
+
+    setErrors({});
+
+    const submissionPayload = {
+      ...result.data,
+      deliveryMethod: selectedDelivery,
+    };
+
+    try {
+      const resp = await fetch('/api/checkout/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+        }),
+      });
+
+      if (!resp.ok) {
+        const body = await resp.json().catch(() => null);
+        const message = body?.error || 'Не удалось создать аккаунт. Попробуйте позже.';
+        setConsentLogError(message);
+        return;
+      }
+
+      const body = await resp.json();
+      if (body.error) {
+        setConsentLogError(body.error);
+        return;
+      }
+
+      setConsentLogError(null);
+      console.log('Form submitted successfully:', submissionPayload);
+    } catch (error) {
+      console.error('Checkout create-account error', error);
+      setConsentLogError('Серверная ошибка при создании аккаунта. Попробуйте позже.');
     }
   };
 
@@ -477,7 +559,7 @@ export default function CheckoutForm() {
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  disabled={!isStep1Valid || isLoggingConsent}
+                  disabled={!isStep1Valid || isLoggingConsent || isCreatingAccount}
                   onChange={async (e) => {
                     const checked = e.target.checked;
                     if (!isStep1Valid) {
@@ -485,11 +567,18 @@ export default function CheckoutForm() {
                       return;
                     }
 
-                                    if (checked) {
+                    if (checked) {
                       setConsentLogError(null);
                       setConsentLogSent(false);
-                      const ok = await sendConsentLog();
-                      if (ok) {
+
+                      const accountOk = await createOrEnsureAccount();
+                      if (!accountOk) {
+                        setIsChecked(false);
+                        return;
+                      }
+
+                      const consentOk = await sendConsentLog();
+                      if (consentOk) {
                         setIsChecked(true);
                       } else {
                         setIsChecked(false);
@@ -501,7 +590,7 @@ export default function CheckoutForm() {
                   }}
                   className={clsx(
                     "w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500",
-                    (!isStep1Valid || isLoggingConsent) && "cursor-not-allowed opacity-50"
+                    (!isStep1Valid || isLoggingConsent || isCreatingAccount) && "cursor-not-allowed opacity-50"
                   )}
                 />
               </label>
@@ -510,8 +599,11 @@ export default function CheckoutForm() {
                 <Link href="/pdf/agreement_pd.pdf" className="text-green-600 underline" target="_blank">&nbsp;&nbsp;Cогласие на обработку персональных данных</Link>.
               </div>
             </div>
+            {isCreatingAccount && <p className="text-gray-600 text-sm mt-2">Создание аккаунта и отправка данных в процессе...</p>}
             {isLoggingConsent && <p className="text-gray-600 text-sm mt-2">Сохранение согласия...</p>}
             {consentLogError && <p className="text-red-500 text-sm mt-2">{consentLogError}</p>}
+            {accountError && <p className="text-red-500 text-sm mt-2">{accountError}</p>}
+            {accountMessage && <p className="text-green-600 text-sm mt-2">{accountMessage}</p>}
             {consentLogSent && <p className="text-green-600 text-sm mt-2">Согласие сохранено.</p>}
           </div>
         )}
