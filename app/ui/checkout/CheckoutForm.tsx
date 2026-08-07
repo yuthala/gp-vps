@@ -427,7 +427,20 @@ export default function CheckoutForm() {
             </div>
             <div className="flex pt-3">
               <label className="inline-flex gap-1 pr-2 pt-1.25">
-                <input type="checkbox" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  disabled={!isStep1Valid}
+                  onChange={(e) => {
+                    if (isStep1Valid) {
+                      setIsChecked(e.target.checked);
+                    }
+                  }}
+                  className={clsx(
+                    "w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500",
+                    !isStep1Valid && "cursor-not-allowed opacity-50"
+                  )}
+                />
               </label>
               <div>
                 <span className="text-foreground">Нажимая на кнопку <span className="font-bold">&quot;Далее&quot;</span>, подтверждаю свое</span>
