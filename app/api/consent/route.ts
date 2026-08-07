@@ -12,10 +12,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const ipAddress =
-      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
-      req.headers.get('x-real-ip') ||
-      '127.0.0.1';
+    const getClientIp = (request: Request) => {
+      const headers = request.headers;
+      const forwardedFor = headers.get('x-forwarded-for');
+      if (forwardedFor) {
+        const firstIp = forwardedFor.split(',').map((ip) => ip.trim()).find(Boolean);
+        if (firstIp) return firstIp;
+      }
+
+      const ipHeaders = [
+        'x-real-ip',
+        'true-client-ip',
+        'cf-connecting-ip',
+        'fastly-client-ip',
+        'x-cluster-client-ip',
+      ];
+
+      for (const header of ipHeaders) {
+        const value = headers.get(header);
+        if (value?.trim()) return value.trim();
+      }
+
+      return '127.0.0.1';
+    };
+
+    const ipAddress = getClientIp(req);
 
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 

@@ -215,7 +215,7 @@ export default function CheckoutForm() {
           email: formData.email,
           phone: formData.phone,
           consentType: 'personal_data_processing',
-          versionAgreed: '1.0',
+          versionAgreed: '1.0.1',
         }),
         cache: 'no-store',
       });
