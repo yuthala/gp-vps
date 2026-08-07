@@ -160,6 +160,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from "next/link";
 import clsx from "clsx";
 import { z } from "zod";
+import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions';
 
 // Zod Validation Schema with specific user descriptions
 const checkoutSchema = z.object({
@@ -326,6 +327,16 @@ export default function CheckoutForm() {
     const result = checkoutSchema.safeParse(formData);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsStep1Valid(result.success);
+
+    if (typeof window !== 'undefined') {
+      const info = getCheckoutInfo();
+      info.userName = formData.firstName;
+      info.userSecondName = formData.lastName;
+      info.e_mail = formData.email;
+      info.phoneNumber = formData.phone;
+      info.userComments = formData.comment;
+      updateCheckoutInfo(info);
+    }
   }, [formData]);
 
   // Validate an individual field and update its description
