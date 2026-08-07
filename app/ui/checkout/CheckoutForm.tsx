@@ -192,6 +192,53 @@ export default function CheckoutForm() {
   const [showRemainingSteps, setShowRemainingSteps] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isStep1Valid, setIsStep1Valid] = useState(false);
+  const [consentLogError, setConsentLogError] = useState<string | null>(null);
+  const [consentLogSent, setConsentLogSent] = useState(false);
+  const [isLoggingConsent, setIsLoggingConsent] = useState(false);
+
+  const sendConsentLog = async () => {
+    setIsLoggingConsent(true);
+    try {
+      const parsed = checkoutSchema.safeParse(formData);
+      if (!parsed.success) {
+        setConsentLogError('Заполните данные получателя перед подтверждением согласия.');
+        setConsentLogSent(false);
+        return false;
+      }
+
+      const response = await fetch('/api/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          consentType: 'personal_data_processing',
+          versionAgreed: '1.0',
+        }),
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        setConsentLogError(body?.error ?? 'Не удалось сохранить согласие. Попробуйте снова.');
+        setConsentLogSent(false);
+        return false;
+      }
+
+      setConsentLogError(null);
+      setConsentLogSent(true);
+      return true;
+    } catch (error) {
+      console.error('Consent log error', error);
+      setConsentLogError('Не удалось сохранить согласие. Попробуйте позже.');
+      setConsentLogSent(false);
+      return false;
+    } finally {
+      setIsLoggingConsent(false);
+    }
+  };
 
   // Helper function to format phone numbers to +7(XXX) XXX - XX - XX
   const formatPhone = (value: string) => {
@@ -313,7 +360,7 @@ export default function CheckoutForm() {
     }
   };
 
-  const isButtonEnabled = isStep1Valid && isChecked;
+  const isButtonEnabled = isStep1Valid && consentLogSent;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -430,15 +477,31 @@ export default function CheckoutForm() {
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  disabled={!isStep1Valid}
-                  onChange={(e) => {
-                    if (isStep1Valid) {
-                      setIsChecked(e.target.checked);
+                  disabled={!isStep1Valid || isLoggingConsent}
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    if (!isStep1Valid) {
+                      setConsentLogError('Заполните данные получателя перед подтверждением согласия.');
+                      return;
+                    }
+
+                                    if (checked) {
+                      setConsentLogError(null);
+                      setConsentLogSent(false);
+                      const ok = await sendConsentLog();
+                      if (ok) {
+                        setIsChecked(true);
+                      } else {
+                        setIsChecked(false);
+                      }
+                    } else {
+                      setIsChecked(false);
+                      setConsentLogSent(false);
                     }
                   }}
                   className={clsx(
                     "w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500",
-                    !isStep1Valid && "cursor-not-allowed opacity-50"
+                    (!isStep1Valid || isLoggingConsent) && "cursor-not-allowed opacity-50"
                   )}
                 />
               </label>
@@ -447,6 +510,9 @@ export default function CheckoutForm() {
                 <Link href="/pdf/agreement_pd.pdf" className="text-green-600 underline" target="_blank">&nbsp;&nbsp;Cогласие на обработку персональных данных</Link>.
               </div>
             </div>
+            {isLoggingConsent && <p className="text-gray-600 text-sm mt-2">Сохранение согласия...</p>}
+            {consentLogError && <p className="text-red-500 text-sm mt-2">{consentLogError}</p>}
+            {consentLogSent && <p className="text-green-600 text-sm mt-2">Согласие сохранено.</p>}
           </div>
         )}
       </section>
