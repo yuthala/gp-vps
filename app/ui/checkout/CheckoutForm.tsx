@@ -232,7 +232,8 @@ export default function CheckoutForm() {
 
   // Validate an individual field and update its description
   const validateField = (name: keyof FormData, value: string) => {
-    const fieldSchema = checkoutSchema.pick({ [name]: true } as unknown);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fieldSchema = checkoutSchema.pick({ [name]: true } as any);
     const result = fieldSchema.safeParse({ [name]: value });
 
     if (!result.success) {
@@ -298,7 +299,7 @@ export default function CheckoutForm() {
     if (!result.success) {
       const fieldErrors: Partial<Record<keyof FormData, string>> = {};
       result.error.issues.forEach((issue) => {
-        const path = issue.path as keyof FormData;
+        const path = issue.path as unknown as keyof FormData;
         fieldErrors[path] = issue.message;
       });
       setErrors(fieldErrors);
@@ -471,6 +472,7 @@ export default function CheckoutForm() {
               <Heading level={6} className="py-6 normal-case">Способ оплаты</Heading>
             </div>
             <PaymentOptions />
+        
           </section>
         </>
       )}
