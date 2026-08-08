@@ -9,10 +9,13 @@ interface CartState {
   items: IDPkgSize[]; // массив ID товаров
   id_sizeModal: IDPkgSize;
 	deliveryPrice: number;
-  	addItem: (id: string, pkgSize: number) => void;
-		deleteItem: (id: string, pkgSize: number) => void;
-		clearData: () => void;
-		setDeliveryPrice: (price: number) => void;
+	//сделать активной кнопку Оформить заказ
+	isPlaceOrderActive: boolean;
+	addItem: (id: string, pkgSize: number) => void;
+	deleteItem: (id: string, pkgSize: number) => void;
+	clearData: () => void;
+	setDeliveryPrice: (price: number) => void;
+	setPlaceOrderActive: () => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -24,8 +27,14 @@ export const useCartStore = create<CartState>()(
 			pkgSize: 0
 	  },
 		deliveryPrice: 0,
+		isPlaceOrderActive: false,
 
-		 setDeliveryPrice: (price) => set({ deliveryPrice: price }),
+		// Показать кнопку Оформить заказ
+		setPlaceOrderActive: () => set((state) => ({ 
+    isPlaceOrderActive: !state.isPlaceOrderActive 
+  		})),
+
+		setDeliveryPrice: (price) => set({ deliveryPrice: price }),
 
 		addItem: (id, pkgSize) =>
 			set((state) => {

@@ -471,12 +471,6 @@ export default function CheckoutForm() {
               <Heading level={6} className="py-6 normal-case">Способ оплаты</Heading>
             </div>
             <PaymentOptions />
-            
-            <div className="pt-6">
-              <Button type="submit" height={45} color="#FFFFFF" backgroundColor="#40AD52" className="w-full text-lg font-bold uppercase">
-                Оформить заказ
-              </Button>
-            </div>
           </section>
         </>
       )}

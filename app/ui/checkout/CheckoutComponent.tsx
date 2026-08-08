@@ -1,8 +1,7 @@
 
 import CheckoutForm from "./CheckoutForm";
-import ShoppingCartComponent from "./ShoppingCartComponent";
 import CheckoutTotal from "./CheckoutTotal";
-
+import ShoppingCartComponent from "./ShoppingCartComponent";
 
 export default function CheckoutComponent() {
 	return(
