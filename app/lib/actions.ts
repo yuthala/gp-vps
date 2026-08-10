@@ -48,44 +48,34 @@ export type State = {
   message?: string | null;
 };
 
-export async function createInvoice(prevState: State, formData: FormData) {
+export async function createInvoice(formData: FormData): Promise<void> {
   const validatedFields = CreateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
 
-	 // If form validation fails, return errors early. Otherwise, continue.
-	if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
-    };
+  if (!validatedFields.success) {
+    console.error('Invoice validation failed', validatedFields.error.flatten().fieldErrors);
+    throw new Error('Missing Fields. Failed to Create Invoice.');
   }
-	  // Test it out:
-	// console.log(typeof rawFormData.amount);
-  // console.log(rawFormData);
 
-	// Prepare data for insertion into the database
   const { customerId, amount, status } = validatedFields.data;
-	const amountInCents = amount * 100;
-	const date = new Date().toISOString().split('T')[0];
+  const amountInCents = amount * 100;
+  const date = new Date().toISOString().split('T')[0];
 
-	try {
-		await sql`
-    	INSERT INTO invoices (customer_id, amount, status, date)
-    	VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-  `;
-	} catch (error) {
-		// We'll also log the error to the console for now
-		console.error(error);
-		return {
-			message: 'Database Error: Failed to Create Invoice',
-		};
-	}
+  try {
+    await sql`
+      INSERT INTO invoices (customer_id, amount, status, date)
+      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+    `;
+  } catch (error) {
+    console.error('Database insert error', error);
+    throw new Error('Database Error: Failed to Create Invoice.');
+  }
 
-	revalidatePath('/dashboard/invoices');
-	redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/invoices');
+  redirect('/dashboard/invoices');
 }
 
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });

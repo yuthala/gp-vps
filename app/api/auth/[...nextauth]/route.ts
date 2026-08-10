@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import postgres from "postgres";
-import PostgresAdapter from "@/app/lib/nextauth-adapter";
+import PostgresAdapter from "../../../lib/nextauth-adapter";
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -46,7 +46,7 @@ export const authOptions = {
       },
     }),
   ],
-  adapter: PostgresAdapter(sql) as any,
+  adapter: PostgresAdapter(sql) as unknown,
   session: { strategy: "database", maxAge: 30 * 24 * 60 * 60 },
   // enable verbose debug logs in development
   debug: process.env.NEXTAUTH_DEBUG === 'true' || process.env.NODE_ENV !== 'production',
@@ -64,6 +64,7 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET || "dev-secret",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const handler = NextAuth(authOptions as any);
 
 export const GET = handler;
