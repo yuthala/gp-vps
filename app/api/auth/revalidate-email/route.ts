@@ -1,11 +1,12 @@
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
+import { randomBytes } from 'crypto'
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 function generateToken() {
   try {
-    const { randomBytes } = require('crypto');
+    //const { randomBytes } = require('crypto');
     return randomBytes(32).toString('hex');
   } catch (e) {
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
