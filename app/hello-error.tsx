@@ -7,7 +7,7 @@ export const metadata = {
   title: 'Ошибка сервера | Green Pato',
 };
 
-export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }) {
+export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }): import("react").JSX.Element {
   return (
     <div className="min-h-screen bg-(--light-main) text-foreground">
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">

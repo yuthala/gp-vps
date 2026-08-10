@@ -1,6 +1,5 @@
 //функция для установки падежа "товар" в корзине
 
-
 export default function CaseNumber({qty}: { qty: number}) {
     const cases = ['товар', 'товара', 'товаров'];
     let title = '';
