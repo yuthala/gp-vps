@@ -160,6 +160,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from "next/link";
 import clsx from "clsx";
 import { z } from "zod";
+import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions';
 
 // Zod Validation Schema with specific user descriptions
 const checkoutSchema = z.object({
@@ -192,6 +193,104 @@ export default function CheckoutForm() {
   const [showRemainingSteps, setShowRemainingSteps] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isStep1Valid, setIsStep1Valid] = useState(false);
+  const [consentLogError, setConsentLogError] = useState<string | null>(null);
+  const [consentLogSent, setConsentLogSent] = useState(false);
+  const [accountMessage, setAccountMessage] = useState<string | null>(null);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [isLoggingConsent, setIsLoggingConsent] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+
+  const createOrEnsureAccount = async () => {
+    if (!formData.email) {
+      setAccountError('Введите email для создания аккаунта.');
+      return false;
+    }
+
+    setIsCreatingAccount(true);
+    setAccountError(null);
+    setAccountMessage(null);
+
+    try {
+      const resp = await fetch('/api/checkout/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+        }),
+      });
+
+      const body = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        const message = body?.error || 'Не удалось создать аккаунт. Попробуйте позже.';
+        setAccountError(message);
+        return false;
+      }
+
+      if (body?.error) {
+        setAccountError(body.error);
+        return false;
+      }
+
+      if (body?.created) {
+        setAccountMessage('Пользователь создан. Данные для входа отправлены на email.');
+      } else {
+        setAccountMessage('Найден существующий аккаунт. Продолжайте оформление заказа.');
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Create account error', error);
+      setAccountError('Серверная ошибка при создании аккаунта. Попробуйте позже.');
+      return false;
+    } finally {
+      setIsCreatingAccount(false);
+    }
+  };
+
+  const sendConsentLog = async () => {
+    setIsLoggingConsent(true);
+    try {
+      const parsed = checkoutSchema.safeParse(formData);
+      if (!parsed.success) {
+        setConsentLogError('Заполните данные получателя перед подтверждением согласия.');
+        setConsentLogSent(false);
+        return false;
+      }
+
+      const response = await fetch('/api/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          consentType: 'personal_data_processing',
+          versionAgreed: '1.0.1',
+        }),
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        setConsentLogError(body?.error ?? 'Не удалось сохранить согласие. Попробуйте снова.');
+        setConsentLogSent(false);
+        return false;
+      }
+
+      setConsentLogError(null);
+      setConsentLogSent(true);
+      return true;
+    } catch (error) {
+      console.error('Consent log error', error);
+      setConsentLogError('Не удалось сохранить согласие. Попробуйте позже.');
+      setConsentLogSent(false);
+      return false;
+    } finally {
+      setIsLoggingConsent(false);
+    }
+  };
 
   // Helper function to format phone numbers to +7(XXX) XXX - XX - XX
   const formatPhone = (value: string) => {
@@ -228,6 +327,16 @@ export default function CheckoutForm() {
     const result = checkoutSchema.safeParse(formData);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsStep1Valid(result.success);
+
+    if (typeof window !== 'undefined') {
+      const info = getCheckoutInfo();
+      info.userName = formData.firstName;
+      info.userSecondName = formData.lastName;
+      info.e_mail = formData.email;
+      info.phoneNumber = formData.phone;
+      info.userComments = formData.comment;
+      updateCheckoutInfo(info);
+    }
   }, [formData]);
 
   // Validate an individual field and update its description
@@ -291,7 +400,7 @@ export default function CheckoutForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const result = checkoutSchema.safeParse(formData);
@@ -303,17 +412,48 @@ export default function CheckoutForm() {
         fieldErrors[path] = issue.message;
       });
       setErrors(fieldErrors);
-    } else {
-      setErrors({});
-      const submissionPayload = {
-        ...result.data,
-        deliveryMethod: selectedDelivery,
-      };
-      console.log("Form submitted successfully:", submissionPayload);
+      return;
+    }
+
+    setErrors({});
+
+    const submissionPayload = {
+      ...result.data,
+      deliveryMethod: selectedDelivery,
+    };
+
+    try {
+      const resp = await fetch('/api/checkout/create-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+        }),
+      });
+
+      if (!resp.ok) {
+        const body = await resp.json().catch(() => null);
+        const message = body?.error || 'Не удалось создать аккаунт. Попробуйте позже.';
+        setConsentLogError(message);
+        return;
+      }
+
+      const body = await resp.json();
+      if (body.error) {
+        setConsentLogError(body.error);
+        return;
+      }
+
+      setConsentLogError(null);
+      console.log('Form submitted successfully:', submissionPayload);
+    } catch (error) {
+      console.error('Checkout create-account error', error);
+      setConsentLogError('Серверная ошибка при создании аккаунта. Попробуйте позже.');
     }
   };
 
-  const isButtonEnabled = isStep1Valid && isChecked;
+  const isButtonEnabled = isStep1Valid && consentLogSent;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -430,15 +570,38 @@ export default function CheckoutForm() {
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  disabled={!isStep1Valid}
-                  onChange={(e) => {
-                    if (isStep1Valid) {
-                      setIsChecked(e.target.checked);
+                  disabled={!isStep1Valid || isLoggingConsent || isCreatingAccount}
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    if (!isStep1Valid) {
+                      setConsentLogError('Заполните данные получателя перед подтверждением согласия.');
+                      return;
+                    }
+
+                    if (checked) {
+                      setConsentLogError(null);
+                      setConsentLogSent(false);
+
+                      const accountOk = await createOrEnsureAccount();
+                      if (!accountOk) {
+                        setIsChecked(false);
+                        return;
+                      }
+
+                      const consentOk = await sendConsentLog();
+                      if (consentOk) {
+                        setIsChecked(true);
+                      } else {
+                        setIsChecked(false);
+                      }
+                    } else {
+                      setIsChecked(false);
+                      setConsentLogSent(false);
                     }
                   }}
                   className={clsx(
                     "w-3.5 h-3.5 rounded border-gray-300 text-green-600 focus:ring-green-500",
-                    !isStep1Valid && "cursor-not-allowed opacity-50"
+                    (!isStep1Valid || isLoggingConsent || isCreatingAccount) && "cursor-not-allowed opacity-50"
                   )}
                 />
               </label>
@@ -447,6 +610,12 @@ export default function CheckoutForm() {
                 <Link href="/pdf/agreement_pd.pdf" className="text-green-600 underline" target="_blank">&nbsp;&nbsp;Cогласие на обработку персональных данных</Link>.
               </div>
             </div>
+            {isCreatingAccount && <p className="text-gray-600 text-sm mt-2">Создание аккаунта и отправка данных в процессе...</p>}
+            {isLoggingConsent && <p className="text-gray-600 text-sm mt-2">Сохранение согласия...</p>}
+            {consentLogError && <p className="text-red-500 text-sm mt-2">{consentLogError}</p>}
+            {accountError && <p className="text-red-500 text-sm mt-2">{accountError}</p>}
+            {accountMessage && <p className="text-green-600 text-sm mt-2">{accountMessage}</p>}
+            {consentLogSent && <p className="text-green-600 text-sm mt-2">Согласие сохранено.</p>}
           </div>
         )}
       </section>
