@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server'
 
 import postgres from 'postgres';
@@ -59,7 +60,7 @@ async function generateUniqueSkuId(product: ProductInput): Promise<string> {
 
 
 // 1. Описываем структуру входящего товара (заменяем any)
-interface NewProductInput {
+export interface NewProductInput {
   imageSrc: string[];
   description: string;
   descriptionDetails: string;
@@ -76,7 +77,7 @@ interface NewProductInput {
 }
 
 // 2. Используем созданный интерфейс в параметрах функции
-async function addNewProduct(rawProduct: NewProductInput): Promise<void> {
+export async function addNewProduct(rawProduct: NewProductInput): Promise<{ success: boolean; sku?: string; error?: string }> {
   // Генерируем гарантированно уникальный SKU
   const uniqueSku = await generateUniqueSkuId(rawProduct);
 
@@ -104,8 +105,11 @@ async function addNewProduct(rawProduct: NewProductInput): Promise<void> {
       );
     `;
     console.log(`[Успех] Товар добавлен с SKU: ${uniqueSku}`);
-  } catch (error) {
+    return { success: true, sku: uniqueSku };
+
+  } catch (error: any) {
     console.error('[Ошибка] Не удалось сохранить товар:', error);
+    return { success: false, error: error.message || 'Не удалось сохранить' };
   }
 }
 
