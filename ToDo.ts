@@ -1,0 +1,1 @@
+// 1. Перенести function forbiddenPage()  из seed/rout.ts в not-found.ts

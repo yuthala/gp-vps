@@ -22,7 +22,6 @@ async function getAuthorizedUser(req: Request) {
     AND s.expires > ${now}
     LIMIT 1
   `;
-
   return rows[0] || null;
 }
 
@@ -106,6 +105,7 @@ async function seedUsers() {
   return insertedUsers;
 }
 
+// Создание в БД таблицы "Invoices"
 async function seedInvoices() {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
