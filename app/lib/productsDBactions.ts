@@ -2,6 +2,7 @@
 'use server'
 
 import postgres from 'postgres';
+import { revalidatePath } from 'next/cache';
 
 // Инициализируем подключение к базе данных
 const sql = postgres(process.env.DATABASE_URL!);
@@ -113,3 +114,83 @@ export async function addNewProduct(rawProduct: NewProductInput): Promise<{ succ
   }
 }
 
+
+// Описываем структуру товара, которую возвращает база данных
+export interface ProductRow {
+  internal_id: string;
+  id: string; // SKU
+  crop_sort: string;
+  crop_name_eng: string;
+  price: number;
+  estimated_on_stock_date: string | null;
+  on_stock_status: 'in_stock' | 'out_of_stock' | 'pre_order';
+  image_src: string[];
+}
+
+const ITEMS_PER_PAGE = 6; // Количество товаров на одной странице
+
+/**
+ * Получение списка товаров с учетом поиска и пагинации
+ */
+export async function fetchFilteredProducts(query: string, currentPage: number): Promise<ProductRow[]> {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    // Поиск идет по артикулу (id), названию сорта или тегам благодаря индексам
+    const products = await sql<ProductRow[]>`
+      SELECT internal_id, id, crop_sort, crop_name_eng, price, estimated_on_stock_date, on_stock_status, image_src
+      FROM products
+      WHERE 
+        id ILIKE ${'%' + query + '%'} OR
+        crop_sort ILIKE ${'%' + query + '%'} OR
+        crop_name_eng ILIKE ${'%' + query + '%'}
+      ORDER BY created_at DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+    
+    return products;
+  } catch (error) {
+    console.error('Ошибка при чтении товаров:', error);
+    throw new Error('Не удалось загрузить список товаров.');
+  }
+}
+
+/**
+ * Подсчет общего количества страниц для пагинации
+ */
+export async function fetchProductsPages(query: string): Promise<number> {
+  try {
+    const data = await sql`
+      SELECT COUNT(*) as count
+      FROM products
+      WHERE 
+        id ILIKE ${'%' + query + '%'} OR
+        crop_sort ILIKE ${'%' + query + '%'} OR
+        crop_name_eng ILIKE ${'%' + query + '%'}
+    `;
+
+    const totalItems = Number(data[0]?.count ?? 0);
+    return Math.ceil(totalItems / ITEMS_PER_PAGE);
+  } catch (error) {
+    console.error('Ошибка при подсчете страниц:', error);
+    throw new Error('Не удалось подсчитать количество страниц.');
+  }
+}
+
+/**
+ * Удаление товара по его внутреннему UUID
+ */
+export async function deleteProduct(internalId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    await sql`
+      DELETE FROM products WHERE internal_id = ${internalId}
+    `;
+    
+    // Сбрасываем кэш Next.js для этой страницы, чтобы таблица сразу обновилась
+    revalidatePath('/admin/products');
+    return { success: true };
+  } catch (error) {
+    console.error('Ошибка при удалении товара:', error);
+    return { success: false, error: 'Не удалось удалить товар из базы данных.' };
+  }
+}
