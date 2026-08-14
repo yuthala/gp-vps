@@ -40,6 +40,73 @@ async function seedPersonalDataAgreements() {
   `;
 }
 
+async function seedProducts() {
+    // 1. Создание в БД алгоритмов UUID (если еще не созданы)
+    await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+    // 2. Создание таблицы товаров с типами данных под ваши требования
+    await sql`
+    CREATE TABLE IF NOT EXISTS products (
+      -- Внутренний системный ID (генерируется автоматически)
+      internal_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      
+      -- sku_id: string - Артикул (SKU). Делаем его UNIQUE, так как артикулы не должны повторяться
+      id VARCHAR(100) NOT NULL UNIQUE,
+      
+      -- imageSrc: array string - Ссылки на картинки из S3 sweb.ru (используем массив TEXT[])
+      image_src TEXT[] NOT NULL DEFAULT '{}',
+      
+      -- description: string
+      description TEXT NOT NULL,
+      
+      -- descriptionDetails: string
+      description_details TEXT,
+      
+      -- cropSort: string
+      crop_sort VARCHAR(255),
+      
+      -- cropNameEng: string
+      crop_name_eng VARCHAR(255) NOT NULL,
+      
+      -- tags: array string - Массив текстовых тегов (например, ['топ', 'новинка'])
+      tags TEXT[] DEFAULT '{}',
+      
+      -- packageSize: array double - Массив дробных чисел (в Postgres это DOUBLE PRECISION[])
+      package_size DOUBLE PRECISION[] DEFAULT '{}',
+      
+      -- cropSize: string
+      crop_size VARCHAR(100),
+      
+      -- pathNameEng: string (часто используется для ЧПУ URL, например /catalog/tomato-red)
+      path_name_eng VARCHAR(255) NOT NULL UNIQUE,
+      
+      -- onStockStatus: string (ограничиваем возможные статусы для безопасности)
+      on_stock_status VARCHAR(50) NOT NULL DEFAULT 'out_of_stock' 
+        CHECK (on_stock_status IN ('in_stock', 'out_of_stock', 'pre_order')),
+      
+      -- price: double - Цена товара (для денег лучше использовать NUMERIC, но под double подходит DOUBLE PRECISION)
+      price DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+      
+      -- measureUnit: int - ID единицы измерения (например: 1 - шт, 2 - кг, 3 - гр)
+      measure_unit INT NOT NULL DEFAULT 1,
+      
+      -- estimatedOnStockDate: string - Дата ожидаемого поступления (используем тип DATE или TIMESTAMP)
+      estimated_on_stock_date DATE,
+      
+      -- Системные поля даты создания и обновления (полезно для любого магазина)
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    `;
+
+    // 3. Создаем индексы для мгновенного поиска по артикулу и по URL-пути
+    await sql`CREATE INDEX IF NOT EXISTS idx_products_sku ON products(id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_products_path ON products(path_name_eng);`;
+    
+    console.log('Таблица products успешно создана или уже существует.');
+}
+
+
 async function seedPersonalDataAConsents() {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
   await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
@@ -317,7 +384,8 @@ export async function GET(req: Request) {
       seedInvoices(),
       seedRevenue(),
       seedPersonalDataAgreements(),
-      seedPersonalDataAConsents()
+      seedPersonalDataAConsents(),
+      seedProducts()
     ]);
 
     return Response.json({ message: 'Database seeded successfully' });
