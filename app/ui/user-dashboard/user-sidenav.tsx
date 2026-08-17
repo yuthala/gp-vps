@@ -3,7 +3,7 @@
 //import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import NavLinks from '@/app/ui/dashboard/nav-links';
+import NavLinks from '@/app/ui/user-dashboard/user-nav-links';
 //import GPLogo from '@/app/ui/gp-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
 

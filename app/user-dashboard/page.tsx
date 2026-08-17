@@ -14,22 +14,22 @@ export default async function Page() {
   return (
     <main>
       <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Dashboard
+        Dashboard ( Сделать здесь информацию о пользователе: имя фамилия номер телефона и почта)
       </h1>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <Suspense fallback={<CardSkeleton />}>
+        {/* <Suspense fallback={<CardSkeleton />}>
           <CardWrapper />
-        </Suspense>
+        </Suspense> */}
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
 
-        <Suspense fallback={<RevenueChartSkeleton />}>
+        {/* <Suspense fallback={<RevenueChartSkeleton />}>
           <RevenueChart />
         </Suspense>
 
         <Suspense fallback={<LatestInvoicesSkeleton />}>
           <LatestInvoices />
-        </Suspense>
+        </Suspense> */}
         
       </div>
     </main>
