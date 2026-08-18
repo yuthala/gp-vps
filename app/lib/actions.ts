@@ -258,6 +258,23 @@ export async function getProductCard(pathName: string, cropName?: string) {
 	}
 }
 
+//случайные 8 карточек для главной страницы
+export async function getRandomProducts(limit: number = 8) {
+  // 1. Create a shallow copy of the array so we don't accidentally modify the original source file orders
+  const copiedProducts = [...products];
+
+  // 2. Perform a Fisher-Yates or simple random sort shuffle
+  const shuffled = copiedProducts.sort(() => 0.5 - Math.random());
+
+  // 3. Extract the requested limit amount (e.g., 8 items)
+  const selectedCards = shuffled.slice(0, limit);
+
+  // 4. Return the data structured exactly like your getProductCard function does 
+  return { 
+    res: selectedCards 
+  };
+}
+
 
 // Функции с использованием cookies
 const CART_NAME = 'shopping_cart'

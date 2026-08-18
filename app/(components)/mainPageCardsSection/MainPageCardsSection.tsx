@@ -1,13 +1,24 @@
 
 import ProductCard from "../../ui/productCard/ProductCard";
+import { getRandomProducts } from "../../lib/actions";
 
-export default function MainPageCardsSection() {
-	return(
-		<section className="w-full pb-16"> 
-			<div className="max-w-7xl px-4">
-				Cards on Main Page
-				{/* <ProductCard pathName={"random"}/> */}
-			</div>
-		</section>
-	)
+export default async function MainPageCardsSection() {
+  const { res: products } = await getRandomProducts(8);
+
+  return (
+    <section className="max-w-7xl mx-auto px-4 py-12">      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product, index) => (
+          /* 2. Added the matching layout wrapper and compound key style used on your Catalog page */
+          <div 
+            key={`${product.pathName}-${index}`} 
+            className="flex w-full justify-center"
+          >
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
+
