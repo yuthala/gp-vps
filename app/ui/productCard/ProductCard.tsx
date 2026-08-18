@@ -7,19 +7,30 @@ import Link from "next/link";
 import Pricing from "../Pricing";
 import Heading from "../Heading";
 
+interface ProductProps {
+  product: {
+    pathName: string;
+		cropName: string;
+    imageSrc: string[];
+    description: string;
+		onStockStatus: string;
+		price: number;
+		measureUnit: number;
+  };
+}
 
-export default async function ProductCard({ pathName}: { pathName: string}) {
-	
-	const products = (await getProductCard(pathName)).res;
+export default async function ProductCard({ product }: ProductProps) {
+
+	//const products = (await getProductCard(pathName || "random")).res;
 
 	return (
   <div className="w-full flex justify-center">
     <div className="w-full max-w-7xl min-w-xs flex flex-col justify-center">
       <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center">
-          {products.map((product, index) => {
-            return (
-              <div key={`${product.pathName}-${index}`} className="flex w-full justify-center">
+          {/* {products.map((product, index) => { */}
+            {/* return ( */}
+              <div className="flex w-full justify-center">
                 {/* Product Card - with equal height */}
                 <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 w-full max-w-90 flex flex-col h-full border border-[#064929]/20">
                   {/* Image - fixed dimensions 360x230 */}
@@ -80,8 +91,8 @@ export default async function ProductCard({ pathName}: { pathName: string}) {
                   </div>
                 </div>
               </div>
-            );
-          })}
+            {/* ); */}
+          {/* })} */}
         </div>
       </div>
     </div>
