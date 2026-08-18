@@ -13,18 +13,18 @@ export default async function CatalogCards({ params }: PageProps) {
   //const id = params.title;
 
 	return (
-<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center">
-	  {products.map((product, index) => (
-    /* The loop index is safely accessible right here */
-    <div 
-      key={`${product.pathName}-${index}`} 
-      className="flex w-full justify-center"
-    >
-      <ProductCard product={product} />
-    </div>
-  ))}
-	{/* <ProductCard pathName={id}/> */}
-</div>
+		<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center">
+				{products.map((product, index) => (
+				/* The loop index is safely accessible right here */
+				<div 
+					key={`${product.pathName}-${index}`} 
+					className="flex w-full justify-center"
+				>
+					<ProductCard product={product} />
+				</div>
+			))}
+			{/* <ProductCard pathName={id}/> */}
+		</div>
 	)
 }
 

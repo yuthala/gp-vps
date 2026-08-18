@@ -26,7 +26,7 @@ export default async function ProductCard({ product }: ProductProps) {
 	return (
   <div className="w-full flex justify-center">
     <div className="w-full max-w-7xl min-w-xs flex flex-col justify-center">
-      <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
+      <div className="max-w-6xl mx-auto px-4">
         {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center"> */}
           {/* {products.map((product, index) => { */}
             {/* return ( */}
@@ -34,14 +34,17 @@ export default async function ProductCard({ product }: ProductProps) {
                 {/* Product Card - with equal height */}
                 <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 w-full max-w-90 flex flex-col h-full border border-[#064929]/20">
                   {/* Image - fixed dimensions 360x230 */}
-                  <div className="w-full h-57.5 overflow-hidden shrink-0">
+                  <div className="relative h-48 w-full mb-4 bg-slate-100 rounded-t-lg overflow-hidden shrink-0">
                     <Image
                       src={product.imageSrc[0]}
                       width={360}
                       height={230}
                       alt={product.pathName}
-                      className="object-cover"
+                      className="object-cover w-full h-full"
+											priority={false}
                     />
+										{/* The Tint Layer */}
+  										<div className="absolute inset-0 bg-slate-900/5 mix-blend-multiply transition-opacity duration-300 group-hover:opacity-0" />
                   </div>
                   
                   {/* Card Content - flex-grow to fill remaining space */}

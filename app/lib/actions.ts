@@ -260,16 +260,20 @@ export async function getProductCard(pathName: string, cropName?: string) {
 
 //случайные 8 карточек для главной страницы
 export async function getRandomProducts(limit: number = 8) {
-  // 1. Create a shallow copy of the array so we don't accidentally modify the original source file orders
-  const copiedProducts = [...products];
+  // 1. Filter out items where the stock status is 'expected'
+  const availableProducts = products.filter(
+    (product) => product.onStockStatus !== 'expected' && product.onStockStatus !== 'not_available'
+  );
 
-  // 2. Perform a Fisher-Yates or simple random sort shuffle
+  // 2. Create a shallow copy of the filtered array to protect the original dataset
+  const copiedProducts = [...availableProducts];
+
+  // 3. Shuffle only the available items
   const shuffled = copiedProducts.sort(() => 0.5 - Math.random());
 
-  // 3. Extract the requested limit amount (e.g., 8 items)
+  // 4. Extract the requested limit amount (e.g., 8 items)
   const selectedCards = shuffled.slice(0, limit);
 
-  // 4. Return the data structured exactly like your getProductCard function does 
   return { 
     res: selectedCards 
   };
