@@ -4,10 +4,19 @@ import { NextResponse } from 'next/server';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 export async function GET(req: Request) {
+
+  // Определяем базовый URL для редиректов
+  const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const cleanBase = base.replace(/\/$/, '');
+
   try {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
-    if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 400 });
+    //if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 400 });
+    // Вместо JSON редиректим на страницу с флагом ошибки
+    if (!token) {
+      return NextResponse.redirect(`${cleanBase}/verify?status=missing_token`);
+    }
 
     const now = new Date().toISOString();
     const rows = await sql`
@@ -18,7 +27,12 @@ export async function GET(req: Request) {
     `;
 
     const user = rows[0];
-    if (!user) return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
+
+    //if (!user) return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
+     // Вместо JSON редиректим на страницу с флагом "истек или неверный"
+    if (!user) {
+      return NextResponse.redirect(`${cleanBase}/verify?status=expired`);
+    }
 
     await sql`
       UPDATE users

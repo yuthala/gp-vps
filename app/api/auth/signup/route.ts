@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
+import { sendVerificationEmail } from '@/app/lib/email'
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
 
     // Send verification email (SendGrid or SMTP) or fallback to console
     try {
-      const { default: sendVerificationEmail } = await import('@/app/lib/email');
+      //const { default: sendVerificationEmail } = await import('@/app/lib/email');
       await sendVerificationEmail(email, verifyUrl, name);
     } catch (e) {
       console.error('Error sending verification email', e);

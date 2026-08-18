@@ -1,6 +1,7 @@
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto'
+import { sendVerificationEmail } from '@/app/lib/email'
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
 
     // Send verification email
     try {
-      const { default: sendVerificationEmail } = await import('@/app/lib/email');
+      //const { default: sendVerificationEmail } = await import('@/app/lib/email');
       const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
       const verifyUrl = `${base.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
       await sendVerificationEmail(email, verifyUrl, user.name);

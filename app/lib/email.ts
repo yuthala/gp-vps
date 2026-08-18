@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export async function sendVerificationEmail(to: string, verifyUrl: string, name?: string) {
   try {
     if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
@@ -16,6 +17,7 @@ export async function sendVerificationEmail(to: string, verifyUrl: string, name?
         logger: process.env.NODE_ENV === 'development',
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mail: any = {
         from: process.env.EMAIL_FROM || 'no-reply@example.com',
         to,
@@ -104,6 +106,7 @@ export async function sendCredentialsEmail(
         logger: process.env.NODE_ENV === 'development',
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mail: any = {
         from: process.env.EMAIL_FROM || 'no-reply@example.com',
         to,
@@ -140,6 +143,7 @@ export async function sendOrderDeliveryDetailsEmail({
   phone?: string;
   comment?: string;
   deliveryPointAddress?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cartItems: any[];
   goodsTotal: number;
   deliveryPrice: number;
