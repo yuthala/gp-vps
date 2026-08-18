@@ -27,7 +27,7 @@ export default async function ProductCard({ product }: ProductProps) {
   <div className="w-full flex justify-center">
     <div className="w-full max-w-7xl min-w-xs flex flex-col justify-center">
       <div className="max-w-6xl mx-auto px-4 py-8 lg:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center">
+        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center"> */}
           {/* {products.map((product, index) => { */}
             {/* return ( */}
               <div className="flex w-full justify-center">
@@ -93,7 +93,7 @@ export default async function ProductCard({ product }: ProductProps) {
               </div>
             {/* ); */}
           {/* })} */}
-        </div>
+        {/* </div> */}
       </div>
     </div>
   </div>
