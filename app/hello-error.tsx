@@ -11,7 +11,7 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
   return (
     <div className="min-h-screen bg-(--light-main) text-foreground">
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-5xl rounded-[32px] border border-[#064929]/10 bg-white shadow-[0_40px_120px_rgba(6,73,41,0.08)] p-8 sm:p-12">
+        <div className="w-full max-w-5xl rounded-4xl border border-[#064929]/10 bg-white shadow-[0_40px_120px_rgba(6,73,41,0.08)] p-8 sm:p-12">
           <div className="text-center">
             <span className="inline-flex rounded-full bg-[#40AD52]/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.28em] text-[#40AD52]">
               Сервер недоступен
@@ -42,7 +42,7 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
 
           <div className="mt-10 rounded-3xl bg-[#F2F9ED] p-6 text-sm text-[#334155]">
             <p className="font-semibold">Подробности ошибки:</p>
-            <p className="mt-2 break-words">{error?.message || 'Неизвестная ошибка'}</p>
+            <p className="mt-2 wrap-break-word">{error?.message || 'Неизвестная ошибка'}</p>
           </div>
         </div>
       </div>

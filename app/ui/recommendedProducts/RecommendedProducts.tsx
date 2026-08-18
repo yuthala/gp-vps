@@ -22,8 +22,8 @@ export default function RecommendedProducts() {
   const selected = shuffled.slice(0, 3);
 
   return (
-    <section className="pt-10 sm:pt-20">
-			<div className="flex items-center gap-4 pb-6 sm:pb-10">
+    <section>
+			<div className="flex items-center gap-4 pb-10 md:pb-6">
 				<Heading level={5}>Вам может понравиться</Heading>
 					<Image
 						src='/recommendedProducts/heart-icon.svg'

@@ -87,7 +87,7 @@ export default function ShoppingCartComponent() {
 					<div className="flex justify-end w-full">
 						<div className="w-full lg:w-2/3 text-gray-400 text-normal">Выбор способа доставки и оплаты на следующем шаге</div>
 					</div>
-					<div className="flex justify-end w-full pb-10">
+					<div className="flex justify-end w-full pb-2">
 						<div className="w-full lg:w-2/3 flex flex-col sm:flex-row gap-2 sm:gap-0 items-center justify-between">
 							<Link href="/catalog">
 								<Button
