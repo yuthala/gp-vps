@@ -38,7 +38,7 @@ export default function OnStock({ onStockStatus}: { onStockStatus: string }) {
 						width={13}
 						height={16}
 						alt='expected'
-						className="object-cover"
+						className="object-cover w-auto h-4"
 					/>
           Предзаказ открыт
           {/* <CheckIcon className="ml-1 w-4 text-white" /> */}

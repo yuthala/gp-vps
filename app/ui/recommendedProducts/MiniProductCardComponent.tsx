@@ -30,7 +30,7 @@ export default function MiniProductCardComponent({imageSrc, shortDescription, pr
 					p-2 sm:p-4
 			">
       {/* Image - fixed size 124x124 */}
-      <div className="shrink-0 w-31 m-auto ml-2">
+      <div className="shrink-0 w-31 h-30 m-auto ml-2">
         <div className="relative w-full h-full">
           <Image
             src={imageSrc}
