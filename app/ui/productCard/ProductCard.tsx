@@ -50,7 +50,7 @@ export default async function ProductCard({ product }: ProductProps) {
                   {/* Card Content - flex-grow to fill remaining space */}
                   <div className="p-4 flex flex-col grow">
                     {/* Short Description */}
-                    <Heading level={6} className="h-22.5 mb-3 line-clamp-3 shrink-0">
+                    <Heading level={6} className="h-20 mb-2 line-clamp-3 shrink-0">
                       {product.description || 'Здесь должно быть описание товара'}
                     </Heading>
 
