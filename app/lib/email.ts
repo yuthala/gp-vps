@@ -21,8 +21,10 @@ export async function sendVerificationEmail(to: string, verifyUrl: string, name?
       const mail: any = {
         from: process.env.EMAIL_FROM || 'no-reply@example.com',
         to,
-        subject: 'Verify your email',
-        text: `Hi ${name || ''},\n\nPlease verify your email by visiting: ${verifyUrl}`,
+        // subject: 'Verify your email',
+				subject: 'Подтвердите адрес электронной почты',
+        //text: `Hi ${name || ''},\n\nPlease verify your email by visiting: ${verifyUrl}`,
+				text: `Здравствуйте, ${name || ''},\n\nПожалуйста пройдите по ссылке, чтобы подтвердить ваш адрес электронной почты: ${verifyUrl}`,
         html: `<p>Hi ${name || ''},</p><p>Please verify your email by clicking <a href="${verifyUrl}">this link</a>.</p>`,
       };
 
