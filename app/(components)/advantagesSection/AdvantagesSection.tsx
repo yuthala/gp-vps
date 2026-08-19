@@ -2,6 +2,7 @@
 
 import { Advantages } from "../../lib/definitions";
 import Heading from "../../ui/Heading";
+import Link from "next/link";
 
 const cards: Advantages[] = [
 	{iconSrc: '/advantagesSection/adv-1.svg', iconWidth: 40, iconHeight: 40, heading: 'Собственное производство', description: (
@@ -10,7 +11,16 @@ const cards: Advantages[] = [
 		</>
 	)},
 	{iconSrc: '/advantagesSection/adv-2.svg', iconWidth: 48, iconHeight: 48, heading: 'Удобная доставка по РФ', description: 'Укажите адрес доставки в форме заказа - и наш менеджер подберет оптимальный вариант. Мы сотрудничаем с несколькими логистическими операторами, и всегда сможем подобрать быструю и удобную доставку вашего заказа.'},
-	{iconSrc: '/advantagesSection/adv-3.svg', iconWidth: 40, iconHeight: 40, heading: 'Широкий ассортимент', description: 'В нашем ассортименте вы найдете лучшие сорта чеснока, лука и шалота. Год от года ассортимент может быть различным. С актуальным ассортиментом вы можете ознакомиться в Каталоге.'},
+	{iconSrc: '/advantagesSection/adv-3.svg', iconWidth: 40, iconHeight: 40, heading: 'Широкий ассортимент', description: (
+      <>
+        В нашем ассортименте вы найдете лучшие сорта чеснока, лука и шалота. 
+        Год от года ассортимент может быть различным. 
+        С актуальным ассортиментом вы можете ознакомиться в {' '}
+        <Link href="/catalog" className=" underline hover:text-(--secondary)">
+          Каталоге
+        </Link>.
+      </>
+    )},
 	{iconSrc: '/advantagesSection/adv-4.svg', iconWidth: 30, iconHeight: 30, heading: 'У нас нет минимального заказа', description: 'Да, заказывайте сколько хотите. Отправим любое количество!'}
 ]
 
