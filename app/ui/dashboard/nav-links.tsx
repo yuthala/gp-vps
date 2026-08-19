@@ -3,7 +3,7 @@
 import {
   UserGroupIcon,
   HomeIcon,
-  DocumentDuplicateIcon,
+  //DocumentDuplicateIcon,
   ArchiveBoxIcon,
   RectangleStackIcon,
 } from '@heroicons/react/24/outline';
