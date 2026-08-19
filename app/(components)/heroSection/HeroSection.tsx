@@ -16,9 +16,9 @@ export default function HeroSection() {
 					</div>
 
 					<div>
-							<Heading level={3} className="text-2xl lg:text-3xl font-bold text-(--secondary) pb-4 align-left"><span className="text-red-600">[</span>green pato<span className="text-red-600">]</span></Heading>
-							<Heading level={1} className="text-3xl lg:text-5xl font-extrabold uppercase text-foreground leading-tight pb-6">Питомник луковичных <br/>культур</Heading>
-							<div className="text-4xl lg:text-6xl font-extrabold uppercase text-white sm:pl-8">
+							<Heading level={3} className="text-lg font-bold text-(--secondary) pb-4 align-left"><span className="text-red-600">[</span>green pato<span className="text-red-600">]</span></Heading>
+							<Heading level={1} className="text-2xl lg:text-4xl font-extrabold uppercase text-foreground leading-tight pb-6">Питомник луковичных <br/>культур</Heading>
+							<div className="text-4xl lg:text-4xl font-extrabold uppercase text-white sm:pl-8">
 								<Heading level={3} className="pb-6 align-left">чеснок</Heading>
 
 								<Heading level={3} className="pb-6 align-left">лук</Heading>
@@ -29,7 +29,7 @@ export default function HeroSection() {
 					</div>
 
           <div className="flex-1 relative">
-            <div className="w-full h-64 sm:h-80 md:h-130 lg:h-150 relative rounded overflow-hidden">
+            <div className="w-full h-64 sm:h-84 lg:h-105 relative rounded overflow-hidden">
               <Image
                 src="/hero.jpg"
                 alt="Hero"

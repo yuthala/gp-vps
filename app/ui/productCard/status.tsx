@@ -4,7 +4,7 @@ import Image from 'next/image';
 export default function OnStock({ onStockStatus}: { onStockStatus: string }) {
   return (
     <span
-      className='rounded-full pt-3 pb-8 text-xl'>
+      className='rounded-full py-2 text-xl'>
       {onStockStatus === 'available' ? (
         <div className="flex gap-2 items-center">
 					<Image

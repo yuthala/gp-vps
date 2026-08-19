@@ -6,6 +6,7 @@ import DeliverySection from "./(components)/deliverySection/DeliverySection";
 import OurOzonShop from "./(components)/ourOzonShop/OurOzonShop";
 import VKSection from "./(components)/VKSection/VKSection";
 import Contacts from "./(components)/contacts/Contacts";
+import MainPageCardsSection from "./(components)/mainPageCardsSection/MainPageCardsSection";
 
 export default function Home() {
 	return (
@@ -13,6 +14,7 @@ export default function Home() {
 			<div className="w-full flex justify-center">
 				<div className="w-full max-w-7xl min-w-xs">
 					<HeroSection />
+					<MainPageCardsSection />
 					<AdvantagesSection />
 					<CropsSection />
 					<BookingSection />
