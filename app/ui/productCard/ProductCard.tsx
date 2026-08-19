@@ -60,7 +60,7 @@ export default async function ProductCard({ product }: ProductProps) {
                     <div className="grow"></div>
 
 										<div className={clsx(
-											'pb-8',
+											'pb-2',
 											product.onStockStatus === 'available' ? 'text-[#40AD52]' : 'text-gray-400'
 										)}>
 											<div className="flex justify-between">
