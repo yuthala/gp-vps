@@ -15,14 +15,15 @@ import clsx from 'clsx';
 // Depending on the size of the application, this would be stored in a database.
 const links = [
   { name: 'Home', href: '/dashboard', icon: HomeIcon },
-  {
-    name: 'Invoices',
-    href: '/dashboard/invoices',
-    icon: DocumentDuplicateIcon,
-  },
-  { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  // {
+  //   name: 'Invoices',
+  //   href: '/dashboard/invoices',
+  //   icon: DocumentDuplicateIcon,
+  // },
+  { name: 'Клиенты', href: '/dashboard/customers', icon: UserGroupIcon },
   {name: 'Добавить товар', href: '/dashboard/add-product', icon: ArchiveBoxIcon},
   {name: 'Карточки товаров', href:'/dashboard/product-cards', icon: RectangleStackIcon },
+  {name: 'Заказы', href:'/dashboard/orders', icon: RectangleStackIcon },
   
 ];
 

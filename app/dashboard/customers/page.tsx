@@ -1,3 +1,3 @@
-export default function Page() {
-  return <p>Customers Page</p>;
+export default function CustomersPage() {
+  return <p>Здесь будет страница с клиентами и их заказами: количство и общая стоимость</p>;
 }
