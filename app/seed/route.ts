@@ -102,7 +102,7 @@ async function seedProducts() {
       crop_size VARCHAR(100),
       
       -- pathNameEng: string (часто используется для ЧПУ URL, например /catalog/tomato-red)
-      path_name_eng VARCHAR(255) NOT NULL UNIQUE,
+      path_name_eng VARCHAR(255) NOT NULL,
       
       -- onStockStatus: string (ограничиваем возможные статусы для безопасности)
       on_stock_status VARCHAR(50) NOT NULL DEFAULT 'out_of_stock' 
