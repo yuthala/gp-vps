@@ -1,7 +1,7 @@
 "use client"; // Компонент интерактивен, выполняется на клиенте
 
 import React, { useState } from 'react';
-import { addNewProduct, type NewProductInput } from '@/app/lib/productsDBactions'; // Корректный импорт серверного действия
+import { addNewProduct, type NewProductInput } from '@/app/lib/dbActions/productsDBactions'; // Корректный импорт серверного действия
 
 interface FormState {
   cropSort: string;

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Plus, Edit2, Trash2, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
 // Импортируйте ваши функции и интерфейс из правильного файла (например, @/lib/db)
-import { fetchFilteredProducts, fetchProductsPages, deleteProduct, ProductRow } from '@/app/lib/productsDBactions';
+import { fetchFilteredProducts, fetchProductsPages, deleteProduct, ProductRow } from '@/app/lib/dbActions/productsDBactions';
 
 // Вспомогательная функция для форматирования цен в USD
 const formatCurrency = (value: number) => {

@@ -1,14 +1,16 @@
+// ФАЙЛ ДЛЯ СОЗДАНИЯ ТАБЛИЦ
+
 'use server'
 import postgres from 'postgres';
-import { NextResponse } from 'next/server';
+//import { NextResponse } from 'next/server';
 import { invoices, customers, revenue, users } from '../lib/placeholder-data';
 import bcrypt from 'bcrypt'
 import { forbiddenPage } from '../user-dashboard/forbidden-page';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+// Получение почты администратора из .env
 let adminEmail: string;
-
   // Безопасное получение переменной окружения через try/catch
   try {
     const envEmail = process.env.ADMIN_EMAIL;
