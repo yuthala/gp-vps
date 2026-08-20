@@ -69,15 +69,15 @@ export async function sendCredentialsEmail(
                 <p style="font-size:16px;line-height:1.75;margin:0 0 24px;">Аккаунт успешно создан для оформления заказа на Green Pato. Используйте следующие данные для входа:</p>
                 <table cellpadding="0" cellspacing="0" role="presentation" style="width:100%;margin-bottom:24px;border:1px solid #E2E8F0;border-radius:16px;">
                   <tr>
-                    <td style="padding:16px;background:#F2F9ED;color:#0F172A;font-weight:700;">E-mail</td>
+                    <td style="padding:16px;background:#F2F9ED;color:#0F172A;font-weight:700;border-top-left-radius: 16px;">E-mail</td>
                     <td style="padding:16px;color:#0F172A;">${to}</td>
                   </tr>
                   <tr>
-                    <td style="padding:16px;background:#F2F9ED;color:#0F172A;font-weight:700;">Пароль</td>
+                    <td style="padding:16px;background:#F2F9ED;color:#0F172A;font-weight:700;border-bottom-left-radius: 16px;">Пароль</td>
                     <td style="padding:16px;color:#0F172A;">${password}</td>
                   </tr>
                 </table>
-                <p style="font-size:16px;line-height:1.75;margin:0 0 24px;">Перейдите по кнопке ниже, чтобы войти и продолжить оформление заказа:</p>
+                <p style="font-size:16px;line-height:1.75;margin:0 0 24px;">Перейдите по кнопке ниже, чтобы войти.</p>
                 <div style="text-align:center;margin-bottom:24px;">
                   <a href="${loginUrl}" style="display:inline-block;padding:14px 30px;border-radius:999px;background:#40AD52;color:#FFFFFF;font-weight:700;text-decoration:none;">Войти на сайт</a>
                 </div>
@@ -187,7 +187,7 @@ export async function sendOrderDeliveryDetailsEmail({
             <tr>
               <td style="padding:32px;color:#334155;">
                 <p style="font-size:16px;line-height:1.75;margin:0 0 16px;">Здравствуйте, ${name}.</p>
-                <p style="font-size:16px;line-height:1.75;margin:0 0 16px;">Ниже приведены детали вашего заказа и доставки:</p>
+                <p style="font-size:16px;line-height:1.75;margin:0 0 16px;">Ниже приведены детали вашего заказа №хххххххх от ХХ.ХХ.ХХХХ и доставки:</p>
                 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;margin-bottom:24px;">
                   <thead>
                     <tr>
