@@ -60,7 +60,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   return (
     
     <div className="w-full min-h-screen bg-gray-50 p-6 font-sans text-[#1a1a1a]">
-      <p>НЕОБХОДИМЫ ФУНКЦИОНАЛ: 1.УДАЛИТЬКАРТОЧКУ 2. ДОБАВИТЬ КАРТОЧКУ 3. РЕДАКТИРОВАТЬ КАРТОЧКУ 4. СКРЫТЬ КАРТОЧКУ</p>
+      {/* <p>НЕОБХОДИМЫ ФУНКЦИОНАЛ: 1.УДАЛИТЬКАРТОЧКУ 2. ДОБАВИТЬ КАРТОЧКУ 3. РЕДАКТИРОВАТЬ КАРТОЧКУ 4. СКРЫТЬ КАРТОЧКУ</p> */}
       <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden p-6">
         
         {/* Панель фильтрации: Поиск и Добавление товара */}
