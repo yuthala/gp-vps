@@ -163,7 +163,7 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                       <td className="py-4 px-4 text-right">
                         <div className="inline-flex items-center gap-2">
                           <Link 
-                            href={`/admin/products/${product.internal_id}/edit`}
+                            href={`/dashboard/products/${product.internal_id}/edit`}
                             className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg border border-gray-200 bg-white transition-all"
                           >
                             <Edit2 className="w-4 h-4" />
