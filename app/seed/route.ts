@@ -278,7 +278,7 @@ export async function GET(req: Request) {
       return forbiddenPage();
     }
 
-    const result = await sql.begin((sql) => [
+    const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
       seedUsers(),
       seedCustomers(),
       seedInvoices(),
@@ -288,7 +288,7 @@ export async function GET(req: Request) {
       seedProducts()
     ]);
 
-    return Response.json({ message: 'Database seeded successfully' });
+    return Response.json({ message: 'Database seeded successfully', result });
   } catch (error) {
     console.error('Seed route error', error);
     return Response.json({ error: 'Server error' }, { status: 500 });
