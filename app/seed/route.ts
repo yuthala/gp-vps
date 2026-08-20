@@ -7,7 +7,27 @@ import { forbiddenPage } from '../user-dashboard/forbidden-page';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-const ADMIN_EMAIL = 'sales@greenpato.ru';
+let adminEmail: string;
+
+  // Безопасное получение переменной окружения через try/catch
+  try {
+    const envEmail = process.env.ADMIN_EMAIL;
+    
+    // Если переменная не задана или является пустой строкой
+    if (!envEmail || envEmail.trim() === "") {
+      throw new Error("Переменная окружения ADMIN_EMAIL не настроена в .env файле.");
+    }
+    
+    adminEmail = envEmail;
+  } catch (error) {
+    // Логируем ошибку конфигурации на сервере
+    console.error("[Config Error]:", error);
+    
+    // Так как админский email не настроен, во избежание уязвимостей 
+    // присваиваем значение, которое гарантированно не совпадет ни с одним пользователем
+    adminEmail = "DISABLED_NO_ADMIN_CONFIGURED";
+  }
+
 
 async function getAuthorizedUser(req: Request) {
   const cookie = req.headers.get('cookie') || '';
@@ -252,7 +272,7 @@ async function seedRevenue() {
 export async function GET(req: Request) {
   try {
     const user = await getAuthorizedUser(req);
-    if (!user || user.email !== ADMIN_EMAIL) {
+    if (!user || user.email !== adminEmail) {
       return forbiddenPage();
     }
 
