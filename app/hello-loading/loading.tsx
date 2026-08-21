@@ -1,8 +1,9 @@
 export default function ProductsLoading() {
   return (
-    <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-gradient-to-b from-sky-100 via-sky-50 to-emerald-50 rounded-2xl border border-sky-200/50 shadow-inner">
+    // Добавлен класс z-0, чтобы весь контейнер загрузки находился ниже Header при скролле
+    <div className="w-full min-h-[70vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-gradient-to-b from-sky-100 via-sky-50 to-emerald-50 rounded-2xl border border-sky-200/50 shadow-inner z-0">
       
-      {/* НЕБО И ОБЛАКА */}
+      {/* НЕБО И ОБЛАКА (Оставляем z-индекс по умолчанию внутри контейнера) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Солнце */}
         <div className="absolute top-12 right-16 w-20 h-20 bg-amber-400 rounded-full animate-sun flex items-center justify-center">
@@ -16,7 +17,7 @@ export default function ProductsLoading() {
         <div className="absolute top-32 right-[25%] w-24 h-8 bg-white/70 rounded-full blur-[1px] animate-float-fast before:content-[''] before:absolute before:bottom-2 before:left-4 before:w-10 before:h-10 before:bg-white/70 before:rounded-full after:content-[''] after:absolute after:bottom-2 after:right-5 after:w-12 after:h-12 after:bg-white/70 after:rounded-full" />
       </div>
 
-      {/* ТЕКСТ И ИНДИКАТОР ЗАГРУЗКИ */}
+      {/* ТЕКСТ И ИНДИКАТОР ЗАГРУЗКИ (Безопасный z-10 — выше луга, но ниже Header сайта) */}
       <div className="z-10 text-center space-y-4 mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 backdrop-blur-md border border-sky-200 text-sky-800 text-sm font-medium shadow-sm animate-pulse">
           <svg className="animate-spin h-4 w-4 text-sky-600" fill="none" viewBox="0 0 24 24">
@@ -63,4 +64,3 @@ export default function ProductsLoading() {
     </div>
   );
 }
-
