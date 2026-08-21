@@ -2,6 +2,7 @@
 
 import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
+import type { ProductCard } from '../definitions';
 
 // Инициализируем подключение к базе данных
 const sql = postgres(process.env.DATABASE_URL!);
@@ -334,27 +335,87 @@ export async function fetchProductByInternalId(internalId: string): Promise<NewP
 /**
  * Получение абсолютно всех товаров из базы данных без ограничений, пагинации и выборки
  */
-export async function fetchAllProducts(): Promise<ProductRow[]> {
+export async function fetchAllProducts(): Promise<ProductCard[]> {
   try {
-    // Делаем прямой запрос ко всей таблице, сортируя товары от новых к старым
-    const products = await sql<ProductRow[]>`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const products = await sql<any[]>`
       SELECT 
-        internal_id, 
-        id, 
-        crop_sort, 
-        crop_name_eng, 
-        price, 
-        estimated_on_stock_date, 
-        on_stock_status, 
-        image_src
-      FROM products
+        id,
+        image_src,
+        description,
+        description_details,
+        crop_sort,
+        crop_size,
+        crop_name_eng,
+        path_name_eng,
+        tags,
+        package_size,
+        on_stock_status,
+        estimated_on_stock_date,
+        price,
+        measure_unit
+      FROM products 
       ORDER BY on_stock_status DESC
     `;
-    
-    return products;
+
+    return products.map((row, index) => { // Добавили index для подстраховки
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parseArray = (val: any) => {
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') {
+      try { return JSON.parse(val); } catch { return [val]; }
+    }
+    return [];
+  };
+
+  // Проверяем, преобразуется ли id в число. Если нет — используем index
+  const parsedId = Number(row.id);
+  const safeId = Number.isNaN(parsedId) ? index : parsedId;
+
+  return {
+    id: safeId, // Теперь здесь точно никогда не будет NaN
+    imageSrc: parseArray(row.image_src),
+    description: row.description || '',
+    descriptionDetails: row.description_details || '',
+    cropSort: row.crop_sort || '',
+    cropSize: row.crop_size || undefined,
+    cropName: row.crop_name_eng || '',
+    pathName: row.path_name || 'zubok',
+    tags: row.tags ? parseArray(row.tags) : [],
+    packageSize: parseArray(row.package_size).map(Number),
+    onStockStatus: row.on_stock_status as 'available' | 'not_available' | 'expected', 
+    estimatedOnStockDate: row.estimated_on_stock_date ? String(row.estimated_on_stock_date) : undefined,
+    price: Number(row.price),
+    measureUnit: Number(row.measure_unit || 1),
+  };
+});
+
+
   } catch (error) {
     console.error('Ошибка при получении полного списка товаров из БД:', error);
     throw new Error('Не удалось загрузить все товары.');
   }
 }
+
+/*
+-- Сделать hello-skel -  с использованием скелетонов и error.tsx
+-- Cделать hello-load -  сиспользованием loading.tsx  и error.tsx
+
+-- основные требования:
+-- Запрос ДБ sql
+-- Ожидание загрузки если слабый интернет 
+-- Обработка ошибки error.tsx если интерента нет или нет доступа к базе данных
+*/
+
+
+
+/* Для главной страницы надо 8 случайных товаров из БД. Свойства:
+ -- запрос к бд  с определенными свойствами, какие свойства?
+ --> Свойства: 
+ -- выборка 8 случайнх можно сразу в запросе сделать выборку случайных?
+ -- обработка ошибок если интеренат нет или интернет слабый
+ -- скелетон для загрузки если интернет слабый либо файл loading.tsx 
+ -- error.tsx если нет интернета или нет доступа к БД
+
+*/
 

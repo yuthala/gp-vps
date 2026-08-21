@@ -247,4 +247,93 @@ h6 {
 	}
 }
 
+/* Добавляем кастомную анимацию для Tailwind v4 */
+ .animate-shimmer {
+  animation: shimmer 2s infinite;
+}
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Анимация покачивания травы */
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(4deg); }
+}
+
+/* Анимация движения облаков */
+@keyframes float {
+  0% { transform: translateX(-10%); }
+  50% { transform: translateX(10%); }
+  100% { transform: translateX(-10%); }
+}
+
+/* Анимация пульсации солнечных лучей */
+@keyframes sunPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.6)); }
+}
+
+/* Регистрируем классы для Tailwind */
+.animate-sway {
+  animation: sway 4s ease-in-out infinite;
+}
+.animate-sway-slow {
+  animation: sway 6s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: float 25s ease-in-out infinite;
+}
+.animate-float-fast {
+  animation: float 14s ease-in-out infinite;
+}
+.animate-sun {
+  animation: sunPulse 4s ease-in-out infinite;
+}
+
+/* 1. Анимация бесконечного движения дождевых облаков */
+@keyframes cloudDrive {
+  0% { transform: translateX(-30%); }
+  100% { transform: translateX(110%); }
+}
+
+/* 2. Анимация падающего под наклоном сильного дождя */
+@keyframes heavyRain {
+  0% { transform: translateY(-50px) translateX(20px); opacity: 0; }
+  30% { opacity: 0.6; }
+  60% { opacity: 0.6; }
+  100% { transform: translateY(500px) translateX(-200px); opacity: 0; }
+}
+
+/* 3. Анимация качающихся от ветра деревьев (сгибание ствола) */
+@keyframes treeBend {
+  0%, 100% { transform: rotate(0deg) skewX(0deg); }
+  35% { transform: rotate(-3deg) skewX(-2deg); }
+  45% { transform: rotate(-4deg) skewX(-3deg); }
+  70% { transform: rotate(-1deg) skewX(-1deg); }
+}
+
+/* Регистрируем классы */
+.animate-cloud-slow {
+  animation: cloudDrive 45s linear infinite;
+}
+.animate-cloud-fast {
+  animation: cloudDrive 28s linear infinite;
+}
+.animate-rain-layer-1 {
+  animation: heavyRain 0.6s linear infinite;
+}
+.animate-rain-layer-2 {
+  animation: heavyRain 0.45s linear infinite;
+  animation-delay: 0.15s;
+}
+.animate-rain-layer-3 {
+  animation: heavyRain 0.5s linear infinite;
+  animation-delay: 0.3s;
+}
+.animate-forest-wind {
+  animation: treeBend 5s ease-in-out infinite;
+}
