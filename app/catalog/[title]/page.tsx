@@ -1,16 +1,17 @@
 
-import ProductCard from "../../ui/productCard/ProductCard";
-import { getProductCard } from "../../lib/actions";
+import { ProductCard } from "@/app/lib/definitions";
+import ProductCardUI from "../../ui/productCard/ProductCard";
+//import { getProductCard } from "../../lib/actions";
+import { fetchProductsByPathNameTitle } from '@/app/lib/dbActions/productsDBactions'
 
 interface PageProps {
   params: Promise<{ title: string }>; // Next.js params form
 }
 
 export default async function CatalogCards({ params }: PageProps) {
-	 const { title } = await params;
-	  const { res: products } = await getProductCard(title);
-	//const params = await props.params;
-  //const id = params.title;
+	const { title } = await params;
+	//const { res: products } = await getProductCard(title);
+	const products: ProductCard[]  = await fetchProductsByPathNameTitle(title)
 
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center">
@@ -20,7 +21,7 @@ export default async function CatalogCards({ params }: PageProps) {
 					key={`${product.pathName}-${index}`} 
 					className="flex w-full justify-center"
 				>
-					<ProductCard product={product} />
+					<ProductCardUI product={product} />
 				</div>
 			))}
 			{/* <ProductCard pathName={id}/> */}
