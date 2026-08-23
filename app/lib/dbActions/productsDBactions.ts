@@ -253,6 +253,162 @@ export async function fetchProductsByPathName(pathName: string, currentPage: num
   }
 }
 
+/*
+ --  Получение списка товаров по pathname из стоки запроса
+*/
+export async function fetchProductsByPathNameTitle(pathNameEng: string): Promise<ProductCard[]> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const products = await sql<any[]>`
+      SELECT 
+        id, 
+        image_src, 
+        description, 
+        description_details, 
+        crop_sort, 
+        crop_size, 
+        crop_name_eng, 
+        path_name_eng, 
+        tags, 
+        package_size, 
+        on_stock_status, 
+        estimated_on_stock_date, 
+        price, 
+        measure_unit
+      FROM products 
+      WHERE path_name_eng = ${pathNameEng}
+      -- ORDER BY on_stock_status DESC
+          -- Кастомная сортировка: сначала available (1), затем expected (2), в конце not_available (3)
+       ORDER BY 
+        CASE on_stock_status
+          WHEN 'available' THEN 1
+          WHEN 'expected' THEN 2
+          WHEN 'not_available' THEN 3
+          ELSE 4
+        END ASC
+    `;
+
+    return products.map((row, index) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const parseArray = (val: any) => {
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string') {
+          try {
+            return JSON.parse(val);
+          } catch {
+            return [val];
+          }
+        }
+        return [];
+      };
+
+      const parsedId = Number(row.id);
+      const safeId = Number.isNaN(parsedId) ? index : parsedId;
+
+      return {
+        id: safeId,
+        imageSrc: parseArray(row.image_src),
+        description: row.description || '',
+        descriptionDetails: row.description_details || '',
+        cropSort: row.crop_sort || '',
+        cropSize: row.crop_size || undefined,
+        cropName: row.crop_name_eng || '',
+        pathName: row.path_name_eng || 'zubok', // Исправлено на row.path_name_eng, так как в SELECT запрашивается именно оно
+        tags: row.tags ? parseArray(row.tags) : [],
+        packageSize: parseArray(row.package_size).map(Number),
+        onStockStatus: row.on_stock_status as 'available' | 'not_available' | 'expected',
+        estimatedOnStockDate: row.estimated_on_stock_date ? String(row.estimated_on_stock_date) : undefined,
+        price: Number(row.price),
+        measureUnit: Number(row.measure_unit || 1),
+      };
+    });
+  } catch (error) {
+    console.error(`Ошибка при получении товаров по категории ${pathNameEng} из БД:`, error);
+    throw new Error('Не удалось загрузить товары выбранной категории.');
+  }
+}
+
+/*
+--> Получение данных из ДБ по pahtname_eng and crop_name_eng
+*/
+export async function fetchProductsByPathAndCropName(
+  pathNameEng: string,
+  cropNameEng: string
+): Promise<ProductCard> { // Изменили тип возвращаемого значения на единичный объект
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const products = await sql<any[]>`
+      SELECT 
+        id, 
+        image_src, 
+        description, 
+        description_details, 
+        crop_sort, 
+        crop_size, 
+        crop_name_eng, 
+        path_name_eng, 
+        tags, 
+        package_size, 
+        on_stock_status, 
+        estimated_on_stock_date, 
+        price, 
+        measure_unit
+      FROM products 
+      WHERE path_name_eng = ${pathNameEng}
+        AND crop_name_eng = ${cropNameEng}
+      ORDER BY on_stock_status DESC
+      LIMIT 1 -- Ограничиваем выборку одной строкой для оптимизации
+    `;
+
+    // Если ничего не найдено, выбрасываем ошибку (либо можно возвращать null, изменив тип выше)
+    if (products.length === 0) {
+      throw new Error(`Товар не найден для категории "${pathNameEng}" и культуры "${cropNameEng}"`);
+    }
+
+    const row = products[0];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parseArray = (val: any) => {
+      if (Array.isArray(val)) return val;
+      if (typeof val === 'string') {
+        try {
+          return JSON.parse(val);
+        } catch {
+          return [val];
+        }
+      }
+      return [];
+    };
+
+    const parsedId = Number(row.id);
+    const safeId = Number.isNaN(parsedId) ? 0 : parsedId;
+
+    return {
+      id: safeId,
+      imageSrc: parseArray(row.image_src),
+      description: row.description || '',
+      descriptionDetails: row.description_details || '',
+      cropSort: row.crop_sort || '',
+      cropSize: row.crop_size || undefined,
+      cropName: row.crop_name_eng || '',
+      pathName: row.path_name_eng || 'zubok',
+      tags: row.tags ? parseArray(row.tags) : [],
+      packageSize: parseArray(row.package_size).map(Number),
+      onStockStatus: row.on_stock_status as 'available' | 'not_available' | 'expected',
+      estimatedOnStockDate: row.estimated_on_stock_date ? String(row.estimated_on_stock_date) : undefined,
+      price: Number(row.price),
+      measureUnit: Number(row.measure_unit || 1),
+    };
+  } catch (error) {
+    console.error(
+      `Ошибка при получении товара по категории ${pathNameEng} и культуре ${cropNameEng} из БД:`, 
+      error
+    );
+    throw new Error('Не удалось загрузить данные товара.');
+  }
+}
+
+
 
 /**
  * Подсчет общего количества страниц для пагинации

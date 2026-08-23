@@ -1,12 +1,14 @@
 
-import { getProductCard } from "../../../lib/actions";
+//import { getProductCard } from "../../../lib/actions";
 import ProductImage from "@/app/ui/productCard/ProductImage";
 import ProductDetails from '../../../ui/productCard/ProductDetails';
+import { fetchProductsByPathAndCropName } from "@/app/lib/dbActions/productsDBactions";
 
 
 export default async function WideCardPage(props: { params: Promise<{ title: string, wideCard: string }> }) {
 	const {title, wideCard} = await props.params;
-	const data = (await getProductCard(title, wideCard)).data;
+	//const data = (await getProductCard(title, wideCard)).data;
+  const data = await fetchProductsByPathAndCropName(title, wideCard)
 
 	return (
   <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 p-4">
