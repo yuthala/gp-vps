@@ -74,7 +74,7 @@ export interface NewProductInput {
   packageSize: number[];
   cropSize: string;
   pathName: string;
-  onStockStatus: 'in_stock' | 'out_of_stock' | 'pre_order'; // Строгие литеральные типы
+  onStockStatus: 'available' | 'not_available' | 'expected'; // Строгие литеральные типы
   price: number;
   measureUnit: number;
   estimatedOnStockDate: string;
@@ -198,7 +198,7 @@ export interface ProductRow {
   crop_name_eng: string;
   price: number;
   estimated_on_stock_date: string | null;
-  on_stock_status: 'in_stock' | 'out_of_stock' | 'pre_order';
+  on_stock_status: 'available' | 'not_available' | 'expected';
   image_src: string[];
 }
 
@@ -397,25 +397,74 @@ export async function fetchAllProducts(): Promise<ProductCard[]> {
   }
 }
 
-/*
--- Сделать hello-skel -  с использованием скелетонов и error.tsx
--- Cделать hello-load -  сиспользованием loading.tsx  и error.tsx
-
--- основные требования:
--- Запрос ДБ sql
--- Ожидание загрузки если слабый интернет 
--- Обработка ошибки error.tsx если интерента нет или нет доступа к базе данных
-*/
-
-
 
 /* Для главной страницы надо 8 случайных товаров из БД. Свойства:
- -- запрос к бд  с определенными свойствами, какие свойства?
- --> Свойства: 
- -- выборка 8 случайнх можно сразу в запросе сделать выборку случайных?
- -- обработка ошибок если интеренат нет или интернет слабый
- -- скелетон для загрузки если интернет слабый либо файл loading.tsx 
- -- error.tsx если нет интернета или нет доступа к БД
-
+-- где есть пагинация реализовать promise.all
 */
+
+// Загрузка восьми случайных элементов из БД для главной страницы
+export async function fetchRandomProducts(): Promise<ProductCard[]> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const products = await sql<any[]>`
+      SELECT 
+        id,
+        image_src,
+        description,
+        description_details,
+        crop_sort,
+        crop_size,
+        crop_name_eng,
+        path_name_eng,
+        tags,
+        package_size,
+        on_stock_status,
+        estimated_on_stock_date,
+        price,
+        measure_unit
+      FROM products 
+      WHERE on_stock_status = 'available'
+      ORDER BY RANDOM() 
+      LIMIT 8
+    `;
+
+    return products.map((row, index) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const parseArray = (val: any) => {
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string') {
+          try { return JSON.parse(val); } catch { return [val]; }
+        }
+        return [];
+      };
+
+      const parsedId = Number(row.id);
+      const safeId = Number.isNaN(parsedId) ? index : parsedId;
+
+      return {
+        id: safeId,
+        imageSrc: parseArray(row.image_src),
+        description: row.description || '',
+        descriptionDetails: row.description_details || '',
+        cropSort: row.crop_sort || '',
+        cropSize: row.crop_size || undefined,
+        cropName: row.crop_name_eng || '',
+        pathName: row.path_name_eng || 'zubok', // Изменено на row.path_name_eng, так как это поле запрашивается в SELECT
+        tags: row.tags ? parseArray(row.tags) : [],
+        packageSize: parseArray(row.package_size).map(Number),
+        onStockStatus: row.on_stock_status as 'available' | 'not_available' | 'expected', 
+        estimatedOnStockDate: row.estimated_on_stock_date ? String(row.estimated_on_stock_date) : undefined,
+        price: Number(row.price),
+        measureUnit: Number(row.measure_unit || 1),
+      };
+    });
+
+  } catch (error) {
+    console.error('Ошибка при получении случайных товаров из БД:', error);
+    //throw new Error('Не удалось загрузить случайные товары.');
+    // В случае ошибки возвращаем пустой массив вместо ошбибки, чтобы страница не падала. 
+    return []
+  }
+}
+
 

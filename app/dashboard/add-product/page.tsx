@@ -10,7 +10,7 @@ interface FormState {
   packageSizeString: string;
   cropSize: string;
   pathName: string;
-  onStockStatus: 'in_stock' | 'out_of_stock' | 'pre_order';
+  onStockStatus: 'available' | 'not_available' | 'expected';
   price: string;
   measureUnit: string;
   estimatedOnStockDate: string;
@@ -26,7 +26,7 @@ export default function AddProductPage() {
     packageSizeString: '2.5, 0, 10',
     cropSize: 'мелкая',
     pathName: 'zubok',
-    onStockStatus: 'pre_order',
+    onStockStatus: 'expected',
     price: '100',
     measureUnit: '100',
     estimatedOnStockDate: '2026-08-10',

@@ -16,19 +16,19 @@ const formatCurrency = (value: number) => {
 // Функция конфигурации внешнего вида статусов
 const getStatusConfig = (status: ProductRow['on_stock_status']) => {
   switch (status) {
-    case 'in_stock':
+    case 'available':
       return { 
-        text: 'In Stock', 
+        text: 'Available', 
         className: 'bg-[#14a34a] text-white', 
         icon: <CheckCircle2 className="w-3.5 h-3.5" /> 
       };
-    case 'pre_order':
+    case 'expected':
       return { 
-        text: 'Pre Order', 
+        text: 'Expected', 
         className: 'bg-[#0b57d0] text-white', 
         icon: <Clock className="w-3.5 h-3.5" /> 
       };
-    case 'out_of_stock':
+    case 'not_available':
     default:
       return { 
         text: 'Out of Stock', 

@@ -3,9 +3,10 @@
 'use server'
 import postgres from 'postgres';
 //import { NextResponse } from 'next/server';
-import { invoices, customers, revenue, users } from '../lib/placeholder-data';
+import { invoices, customers, revenue, users, products } from '../lib/placeholder-data';
 import bcrypt from 'bcrypt'
 import { forbiddenPage } from '../user-dashboard/forbidden-page';
+import type { ProductCard } from '../lib/definitions';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -105,8 +106,8 @@ async function seedProducts() {
       path_name_eng VARCHAR(255) NOT NULL,
       
       -- onStockStatus: string (ограничиваем возможные статусы для безопасности)
-      on_stock_status VARCHAR(50) NOT NULL DEFAULT 'out_of_stock' 
-        CHECK (on_stock_status IN ('in_stock', 'out_of_stock', 'pre_order')),
+      on_stock_status VARCHAR(50) NOT NULL DEFAULT 'not_available' 
+        CHECK (on_stock_status IN ('available', 'not_available', 'expected')),
       
       -- price: double - Цена товара (для денег лучше использовать NUMERIC, но под double подходит DOUBLE PRECISION)
       price DOUBLE PRECISION NOT NULL DEFAULT 0.0,
@@ -129,6 +130,77 @@ async function seedProducts() {
     
     console.log('Таблица products успешно создана или уже существует.');
 }
+
+/*
+--> поместить данные из массива товаров в БД
+ */
+
+export async function seedProductsArray() {
+  try {
+    // Внутри функции мы можем создавать переменные, это не вызовет ошибку
+    const insertedProducts = await Promise.all(
+      products.map(async (product) => {
+        return sql`
+          INSERT INTO products (
+            id,
+            image_src,
+            description,
+            description_details,
+            crop_sort,
+            crop_size,
+            crop_name_eng,
+            path_name_eng,
+            tags,
+            package_size,
+            on_stock_status,
+            price,
+            measure_unit,
+            estimated_on_stock_date
+          )
+          VALUES (
+            ${product.id},
+            ${product.imageSrc || []},
+            ${product.description},
+            ${product.descriptionDetails || null},
+            ${product.cropSort || null},
+            ${product.cropSize || null},
+            ${product.cropName},
+            ${product.pathName},
+            ${product.tags || []},
+            ${product.packageSize || []},
+            ${product.onStockStatus},
+            ${Number(product.price)},
+            ${Number(product.measureUnit || 1)},
+            ${product.estimatedOnStockDate || null}
+          )
+          ON CONFLICT (id) DO UPDATE SET
+            image_src = EXCLUDED.image_src,
+            description = EXCLUDED.description,
+            description_details = EXCLUDED.description_details,
+            crop_sort = EXCLUDED.crop_sort,
+            crop_size = EXCLUDED.crop_size,
+            crop_name_eng = EXCLUDED.crop_name_eng,
+            path_name_eng = EXCLUDED.path_name_eng,
+            tags = EXCLUDED.tags,
+            package_size = EXCLUDED.package_size,
+            on_stock_status = EXCLUDED.on_stock_status,
+            price = EXCLUDED.price,
+            measure_unit = EXCLUDED.measure_unit,
+            estimated_on_stock_date = EXCLUDED.estimated_on_stock_date,
+            updated_at = CURRENT_TIMESTAMP;
+        `;
+      }),
+    );
+
+    // Возвращаем простой сериализуемый объект (массив или статус)
+    return { success: true, count: insertedProducts.length };
+    
+  } catch (error) {
+    console.error('Ошибка сидирования товаров:', error);
+    return { success: false, error: 'Не удалось загрузить товары' };
+  }
+}
+
 
 
 async function seedPersonalDataAConsents() {
@@ -279,13 +351,14 @@ export async function GET(req: Request) {
     }
 
     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-      seedUsers(),
-      seedCustomers(),
-      seedInvoices(),
-      seedRevenue(),
-      seedPersonalDataAgreements(),
-      seedPersonalDataAConsents(),
-      seedProducts()
+      //seedUsers(),
+      //seedCustomers(),
+      //seedInvoices(),
+      //seedRevenue(),
+      //seedPersonalDataAgreements(),
+      //seedPersonalDataAConsents(),
+      //seedProducts()
+      seedProductsArray()
     ]);
 
     return Response.json({ message: 'Database seeded successfully', result });
