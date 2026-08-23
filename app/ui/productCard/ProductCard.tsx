@@ -1,4 +1,4 @@
-import { getProductCard } from "../../lib/actions";
+//import { getProductCard } from "../../lib/actions";
 import clsx from 'clsx';
 import  OnStock  from "./status";
 import Image from "next/image";
