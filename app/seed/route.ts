@@ -6,7 +6,6 @@ import postgres from 'postgres';
 import { invoices, customers, revenue, users, products } from '../lib/placeholder-data';
 import bcrypt from 'bcrypt'
 import { forbiddenPage } from '../user-dashboard/forbidden-page';
-import type { ProductCard } from '../lib/definitions';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -351,13 +350,13 @@ export async function GET(req: Request) {
     }
 
     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-      //seedUsers(),
-      //seedCustomers(),
-      //seedInvoices(),
-      //seedRevenue(),
-      //seedPersonalDataAgreements(),
-      //seedPersonalDataAConsents(),
-      //seedProducts()
+      seedUsers(),
+      seedCustomers(),
+      seedInvoices(),
+      seedRevenue(),
+      seedPersonalDataAgreements(),
+      seedPersonalDataAConsents(),
+      seedProducts(),
       seedProductsArray()
     ]);
 
