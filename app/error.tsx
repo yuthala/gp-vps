@@ -1,17 +1,22 @@
-'use client';
+/* eslint-disable @next/next/no-html-link-for-pages */
+'use client'; 
 
-import Link from 'next/link';
 import Heading from '@/app/ui/Heading';
 
-export const metadata = {
-  title: 'Ошибка сервера | Green Pato',
-};
-
-export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }): import("react").JSX.Element {
+export default function ErrorPage({ 
+  error, 
+  //reset 
+}: { 
+  error: Error & { digest?: string }; 
+  reset: () => void; 
+}) {
   return (
     <div className="min-h-screen bg-(--light-main) text-foreground">
+      <title>Ошибка сервера | Green Pato</title>
+      
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-5xl rounded-4xl border border-[#064929]/10 bg-white shadow-[0_40px_120px_rgba(6,73,41,0.08)] p-8 sm:p-12">
+          
           <div className="text-center">
             <span className="inline-flex rounded-full bg-[#40AD52]/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.28em] text-[#40AD52]">
               Сервер недоступен
@@ -24,28 +29,38 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            <button
+          <div className="mt-10 flex justify-center">
+            {/* <button
               type="button"
               onClick={reset}
               className="w-full rounded-xl bg-[#40AD52] px-6 py-4 text-sm font-bold uppercase text-white transition hover:bg-[#32793b] focus:outline-none focus:ring-2 focus:ring-[#40AD52]/40"
             >
               Повторить попытку
-            </button>
-            <Link
+            </button> */}
+            
+            {/* Использование тега <a> вместо <Link> решает проблему с зависанием навигации 
+            Если приложение падает из-за перехода на неисправную страницу, то приложение падает и Link не работает
+            */}
+     
+            <a
               href="/"
-              className="w-full rounded-xl border border-[#064929] bg-white px-6 py-4 text-center text-sm font-bold uppercase text-[#064929] transition hover:bg-[#F2F9ED]"
+              className="w-full max-w-xs rounded-xl border border-[#064929] bg-white px-6 py-4 text-center text-sm font-bold uppercase text-[#064929] transition hover:bg-[#F2F9ED]"
             >
               На главную
-            </Link>
+            </a>
           </div>
 
           <div className="mt-10 rounded-3xl bg-[#F2F9ED] p-6 text-sm text-[#334155]">
             <p className="font-semibold">Подробности ошибки:</p>
-            <p className="mt-2 wrap-break-word">{error?.message || 'Неизвестная ошибка'}</p>
+            <p className="mt-2 break-words font-mono text-xs bg-white/50 p-3 rounded-lg border border-[#064929]/5">
+              {error?.message || 'Неизвестная ошибка'}
+            </p>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
+
+
