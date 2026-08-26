@@ -337,7 +337,7 @@ export async function removeFromCart(id: number) {
   cookieStore.set(CART_NAME, JSON.stringify(newCart), { path: '/' })
 }
 
-//Рекомендуемые товары
+//Рекомендуемые товары // СДЕЛАТЬ ПОЛУЧЕНИЕ ПРОДУКТОВ ИЗ БД products
 export async function getRecommendedProducts(products: ProductCard[]) {
 
 	let recommendedProducts: MiniProductCard[] = [];

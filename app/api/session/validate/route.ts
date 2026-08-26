@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
     const now = new Date().toISOString();
     const rows = await sql`
-      SELECT s.user_id, u.name, u.email
+      SELECT s.user_id, u.role, u.email
       FROM sessions s
       JOIN users u ON u.id = s.user_id
       WHERE s.session_token = ${token}

@@ -3,6 +3,8 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function proxy(req: NextRequest) {
+ 
+  // ПРОВЕРКА АВТОРИЗАЦИИ ПЕРЕД ПЕРЕХОДОМ НА /dashboard или /user-dashboard
   const { pathname } = req.nextUrl;
    let adminEmail: string;
 
@@ -64,6 +66,15 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/user-dashboard", req.url));
   }
 
+  if (pathname.startsWith("/seed") && !isAdmin) {
+    return NextResponse.redirect(new URL("/user-dashboard", req.url));
+  }
+
+  
+  if (pathname.startsWith("/forbidden") && isAdmin) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   // Если админ пытается зайти на страницу обычного пользователя /user-dashboard
   if (pathname.startsWith("/user-dashboard") && isAdmin) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -74,5 +85,5 @@ export async function proxy(req: NextRequest) {
 
 // Перехватываем и админскую, и пользовательскую панели
 export const config = {
-  matcher: ["/dashboard/:path*", "/user-dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/user-dashboard/:path*", '/forbidden/:path*','/seed/:path•'],
 };

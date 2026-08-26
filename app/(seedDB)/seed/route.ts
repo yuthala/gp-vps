@@ -1,11 +1,10 @@
 // ФАЙЛ ДЛЯ СОЗДАНИЯ ТАБЛИЦ
-
 'use server'
+import { redirect } from 'next/navigation';
 import postgres from 'postgres';
 //import { NextResponse } from 'next/server';
-import { invoices, customers, revenue, users, products } from '../lib/placeholder-data';
+import { invoices, customers, revenue, users, products } from '@/app/lib/placeholder-data';
 import bcrypt from 'bcrypt'
-import { forbiddenPage } from '../user-dashboard/forbidden-page';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -39,7 +38,7 @@ async function getAuthorizedUser(req: Request) {
 
   const now = new Date().toISOString();
   const rows = await sql`
-    SELECT u.id, u.name, u.email
+    SELECT u.id, u.role, u.email
     FROM sessions s
     JOIN users u ON u.id = s.user_id
     WHERE s.session_token = ${token}
@@ -342,27 +341,52 @@ async function seedRevenue() {
 
 
 
+// export async function GET(req: Request) {
+//   try {
+//     const user = await getAuthorizedUser(req);
+//     if (!user || user.email !== adminEmail) {
+//       return forbiddenPage();
+//     }
+
+//     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
+//       seedUsers(),
+//       seedCustomers(),
+//       seedInvoices(),
+//       seedRevenue(),
+//       seedPersonalDataAgreements(),
+//       seedPersonalDataAConsents(),
+//       seedProducts(),
+//       seedProductsArray()
+//     ]);
+
+//     return Response.json({ message: 'Database seeded successfully', result });
+//   } catch (error) {
+//     console.error('Seed route error', error);
+//     return Response.json({ error: 'Server error' }, { status: 500 });
+//   }
+// }
+
 export async function GET(req: Request) {
   try {
     const user = await getAuthorizedUser(req);
     if (!user || user.email !== adminEmail) {
-      return forbiddenPage();
+      redirect('/forbidden'); // Вызывает внутреннее исключение Next.js
     }
 
     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-      seedUsers(),
-      seedCustomers(),
-      seedInvoices(),
-      seedRevenue(),
-      seedPersonalDataAgreements(),
-      seedPersonalDataAConsents(),
-      seedProducts(),
-      seedProductsArray()
+     //syncUsersTableStructure()
     ]);
 
-    return Response.json({ message: 'Database seeded successfully', result });
-  } catch (error) {
-    console.error('Seed route error', error);
-    return Response.json({ error: 'Server error' }, { status: 500 });
+    return Response.json({ success: true });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // ВАЖНО: Проверяем, является ли ошибка системным редиректом Next.js
+    if (error.message === 'NEXT_REDIRECT' || error.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error; // Пробрасываем её дальше, чтобы Next.js выполнил переход
+    }
+
+    // Обработка всех остальных реальных ошибок сидинга
+    console.error("Seed route error", error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
