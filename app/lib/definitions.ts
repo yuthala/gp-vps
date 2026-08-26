@@ -205,3 +205,47 @@ deliveryPointID: string;
 deliveryPointAdress: string
 }
 
+/**
+ --> ТИПЫ ДАННЫХ ДЛЯ РАБОТЫ С ТАБЛИЦАМИ users clients_profiles staff_profiles
+ */
+
+// Типы для ENUM-полей
+export type UserRole = 'admin' | 'stuff' | 'customer';
+export type AuditAction = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE';
+
+// Интерфейс пользователя из таблицы users
+export interface UserEntity {
+  id: string;
+  role: UserRole;
+  email: string;
+  password_hash: string;
+  is_email_verified: boolean;
+  email_verification_token: string | null;
+  email_verified_at: Date | null;
+  registration_ip: string | null;
+  registration_device: string | null;
+  created_at: Date;
+}
+
+// Интерфейс профиля клиента
+export interface ClientProfileEntity {
+  user_id: string;
+  first_name: string;
+  second_name: string;
+  phone_number: string | null;
+  bonus_balance: number;
+  discount_group: string;
+  updated_at: Date;
+}
+
+// Составной тип для возврата полной карточки клиента (User + Profile)
+export interface ClientProfileDTO {
+  id: string;
+  email: string;
+  is_email_verified: boolean;
+  first_name: string;
+  second_name: string;
+  phone_number: string | null;
+  bonus_balance: string; // Из БД тип numeric часто приходит строкой во избежание потери точности
+  discount_group: string;
+}
