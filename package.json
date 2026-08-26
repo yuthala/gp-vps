@@ -41,11 +41,5 @@
     "postcss": "8.5.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "bcrypt",
-      "sharp"
-    ]
   }
 }
