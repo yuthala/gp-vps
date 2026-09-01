@@ -217,6 +217,9 @@ export default function CheckoutForm() {
         body: JSON.stringify({
           email: formData.email,
           name: `${formData.firstName} ${formData.lastName}`.trim(),
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
         }),
       });
 
@@ -393,11 +396,26 @@ export default function CheckoutForm() {
     }, 0);
   };
 
-  const handleNextStep = (e: React.MouseEvent) => {
+  const handleNextStep = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (isStep1Valid && isChecked) {
-      setShowRemainingSteps(true);
+
+    if (!isStep1Valid || isLoggingConsent || isCreatingAccount) {
+      return;
     }
+
+    const accountOk = await createOrEnsureAccount();
+    if (!accountOk) {
+      return;
+    }
+
+    const consentOk = await sendConsentLog();
+    if (!consentOk) {
+      return;
+    }
+
+    setIsChecked(true);
+    setConsentLogSent(true);
+    setShowRemainingSteps(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -453,7 +471,7 @@ export default function CheckoutForm() {
     }
   };
 
-  const isButtonEnabled = isStep1Valid && consentLogSent;
+  const isButtonEnabled = isStep1Valid && isChecked && !isLoggingConsent && !isCreatingAccount;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -581,19 +599,7 @@ export default function CheckoutForm() {
                     if (checked) {
                       setConsentLogError(null);
                       setConsentLogSent(false);
-
-                      const accountOk = await createOrEnsureAccount();
-                      if (!accountOk) {
-                        setIsChecked(false);
-                        return;
-                      }
-
-                      const consentOk = await sendConsentLog();
-                      if (consentOk) {
-                        setIsChecked(true);
-                      } else {
-                        setIsChecked(false);
-                      }
+                      setIsChecked(true);
                     } else {
                       setIsChecked(false);
                       setConsentLogSent(false);

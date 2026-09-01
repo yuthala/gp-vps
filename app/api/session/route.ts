@@ -21,16 +21,16 @@ export async function POST(req: Request) {
     if (!email || !password) return NextResponse.json({ error: 'Missing' }, { status: 400 });
 
     const rows = await sql`
-      SELECT id, password, email_verified
+      SELECT id, password_hash, is_email_verified
       FROM users
       WHERE email = ${email}
       LIMIT 1
     `;
     const user = rows[0];
     if (!user) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-    if (!user.email_verified) return NextResponse.json({ error: 'Email not verified' }, { status: 403 });
+    if (!user.is_email_verified) return NextResponse.json({ error: 'Email not verified' }, { status: 403 });
 
-    const ok = await bcrypt.compare(password, user.password);
+    const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
     // Check if an existing valid session exists for this user

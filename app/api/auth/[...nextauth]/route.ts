@@ -21,7 +21,7 @@ export const authOptions = {
           const password = (credentials as Record<string, unknown>).password as string;
           
           const rows = await sql`
-            SELECT id, name, email, password, email_verified
+            SELECT id, email, password_hash, is_email_verified
             FROM users
             WHERE email = ${email}
             LIMIT 1
@@ -29,16 +29,16 @@ export const authOptions = {
 
           const user = rows[0];
           if (!user) return null;
-          // require email verification
-          if (!user.email_verified) {
+
+          if (!user.is_email_verified) {
             console.warn('Attempt to sign in with unverified email', email);
             return null;
           }
 
-          const match = await bcrypt.compare(password, user.password);
+          const match = await bcrypt.compare(password, user.password_hash);
           if (!match) return null;
 
-          return { id: user.id, name: user.name, email: user.email };
+          return { id: user.id, name: user.email, email: user.email };
         } catch (err) {
           console.error('Auth error', err);
           return null;

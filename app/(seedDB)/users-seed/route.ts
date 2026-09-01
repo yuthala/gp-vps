@@ -182,7 +182,7 @@ async function seedPersonalDataAConsents() {
   await sql`
       CREATE TABLE IF NOT EXISTS consent_logs (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID REFERENCES customerspd(id) ON DELETE CASCADE,
+      customer_id UUID REFERENCES users(id) ON DELETE CASCADE,
       consent_type VARCHAR(50) NOT NULL,
       version_agreed VARCHAR(10) NOT NULL,
       ip_address INET NOT NULL,

@@ -17,8 +17,7 @@ export async function sendVerificationEmail(to: string, verifyUrl: string, name?
         logger: process.env.NODE_ENV === 'development',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mail: any = {
+      const mail = {
         from: process.env.EMAIL_FROM || 'no-reply@example.com',
         to,
         subject: 'Verify your email',
@@ -43,7 +42,17 @@ export async function sendCredentialsEmail(
   name: string,
   password: string,
   loginUrl: string,
+  verifyUrl?: string,
 ) {
+  const verificationBlock = verifyUrl
+    ? `
+      <p style="font-size:16px;line-height:1.75;margin:0 0 16px;">Для активации аккаунта нажмите кнопку ниже и подтвердите email:</p>
+      <div style="text-align:center;margin-bottom:24px;">
+        <a href="${verifyUrl}" style="display:inline-block;padding:14px 30px;border-radius:999px;background:#0F766E;color:#FFFFFF;font-weight:700;text-decoration:none;">Подтвердить email</a>
+      </div>
+    `
+    : '';
+
   const htmlBody = `<!DOCTYPE html>
 <html lang="ru">
   <head>
@@ -75,6 +84,7 @@ export async function sendCredentialsEmail(
                     <td style="padding:16px;color:#0F172A;">${password}</td>
                   </tr>
                 </table>
+                ${verificationBlock}
                 <p style="font-size:16px;line-height:1.75;margin:0 0 24px;">Перейдите по кнопке ниже, чтобы войти и продолжить оформление заказа:</p>
                 <div style="text-align:center;margin-bottom:24px;">
                   <a href="${loginUrl}" style="display:inline-block;padding:14px 30px;border-radius:999px;background:#40AD52;color:#FFFFFF;font-weight:700;text-decoration:none;">Войти на сайт</a>
@@ -88,6 +98,8 @@ export async function sendCredentialsEmail(
     </table>
   </body>
 </html>`;
+
+  const textBody = `Здравствуйте ${name},\n\nВаши данные для входа:\nE-mail: ${to}\nПароль: ${password}\n${verifyUrl ? `\nПодтвердите email: ${verifyUrl}\n` : ''}\nВойдите по ссылке: ${loginUrl}`;
 
   try {
     if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
@@ -106,12 +118,11 @@ export async function sendCredentialsEmail(
         logger: process.env.NODE_ENV === 'development',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mail: any = {
+      const mail = {
         from: process.env.EMAIL_FROM || 'no-reply@example.com',
         to,
         subject: 'Green Pato: данные для входа',
-        text: `Здравствуйте ${name},\n\nВаши данные для входа:\nE-mail: ${to}\nПароль: ${password}\n\nВойдите по ссылке: ${loginUrl}`,
+        text: textBody,
         html: htmlBody,
       };
 
@@ -123,7 +134,7 @@ export async function sendCredentialsEmail(
     console.error('SMTP send failed', e);
   }
 
-  console.log(`Dev login credentials for ${to}: email=${to} password=${password} login=${loginUrl}`);
+  console.log(`Dev login credentials for ${to}: email=${to} password=${password} login=${loginUrl}${verifyUrl ? ` verify=${verifyUrl}` : ''}`);
   return { provider: 'console', url: loginUrl };
 }
 
@@ -143,8 +154,7 @@ export async function sendOrderDeliveryDetailsEmail({
   phone?: string;
   comment?: string;
   deliveryPointAddress?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cartItems: any[];
+  cartItems: Array<Record<string, unknown>>;
   goodsTotal: number;
   deliveryPrice: number;
   checkoutUrl: string;

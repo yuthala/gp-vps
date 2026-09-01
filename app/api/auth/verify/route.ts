@@ -4,48 +4,38 @@ import { NextResponse } from 'next/server';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 export async function GET(req: Request) {
-
-  // Определяем базовый URL для редиректов
   const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const cleanBase = base.replace(/\/$/, '');
 
   try {
     const url = new URL(req.url);
     const token = url.searchParams.get('token');
-    //if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 400 });
-    // Вместо JSON редиректим на страницу с флагом ошибки
+
     if (!token) {
       return NextResponse.redirect(`${cleanBase}/verify?status=missing_token`);
     }
 
-    const now = new Date().toISOString();
     const rows = await sql`
-      SELECT id, email FROM users
-      WHERE verification_token = ${token}
-      AND verification_expires > ${now}
+      SELECT id
+      FROM users
+      WHERE email_verification_token = ${token}
       LIMIT 1
     `;
 
     const user = rows[0];
-
-    //if (!user) return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
-     // Вместо JSON редиректим на страницу с флагом "истек или неверный"
     if (!user) {
       return NextResponse.redirect(`${cleanBase}/verify?status=expired`);
     }
 
     await sql`
       UPDATE users
-      SET email_verified = true,
-          verification_token = NULL,
-          verification_expires = NULL
+      SET is_email_verified = true,
+          email_verification_token = NULL,
+          email_verified_at = NOW()
       WHERE id = ${user.id}
     `;
 
-    // Redirect to friendly verification page with status
-    const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const redirectTo = `${base.replace(/\/$/, '')}/verify?status=success`;
-    return NextResponse.redirect(redirectTo);
+    return NextResponse.redirect(`${cleanBase}/verify?status=success`);
   } catch (err) {
     console.error('Verification error', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

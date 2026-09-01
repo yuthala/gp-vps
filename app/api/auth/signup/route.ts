@@ -6,6 +6,17 @@ import { sendVerificationEmail } from '@/app/lib/email'
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+function getRegistrationMeta(request: Request) {
+  const forwardedFor = request.headers.get('x-forwarded-for');
+  const ip = forwardedFor?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || '127.0.0.1';
+  const device = request.headers.get('user-agent') || 'unknown';
+
+  return {
+    registration_ip: ip,
+    registration_device: device,
+  };
+}
+
 function generateToken() {
   try {
     // Node's crypto in edge/runtime
@@ -30,29 +41,44 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
     }
 
+    const { registration_ip, registration_device } = getRegistrationMeta(req);
     const hashed = await bcrypt.hash(password, 10);
-
     const token = generateToken();
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
     await sql`
-      INSERT INTO users (name, email, password, email_verified, verification_token, verification_expires)
-      VALUES (${name}, ${email}, ${hashed}, false, ${token}, ${expires})
+      INSERT INTO users (
+        role,
+        email,
+        password_hash,
+        is_email_verified,
+        email_verification_token,
+        email_verified_at,
+        registration_ip,
+        registration_device,
+        created_at
+      )
+      VALUES (
+        'customer',
+        ${email},
+        ${hashed},
+        false,
+        ${token},
+        NULL,
+        ${registration_ip},
+        ${registration_device},
+        NOW()
+      )
     `;
 
-    // Build verification URL using NEXTAUTH_URL or fallback
     const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const verifyUrl = `${base.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
 
-    // Send verification email (SendGrid or SMTP) or fallback to console
     try {
-      //const { default: sendVerificationEmail } = await import('@/app/lib/email');
       await sendVerificationEmail(email, verifyUrl, name);
     } catch (e) {
       console.error('Error sending verification email', e);
     }
 
-    // Always return verifyUrl so frontend knows to show verification message
     return NextResponse.json({ ok: true, verifyUrl }, { status: 201 });
   } catch (err) {
     console.error('Signup error', err);
