@@ -66,7 +66,11 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/user-dashboard", req.url));
   }
 
-  if (pathname.startsWith("/seed") && !isAdmin) {
+  if (pathname.startsWith("/products-seed") && !isAdmin) {
+    return NextResponse.redirect(new URL("/user-dashboard", req.url));
+  }
+
+  if (pathname.startsWith("/users-seed") && !isAdmin) {
     return NextResponse.redirect(new URL("/user-dashboard", req.url));
   }
 
@@ -85,5 +89,5 @@ export async function proxy(req: NextRequest) {
 
 // Перехватываем и админскую, и пользовательскую панели
 export const config = {
-  matcher: ["/dashboard/:path*", "/user-dashboard/:path*", '/forbidden/:path*','/seed/:path•'],
+  matcher: ["/dashboard/:path*", "/user-dashboard/:path*", '/forbidden/:path*','/products-seed/:path•', '/users-seed/:path•'],
 };
