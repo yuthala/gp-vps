@@ -2,9 +2,7 @@
 import postgres from 'postgres';
 import { redirect } from 'next/navigation';
 
-
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
-
 
 // Получение почты администратора из .env
 let adminEmail: string;
@@ -164,6 +162,7 @@ async function seedStaffProfiles() {
   `;
 }
 
+/* СОЗДАНИЕ ТАБЛИЦЫ customerspd */
 async function seedPersonalDataAConsents() {
   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
   await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
@@ -204,28 +203,6 @@ async function seedPersonalDataAConsents() {
 }
 
 
-// export async function GET(req: Request) {
-
-//   try {
-//      const user = await getAuthorizedUser(req);
-//     if (!user || user.email  !== adminEmail) {
-//       //return forbiddenPage();
-//       redirect('/forbidden');
-//     }
-    
-//     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-//      syncUsersTableStructure()
-//     ]);
-
-//     return Response.json({ message: 'Database seeded successfully', result });
-//   } catch (error) {
-//     console.error('Seed route error', error);
-//     return Response.json({ error: 'Server error' }, { status: 500 });
-//   }
-// }
-
-//import { redirect } from 'next/navigation';
-
 export async function GET(req: Request) {
   try {
     const user = await getAuthorizedUser(req);
@@ -253,3 +230,21 @@ export async function GET(req: Request) {
   }
 }
 
+// export async function GET(req: Request) {
+//   try {
+//      const user = await getAuthorizedUser(req);
+//     if (!user || user.email  !== adminEmail) {
+//       //return forbiddenPage();
+//       redirect('/forbidden');
+//     }
+    
+//     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
+//      syncUsersTableStructure()
+//     ]);
+
+//     return Response.json({ message: 'Database seeded successfully', result });
+//   } catch (error) {
+//     console.error('Seed route error', error);
+//     return Response.json({ error: 'Server error' }, { status: 500 });
+//   }
+// }

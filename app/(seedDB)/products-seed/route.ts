@@ -2,9 +2,7 @@
 'use server'
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
-//import { NextResponse } from 'next/server';
-import { invoices, customers, revenue, users, products } from '@/app/lib/placeholder-data';
-import bcrypt from 'bcrypt'
+import { products } from '@/app/lib/placeholder-data';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -48,20 +46,6 @@ async function getAuthorizedUser(req: Request) {
   return rows[0] || null;
 }
 
-async function seedPersonalDataAgreements() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-  await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
-
-  await sql`
-      CREATE TABLE IF NOT EXISTS customerspd (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      first_name VARCHAR(255) NOT NULL,
-      last_name VARCHAR(255) NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      phone_number TEXT NOT NULL UNIQUE,
-      );
-  `;
-}
 
 async function seedProducts() {
     // 1. Создание в БД алгоритмов UUID (если еще не созданы)
@@ -228,8 +212,6 @@ export async function GET(req: Request) {
 /*
 ФУНКЦИИ ДЛЯ ОБРАЗЦА. ИСПОЛЬЗОВАЛИЬС НА СТАРТЕ ПРОЕКТА
  */
-
-
 
 
 // Создание в БД таблицы "Invoices"
