@@ -21,6 +21,7 @@ const links = [
   //   icon: DocumentDuplicateIcon,
   // },
   { name: 'Клиенты', href: '/dashboard/customers', icon: UserGroupIcon },
+  { name: 'Сотрудники', href: '/dashboard/stuff', icon: UserGroupIcon },
   {name: 'Добавить товар', href: '/dashboard/add-product', icon: ArchiveBoxIcon},
   {name: 'Карточки товаров', href:'/dashboard/product-cards', icon: RectangleStackIcon },
   {name: 'Заказы', href:'/dashboard/orders', icon: RectangleStackIcon },
