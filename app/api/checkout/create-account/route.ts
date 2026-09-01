@@ -38,6 +38,17 @@ async function ensureClientProfileTable() {
   await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS email TEXT;`;
   await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS bonus_balance NUMERIC(10, 2) DEFAULT 0.00;`;
   await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS discount_group VARCHAR(100) DEFAULT 'Standard';`;
+  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS date_deleted`;
+  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS last_name`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
+  await sql`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS users_active_email_key ON users (LOWER(email)) WHERE date_deleted IS NULL`;
+  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_email_key`;
+  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_phone_number_key`;
+  await sql`DROP INDEX IF EXISTS client_profiles_active_email_key`;
+  await sql`DROP INDEX IF EXISTS client_profiles_active_phone_key`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_email_unique_idx ON client_profiles (LOWER(email))`;
+  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_phone_unique_idx ON client_profiles (phone_number)`;
 }
 
 function generatePassword(length = 12) {
@@ -71,12 +82,20 @@ export async function POST(req: Request) {
     await syncUsersTableStructure();
     await ensureClientProfileTable();
 
+    await sql`
+      DELETE FROM client_profiles cp
+      USING users u
+      WHERE cp.user_id = u.id
+        AND u.date_deleted IS NOT NULL
+        AND (LOWER(cp.email) = LOWER(${email}) OR cp.phone_number = ${phone})
+    `;
+
     const fullName = (name || `${firstName} ${lastName}`.trim()).trim();
 
     const existingUser = await sql`
       SELECT id, is_email_verified
       FROM users
-      WHERE email = ${email}
+      WHERE LOWER(email) = LOWER(${email}) AND date_deleted IS NULL
       LIMIT 1
     `;
 

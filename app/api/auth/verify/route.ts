@@ -19,6 +19,7 @@ export async function GET(req: Request) {
       SELECT id
       FROM users
       WHERE email_verification_token = ${token}
+        AND date_deleted IS NULL
       LIMIT 1
     `;
 

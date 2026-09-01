@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    const existing = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+    const existing = await sql`SELECT id FROM users WHERE LOWER(email) = LOWER(${email}) AND date_deleted IS NULL LIMIT 1`;
     if (existing.length) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
     }

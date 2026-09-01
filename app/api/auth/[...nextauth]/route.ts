@@ -23,7 +23,8 @@ export const authOptions = {
           const rows = await sql`
             SELECT id, email, password_hash, is_email_verified
             FROM users
-            WHERE email = ${email}
+            WHERE LOWER(email) = LOWER(${email})
+              AND date_deleted IS NULL
             LIMIT 1
           `;
 

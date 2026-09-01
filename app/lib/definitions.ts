@@ -225,6 +225,7 @@ export interface UserEntity {
   registration_ip: string | null;
   registration_device: string | null;
   created_at: Date;
+  date_deleted: Date | null;
 }
 
 // Интерфейс профиля клиента

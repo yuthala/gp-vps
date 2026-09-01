@@ -23,7 +23,8 @@ export async function POST(req: Request) {
     const rows = await sql`
       SELECT id, password_hash, is_email_verified
       FROM users
-      WHERE email = ${email}
+      WHERE LOWER(email) = LOWER(${email})
+        AND date_deleted IS NULL
       LIMIT 1
     `;
     const user = rows[0];

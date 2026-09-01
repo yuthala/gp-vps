@@ -200,6 +200,35 @@ export default function CheckoutForm() {
   const [isLoggingConsent, setIsLoggingConsent] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const fillAuthorizedCustomer = async () => {
+      try {
+        const response = await fetch('/api/session/validate', { cache: 'no-store' });
+        if (!response.ok) return;
+
+        const body = await response.json();
+        if (cancelled || body.user?.role !== 'customer') return;
+
+        setFormData((current) => ({
+          ...current,
+          firstName: current.firstName || body.user.firstName || '',
+          lastName: current.lastName || body.user.lastName || '',
+          email: current.email || body.user.email || '',
+          phone: current.phone || body.user.phone || '',
+        }));
+      } catch (error) {
+        console.error('Authorized customer lookup error', error);
+      }
+    };
+
+    void fillAuthorizedCustomer();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const createOrEnsureAccount = async () => {
     if (!formData.email) {
       setAccountError('Введите email для создания аккаунта.');
