@@ -106,9 +106,9 @@ export default function EditProductForm({ product }: { product: any }) {
           <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Статус наличия</label>
           <select name="onStockStatus" value={formData.onStockStatus} onChange={handleChange}
             className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-            <option value="in_stock">В наличии (In Stock)</option>
-            <option value="out_of_stock">Нет на складе (Out of Stock)</option>
-            <option value="pre_order">Предзаказ (Pre-order)</option>
+            <option value="available">В наличии (Available)</option>
+            <option value="not_available">Нет на складе (Not available)</option>
+            <option value="expected">Предзаказ (Expected)</option>
           </select>
         </div>
       </div>

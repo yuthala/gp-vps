@@ -89,9 +89,9 @@ export default function AddProductPage() {
         
         <label>Статус: 
           <select name="onStockStatus" value={formData.onStockStatus} onChange={handleChange}>
-            <option value="in_stock">В наличии</option>
-            <option value="out_of_stock">Нет на складе</option>
-            <option value="pre_order">Предзаказ</option>
+            <option value="available">В наличии</option>
+            <option value="not_available">Нет на складе</option>
+            <option value="expected">Предзаказ</option>
           </select>
         </label>
 
