@@ -132,7 +132,6 @@ async function seedProducts() {
 /*
 --> поместить данные из массива товаров в БД
  */
-
 export async function seedProductsArray() {
   try {
     // Внутри функции мы можем создавать переменные, это не вызовет ошибку
@@ -200,146 +199,137 @@ export async function seedProductsArray() {
 }
 
 
+export async function GET(req: Request) {
+  try {
+    const user = await getAuthorizedUser(req);
+    if (!user || user.email !== adminEmail) {
+      redirect('/forbidden'); // Вызывает внутреннее исключение Next.js
+    }
 
-async function seedPersonalDataAConsents() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-  await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
+    const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
+     //syncUsersTableStructure()
+    ]);
 
-  // Таблица клиентов (исправлена лишняя запятая перед закрывающей скобкой)
-  await sql`
-      CREATE TABLE IF NOT EXISTS customerspd (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      first_name VARCHAR(255) NOT NULL,
-      last_name VARCHAR(255) NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      phone_number TEXT NOT NULL UNIQUE
-      );
-  `;
+    return Response.json({ success: true });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    // ВАЖНО: Проверяем, является ли ошибка системным редиректом Next.js
+    if (error.message === 'NEXT_REDIRECT' || error.digest?.startsWith('NEXT_REDIRECT')) {
+      throw error; // Пробрасываем её дальше, чтобы Next.js выполнил переход
+    }
 
-  // Таблица фиксации согласий клиентов (Доказательная база для Роскомнадзора)
-  await sql`
-      CREATE TABLE IF NOT EXISTS consent_logs (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID REFERENCES customerspd(id) ON DELETE CASCADE,
-      consent_type VARCHAR(50) NOT NULL,
-      version_agreed VARCHAR(10) NOT NULL,
-      ip_address INET NOT NULL,
-      signed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-      );
-  `;
-
-  // Таблица логирования доступа сотрудников к ПД (Требование ФСТЭК по аудиту)
-  await sql`
-      CREATE TABLE IF NOT EXISTS pd_access_logs (
-      id BIGSERIAL PRIMARY KEY,
-      employee_id UUID NOT NULL,
-      customer_id UUID REFERENCES customerspd(id) ON DELETE SET NULL,
-      action_type VARCHAR(20) NOT NULL,
-      accessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
-      );
-  `;
+    // Обработка всех остальных реальных ошибок сидинга
+    console.error("Seed route error", error);
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
 
 
-async function seedUsers() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-  await sql`
-    CREATE TABLE IF NOT EXISTS users (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL
-    );
-  `;
+/*
+ФУНКЦИИ ДЛЯ ОБРАЗЦА. ИСПОЛЬЗОВАЛИЬС НА СТАРТЕ ПРОЕКТА
+ */
 
-  const insertedUsers = await Promise.all(
-    users.map(async (user) => {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      return sql`
-        INSERT INTO users (id, name, email, password)
-        VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
-        ON CONFLICT (id) DO NOTHING;
-      `;
-    }),
-  );
 
-  return insertedUsers;
-}
+
 
 // Создание в БД таблицы "Invoices"
-async function seedInvoices() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+// async function seedInvoices() {
+//   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-  await sql`
-    CREATE TABLE IF NOT EXISTS invoices (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      customer_id UUID NOT NULL,
-      amount INT NOT NULL,
-      status VARCHAR(255) NOT NULL,
-      date DATE NOT NULL
-    );
-  `;
+//   await sql`
+//     CREATE TABLE IF NOT EXISTS invoices (
+//       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+//       customer_id UUID NOT NULL,
+//       amount INT NOT NULL,
+//       status VARCHAR(255) NOT NULL,
+//       date DATE NOT NULL
+//     );
+//   `;
 
-  const insertedInvoices = await Promise.all(
-    invoices.map(
-      (invoice) => sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
-        ON CONFLICT (id) DO NOTHING;
-      `,
-    ),
-  );
+//   const insertedInvoices = await Promise.all(
+//     invoices.map(
+//       (invoice) => sql`
+//         INSERT INTO invoices (customer_id, amount, status, date)
+//         VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
+//         ON CONFLICT (id) DO NOTHING;
+//       `,
+//     ),
+//   );
 
-  return insertedInvoices;
-}
-
-async function seedCustomers() {
-  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-  await sql`
-    CREATE TABLE IF NOT EXISTS customers (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      image_url VARCHAR(255) NOT NULL
-    );
-  `;
-
-  const insertedCustomers = await Promise.all(
-    customers.map(
-      (customer) => sql`
-        INSERT INTO customers (id, name, email, image_url)
-        VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
-        ON CONFLICT (id) DO NOTHING;
-      `,
-    ),
-  );
-
-  return insertedCustomers;
-}
-
-async function seedRevenue() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS revenue (
-      month VARCHAR(4) NOT NULL UNIQUE,
-      revenue INT NOT NULL
-    );
-  `;
-
-  const insertedRevenue = await Promise.all(
-    revenue.map(
-      (rev) => sql`
-        INSERT INTO revenue (month, revenue)
-        VALUES (${rev.month}, ${rev.revenue})
-        ON CONFLICT (month) DO NOTHING;
-      `,
-    ),
-  );
-
-  return insertedRevenue;
-}
+//   return insertedInvoices;
+// }
 
 
+// async function seedCustomers() {
+//   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+//   await sql`
+//     CREATE TABLE IF NOT EXISTS customers (
+//       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+//       name VARCHAR(255) NOT NULL,
+//       email VARCHAR(255) NOT NULL,
+//       image_url VARCHAR(255) NOT NULL
+//     );
+//   `;
+
+//   const insertedCustomers = await Promise.all(
+//     customers.map(
+//       (customer) => sql`
+//         INSERT INTO customers (id, name, email, image_url)
+//         VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
+//         ON CONFLICT (id) DO NOTHING;
+//       `,
+//     ),
+//   );
+
+//   return insertedCustomers;
+// }
+
+// async function seedRevenue() {
+//   await sql`
+//     CREATE TABLE IF NOT EXISTS revenue (
+//       month VARCHAR(4) NOT NULL UNIQUE,
+//       revenue INT NOT NULL
+//     );
+//   `;
+
+//   const insertedRevenue = await Promise.all(
+//     revenue.map(
+//       (rev) => sql`
+//         INSERT INTO revenue (month, revenue)
+//         VALUES (${rev.month}, ${rev.revenue})
+//         ON CONFLICT (month) DO NOTHING;
+//       `,
+//     ),
+//   );
+
+//   return insertedRevenue;
+// }
+
+// async function seedUsers() {
+//   await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+//   await sql`
+//     CREATE TABLE IF NOT EXISTS users (
+//       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+//       name VARCHAR(255) NOT NULL,
+//       email TEXT NOT NULL UNIQUE,
+//       password TEXT NOT NULL
+//     );
+//   `;
+
+//   const insertedUsers = await Promise.all(
+//     users.map(async (user) => {
+//       const hashedPassword = await bcrypt.hash(user.password, 10);
+//       return sql`
+//         INSERT INTO users (id, name, email, password)
+//         VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
+//         ON CONFLICT (id) DO NOTHING;
+//       `;
+//     }),
+//   );
+
+//   return insertedUsers;
+// }
 
 // export async function GET(req: Request) {
 //   try {
@@ -365,28 +355,3 @@ async function seedRevenue() {
 //     return Response.json({ error: 'Server error' }, { status: 500 });
 //   }
 // }
-
-export async function GET(req: Request) {
-  try {
-    const user = await getAuthorizedUser(req);
-    if (!user || user.email !== adminEmail) {
-      redirect('/forbidden'); // Вызывает внутреннее исключение Next.js
-    }
-
-    const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-     //syncUsersTableStructure()
-    ]);
-
-    return Response.json({ success: true });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    // ВАЖНО: Проверяем, является ли ошибка системным редиректом Next.js
-    if (error.message === 'NEXT_REDIRECT' || error.digest?.startsWith('NEXT_REDIRECT')) {
-      throw error; // Пробрасываем её дальше, чтобы Next.js выполнил переход
-    }
-
-    // Обработка всех остальных реальных ошибок сидинга
-    console.error("Seed route error", error);
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
-  }
-}

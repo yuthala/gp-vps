@@ -121,6 +121,88 @@ export async function syncUsersTableStructure(): Promise<void> {
   console.log("🚀 [БД]: Таблица users успешно синхронизирована с интерфейсом UserEntity.");
 }
 
+/*
+СОЗДАНИЕ ПРОФИЛЕЙ КЛИЕНТОВ
+ */
+async function seedClientProfiles() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
+
+  await sql`
+      CREATE TABLE IF NOT EXISTS client_profiles (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+      first_name VARCHAR(255) NOT NULL,
+      second_name VARCHAR(255) NOT NULL,
+      phone_number TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL UNIQUE,
+      bonus_balance NUMERIC(10, 2) DEFAULT 0.00 NOT NULL,
+      discount_group VARCHAR(100) DEFAULT 'Standard' NOT NULL
+      );
+  `;
+}
+
+/*
+СОЗДАНИЕ ПРОФИЛЕЙ СОТРУДНИКОВ
+ */
+async function seedStaffProfiles() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
+
+  await sql`
+      CREATE TABLE IF NOT EXISTS staff_profiles (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+      first_name VARCHAR(255) NOT NULL,
+      second_name VARCHAR(255) NOT NULL,
+      phone_number TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL UNIQUE,
+      position VARCHAR(255) NOT NULL,
+      salary NUMERIC(12, 2) NOT NULL,
+      hire_date DATE DEFAULT CURRENT_DATE NOT NULL
+      );
+  `;
+}
+
+async function seedPersonalDataAConsents() {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+  await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`;
+
+  // Таблица клиентов (исправлена лишняя запятая перед закрывающей скобкой)
+  await sql`
+      CREATE TABLE IF NOT EXISTS customerspd (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      first_name VARCHAR(255) NOT NULL,
+      last_name VARCHAR(255) NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      phone_number TEXT NOT NULL UNIQUE
+      );
+  `;
+
+  // Таблица фиксации согласий клиентов (Доказательная база для Роскомнадзора)
+  await sql`
+      CREATE TABLE IF NOT EXISTS consent_logs (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      customer_id UUID REFERENCES customerspd(id) ON DELETE CASCADE,
+      consent_type VARCHAR(50) NOT NULL,
+      version_agreed VARCHAR(10) NOT NULL,
+      ip_address INET NOT NULL,
+      signed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      );
+  `;
+
+  // Таблица логирования доступа сотрудников к ПД (Требование ФСТЭК по аудиту)
+  await sql`
+      CREATE TABLE IF NOT EXISTS pd_access_logs (
+      id BIGSERIAL PRIMARY KEY,
+      employee_id UUID NOT NULL,
+      customer_id UUID REFERENCES customerspd(id) ON DELETE SET NULL,
+      action_type VARCHAR(20) NOT NULL,
+      accessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+      );
+  `;
+}
+
 
 // export async function GET(req: Request) {
 
@@ -152,7 +234,9 @@ export async function GET(req: Request) {
     }
 
     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-     syncUsersTableStructure()
+     syncUsersTableStructure(),
+     seedClientProfiles(),
+     seedStaffProfiles(),
     ]);
 
     return Response.json({ success: true });
