@@ -1,10 +1,9 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
 import {
-  createClientProfile,
   deleteClientProfile,
   fetchClientProfiles,
-  updateClientProfile,
 } from '@/app/(seedDB)/users-seed/route';
 
 type Customer = Awaited<ReturnType<typeof fetchClientProfiles>>[number];
@@ -27,30 +26,13 @@ export default async function CustomersPage({
         <button type="submit" className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Найти</button>
       </form>
 
-      <form action={createClientProfile} className="mt-6 rounded-lg bg-gray-50 p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-medium">Добавить клиента</h2>
-        <div className="grid gap-3 md:grid-cols-6">
-          <input name="user_id" required placeholder="ID пользователя" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm md:col-span-2" />
-          <input name="first_name" required placeholder="Имя" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="second_name" required placeholder="Фамилия" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="email" required type="email" placeholder="E-mail" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="phone_number" required placeholder="Телефон" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-        </div>
-        <button type="submit" className="mt-3 flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Добавить <PlusIcon className="h-5 w-5" /></button>
-      </form>
+      <Link href="/dashboard/customers/create" className="mt-6 flex h-10 w-fit items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Добавить <PlusIcon className="h-5 w-5" /></Link>
 
       <div className="mt-6 flow-root">
         <div className="inline-block min-w-full align-middle">
           <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
             <div className="md:hidden">
               {customers.map((customer) => <CustomerCard key={customer.user_id} customer={customer} />)}
-            </div>
-            <div className="hidden">
-              {customers.map((customer) => (
-                <form key={customer.user_id} id={`customer-table-${customer.user_id}`} action={updateClientProfile}>
-                  <input type="hidden" name="user_id" value={customer.user_id} />
-                </form>
-              ))}
             </div>
             <table className="hidden min-w-full text-gray-900 md:table">
               <thead className="text-left text-sm font-normal">
@@ -76,45 +58,36 @@ export default async function CustomersPage({
 }
 
 function CustomerRow({ customer }: { customer: Customer }) {
-  const formId = `customer-table-${customer.user_id}`;
   return (
     <tr className="w-full border-b text-sm last-of-type:border-none">
       <td className="whitespace-nowrap py-3 pl-6 pr-3">
-        <input name="first_name" defaultValue={customer.first_name} form={formId} className="w-28 rounded border border-transparent px-1 py-1 hover:border-gray-300" />
-        <input name="second_name" defaultValue={customer.second_name} form={formId} className="ml-1 w-28 rounded border border-transparent px-1 py-1 hover:border-gray-300" />
+        <p>{customer.first_name} {customer.second_name}</p>
       </td>
-      <td className="px-3 py-3"><input name="email" defaultValue={customer.email} form={formId} className="w-48 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="phone_number" defaultValue={customer.phone_number} form={formId} className="w-36 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="bonus_balance" defaultValue={customer.bonus_balance} form={formId} className="w-20 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="discount_group" defaultValue={customer.discount_group} form={formId} className="w-28 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><CustomerActions customer={customer} formId={formId} /></td>
+      <td className="px-3 py-3">{customer.email}</td>
+      <td className="px-3 py-3">{customer.phone_number}</td>
+      <td className="px-3 py-3">{customer.bonus_balance}</td>
+      <td className="px-3 py-3">{customer.discount_group}</td>
+      <td className="px-3 py-3"><CustomerActions customer={customer} /></td>
     </tr>
   );
 }
 
 function CustomerCard({ customer }: { customer: Customer }) {
-  const formId = `customer-card-${customer.user_id}`;
   return (
     <div className="mb-2 rounded-md bg-white p-4">
-      <form id={formId} action={updateClientProfile} className="grid gap-2">
-        <input type="hidden" name="user_id" value={customer.user_id} />
-        <input name="first_name" defaultValue={customer.first_name} className="rounded border px-2 py-1" />
-        <input name="second_name" defaultValue={customer.second_name} className="rounded border px-2 py-1" />
-        <input name="email" defaultValue={customer.email} className="rounded border px-2 py-1" />
-        <input name="phone_number" defaultValue={customer.phone_number} className="rounded border px-2 py-1" />
-        <input name="bonus_balance" defaultValue={customer.bonus_balance} className="rounded border px-2 py-1" />
-        <input name="discount_group" defaultValue={customer.discount_group} className="rounded border px-2 py-1" />
-        <button type="submit" className="flex w-fit items-center gap-2 rounded-md border p-2 hover:bg-gray-100" title="Сохранить изменения"><PencilIcon className="w-5" />Сохранить</button>
-      </form>
+      <p className="font-medium">{customer.first_name} {customer.second_name}</p>
+      <p className="text-sm text-gray-500">{customer.email}</p>
+      <p className="text-sm text-gray-500">{customer.phone_number}</p>
+      <Link href={`/dashboard/customers/${customer.user_id}/edit`} className="mt-3 inline-flex rounded-md border p-2 hover:bg-gray-100" title="Редактировать клиента"><PencilIcon className="w-5" /></Link>
       <form action={deleteClientProfile} className="mt-2"><input type="hidden" name="user_id" value={customer.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить клиента"><TrashIcon className="w-5" /></button></form>
     </div>
   );
 }
 
-function CustomerActions({ customer, formId }: { customer: Customer; formId: string }) {
+function CustomerActions({ customer }: { customer: Customer }) {
   return (
     <div className="flex justify-end gap-2">
-      <button type="submit" form={formId} className="rounded-md border p-2 hover:bg-gray-100" title="Сохранить изменения"><PencilIcon className="w-5" /></button>
+      <Link href={`/dashboard/customers/${customer.user_id}/edit`} className="rounded-md border p-2 hover:bg-gray-100" title="Редактировать клиента"><PencilIcon className="w-5" /></Link>
       <form action={deleteClientProfile}><input type="hidden" name="user_id" value={customer.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить клиента"><TrashIcon className="w-5" /></button></form>
     </div>
   );

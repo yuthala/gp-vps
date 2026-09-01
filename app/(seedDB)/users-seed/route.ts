@@ -120,6 +120,18 @@ export async function fetchClientProfiles(query = ''): Promise<ClientProfileRow[
   return profiles;
 }
 
+export async function fetchClientProfile(userId: string): Promise<ClientProfileRow | null> {
+  const profiles = await sql<ClientProfileRow[]>`
+    SELECT cp.user_id, cp.first_name, cp.second_name, cp.email,
+           cp.phone_number, cp.bonus_balance, cp.discount_group
+    FROM client_profiles cp
+    JOIN users u ON u.id = cp.user_id
+    WHERE cp.user_id = ${userId} AND u.date_deleted IS NULL
+    LIMIT 1
+  `;
+  return profiles[0] ?? null;
+}
+
 export async function createClientProfile(formData: FormData) {
   const userId = String(formData.get('user_id') || '').trim();
   const firstName = String(formData.get('first_name') || '').trim();
@@ -226,6 +238,18 @@ export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]>
   }
 
   return profiles;
+}
+
+export async function fetchStaffProfile(userId: string): Promise<StaffProfileRow | null> {
+  const profiles = await sql<StaffProfileRow[]>`
+    SELECT sp.user_id, sp.first_name, sp.second_name, sp.email,
+           sp.phone_number, sp.position, sp.salary, sp.hire_date
+    FROM staff_profiles sp
+    JOIN users u ON u.id = sp.user_id
+    WHERE sp.user_id = ${userId} AND u.date_deleted IS NULL
+    LIMIT 1
+  `;
+  return profiles[0] ?? null;
 }
 
 export async function createStaffProfile(formData: FormData) {

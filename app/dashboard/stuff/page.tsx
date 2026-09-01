@@ -1,10 +1,9 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import { lusitana } from '@/app/ui/fonts';
 import {
-  createStaffProfile,
   deleteStaffProfile,
   fetchStaffProfiles,
-  updateStaffProfile,
 } from '@/app/(seedDB)/users-seed/route';
 
 type Staff = Awaited<ReturnType<typeof fetchStaffProfiles>>[number];
@@ -27,29 +26,13 @@ export default async function StuffPage({
         <button type="submit" className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Найти</button>
       </form>
 
-      <form action={createStaffProfile} className="mt-6 rounded-lg bg-gray-50 p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-medium">Добавить сотрудника</h2>
-        <div className="grid gap-3 md:grid-cols-4">
-          <input name="user_id" required placeholder="ID пользователя" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="first_name" required placeholder="Имя" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="second_name" required placeholder="Фамилия" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="email" required type="email" placeholder="E-mail" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="phone_number" required placeholder="Телефон" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="position" required placeholder="Должность" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="salary" required type="number" min="0" step="0.01" placeholder="Зарплата" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-          <input name="hire_date" type="date" className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm" />
-        </div>
-        <button type="submit" className="mt-3 flex h-10 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Добавить <PlusIcon className="h-5 w-5" /></button>
-      </form>
+      <Link href="/dashboard/stuff/create" className="mt-6 flex h-10 w-fit items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Добавить <PlusIcon className="h-5 w-5" /></Link>
 
       <div className="mt-6 flow-root">
         <div className="inline-block min-w-full align-middle">
           <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
             <div className="md:hidden">
               {staff.map((member) => <StaffCard key={member.user_id} member={member} />)}
-            </div>
-            <div className="hidden">
-              {staff.map((member) => <StaffForm key={member.user_id} member={member} prefix="table" />)}
             </div>
             <table className="hidden min-w-full text-gray-900 md:table">
               <thead className="text-left text-sm font-normal">
@@ -75,49 +58,43 @@ export default async function StuffPage({
   );
 }
 
-function StaffForm({ member, prefix }: { member: Staff; prefix: string }) {
+function StaffForm({ member }: { member: Staff }) {
   return (
-    <form id={`staff-${prefix}-${member.user_id}`} action={updateStaffProfile}>
-      <input type="hidden" name="user_id" value={member.user_id} />
-      <input name="first_name" defaultValue={member.first_name} />
-      <input name="second_name" defaultValue={member.second_name} />
-      <input name="email" defaultValue={member.email} />
-      <input name="phone_number" defaultValue={member.phone_number} />
-      <input name="position" defaultValue={member.position} />
-      <input name="salary" defaultValue={member.salary} />
-      <input name="hire_date" defaultValue={new Date(member.hire_date).toISOString().slice(0, 10)} />
-    </form>
+    <div className="grid gap-1">
+      <p className="font-medium">{member.first_name} {member.second_name}</p>
+      <p className="text-sm text-gray-500">{member.email}</p>
+      <p className="text-sm text-gray-500">{member.phone_number}</p>
+      <p className="text-sm text-gray-500">{member.position}</p>
+      <Link href={`/dashboard/stuff/${member.user_id}/edit`} className="mt-2 inline-flex w-fit rounded-md border p-2 hover:bg-gray-100" title="Редактировать сотрудника"><PencilIcon className="w-5" /></Link>
+    </div>
   );
 }
 
 function StaffRow({ member }: { member: Staff }) {
-  const formId = `staff-table-${member.user_id}`;
   return (
     <tr className="w-full border-b text-sm last-of-type:border-none">
-      <td className="whitespace-nowrap py-3 pl-6 pr-3"><input name="first_name" defaultValue={member.first_name} form={formId} className="w-28 rounded border border-transparent px-1 py-1 hover:border-gray-300" /> <input name="second_name" defaultValue={member.second_name} form={formId} className="w-28 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="email" defaultValue={member.email} form={formId} className="w-44 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="phone_number" defaultValue={member.phone_number} form={formId} className="w-32 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="position" defaultValue={member.position} form={formId} className="w-32 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="salary" defaultValue={member.salary} form={formId} className="w-24 rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><input name="hire_date" type="date" defaultValue={new Date(member.hire_date).toISOString().slice(0, 10)} form={formId} className="rounded border border-transparent px-1 py-1 hover:border-gray-300" /></td>
-      <td className="px-3 py-3"><StaffActions member={member} formId={formId} /></td>
+      <td className="whitespace-nowrap py-3 pl-6 pr-3">{member.first_name} {member.second_name}</td>
+      <td className="px-3 py-3">{member.email}</td>
+      <td className="px-3 py-3">{member.phone_number}</td>
+      <td className="px-3 py-3">{member.position}</td>
+      <td className="px-3 py-3">{member.salary}</td>
+      <td className="px-3 py-3">{new Date(member.hire_date).toLocaleDateString('ru-RU')}</td>
+      <td className="px-3 py-3"><StaffActions member={member} /></td>
     </tr>
   );
 }
 
 function StaffCard({ member }: { member: Staff }) {
-  const formId = `staff-card-${member.user_id}`;
   return (
     <div className="mb-2 rounded-md bg-white p-4">
-      <StaffForm member={member} prefix="card" />
-      <div className="flex justify-between gap-2">
-        <button type="submit" form={formId} className="flex items-center gap-2 rounded-md border p-2 hover:bg-gray-100" title="Сохранить изменения"><PencilIcon className="w-5" />Сохранить</button>
+      <StaffForm member={member} />
+      <div className="flex justify-end gap-2">
         <form action={deleteStaffProfile}><input type="hidden" name="user_id" value={member.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить сотрудника"><TrashIcon className="w-5" /></button></form>
       </div>
     </div>
   );
 }
 
-function StaffActions({ member, formId }: { member: Staff; formId: string }) {
-  return <div className="flex justify-end gap-2"><button type="submit" form={formId} className="rounded-md border p-2 hover:bg-gray-100" title="Сохранить изменения"><PencilIcon className="w-5" /></button><form action={deleteStaffProfile}><input type="hidden" name="user_id" value={member.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить сотрудника"><TrashIcon className="w-5" /></button></form></div>;
+function StaffActions({ member }: { member: Staff }) {
+  return <div className="flex justify-end gap-2"><Link href={`/dashboard/stuff/${member.user_id}/edit`} className="rounded-md border p-2 hover:bg-gray-100" title="Редактировать сотрудника"><PencilIcon className="w-5" /></Link><form action={deleteStaffProfile}><input type="hidden" name="user_id" value={member.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить сотрудника"><TrashIcon className="w-5" /></button></form></div>;
 }
