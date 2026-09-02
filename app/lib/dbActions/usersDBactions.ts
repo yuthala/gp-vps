@@ -357,17 +357,56 @@ export async function updateClientProfile(formData: FormData) {
   }
 }
 
-export async function deleteClientProfile(formData: FormData) {
-  const userId = String(formData.get('user_id') || '').trim();
-  if (!userId) return;
+/**
+ * SERVER ACTION: Полное удаление профиля и мягкое удаление пользователя в транзакции
+ */
+export async function deleteClientProfile(formData: FormData): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const userId = String(formData.get('user_id') || '').trim();
+    
+    // Проверка на наличие ID
+    if (!userId) {
+      return { error: 'Идентификатор пользователя не найден или пуст' };
+    }
 
-  await ensureCustomerAuditColumns();
-  await sql.begin(async (transaction) => {
-    await transaction`DELETE FROM client_profiles WHERE user_id = ${userId}`;
-    await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
-  });
-  revalidatePath(customerPagePath);
+    // Вызов функции проверки колонок аудита
+    await ensureCustomerAuditColumns();
+
+    // Выполнение операций внутри безопасной базы данных (Трансляция транзакции)
+    await sql.begin(async (transaction) => {
+      // 1. Полностью удаляем профиль из client_profiles
+      await transaction`DELETE FROM client_profiles WHERE user_id = ${userId}`;
+      
+      // 2. Мягко удаляем запись в таблице users
+      await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
+    });
+
+    // Сбрасываем кэш страницы клиентов, чтобы список мгновенно обновился в UI
+    revalidatePath(customerPagePath);
+    
+    // КРИТИЧЕСКИ ВАЖНО: возвращаем признак успеха для активации StatusOverlay
+    return { ok: true }; 
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Ошибка при транзакции удаления клиента:", error);
+    // Возвращаем текст ошибки для вывода на фронтенде через ErrorOverlay
+    return { error: error?.message || "Не удалось удалить клиента из базы данных" };
+  }
 }
+
+
+// export async function deleteClientProfile(formData: FormData) {
+//   const userId = String(formData.get('user_id') || '').trim();
+//   if (!userId) return;
+
+//   await ensureCustomerAuditColumns();
+//   await sql.begin(async (transaction) => {
+//     await transaction`DELETE FROM client_profiles WHERE user_id = ${userId}`;
+//     await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
+//   });
+//   revalidatePath(customerPagePath);
+// }
 
 async function ensureStaffProfileTable() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
