@@ -9,7 +9,7 @@ export default async function EditCustomerPage({ params }: { params: Promise<{ u
 
   return (
     <div className="mx-auto w-full max-w-lg p-6">
-      <h1 className="mb-6 text-2xl font-medium">Редактировать клиента</h1>
+      <h1 className="mb-6 text-2xl font-medium">Редактировать данные клиента</h1>
       <CustomerProfileForm customer={customer} />
     </div>
   );

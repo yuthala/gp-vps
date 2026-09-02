@@ -22,11 +22,11 @@ export default async function CustomersPage({
       <h1 className={`${lusitana.className} text-2xl`}>Клиенты</h1>
 
       <form method="GET" className="mt-4 flex items-center gap-2 md:mt-8">
-        <input name="query" defaultValue={query} placeholder="Поиск клиентов..." className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 md:max-w-md" />
-        <button type="submit" className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Найти</button>
+        <input name="query" defaultValue={query} placeholder="Поиск клиентов..." className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-green-500 md:max-w-md" />
+        <button type="submit" className="h-10 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500">Найти</button>
       </form>
 
-      <Link href="/dashboard/customers/create" className="mt-6 flex h-10 w-fit items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Добавить <PlusIcon className="h-5 w-5" /></Link>
+      <Link href="/dashboard/customers/create" className="mt-6 flex h-10 w-fit items-center gap-2 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500">Добавить <PlusIcon className="h-5 w-5" /></Link>
 
       <div className="mt-6 flow-root">
         <div className="inline-block min-w-full align-middle">
