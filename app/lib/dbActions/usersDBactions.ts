@@ -313,46 +313,76 @@ export async function fetchClientProfile(userId: string): Promise<ClientProfileR
   }
 }
 
-//export async function createClientProfile(formData: FormData) {
-  // const userId = String(formData.get('user_id') || '').trim();
-  // const firstName = String(formData.get('first_name') || '').trim();
-  // const secondName = String(formData.get('second_name') || '').trim();
-  // const email = String(formData.get('email') || '').trim();
-  // const phoneNumber = String(formData.get('phone_number') || '').trim();
-
-  // if (!userId || !firstName || !secondName || !email || !phoneNumber) return;
-
-  // await sql`
-  //   INSERT INTO client_profiles (user_id, first_name, second_name, email, phone_number)
-  //   SELECT ${userId}, ${firstName}, ${secondName}, ${email}, ${phoneNumber}
-  //   WHERE EXISTS (SELECT 1 FROM users WHERE id = ${userId} AND role = 'customer' AND date_deleted IS NULL)
-  // `;
-  // revalidatePath(customerPagePath);
-//}
-
 export async function updateClientProfile(formData: FormData) {
-  const userId = String(formData.get('user_id') || '').trim();
-  const firstName = String(formData.get('first_name') || '').trim();
-  const secondName = String(formData.get('second_name') || '').trim();
-  const email = String(formData.get('email') || '').trim();
-  const phoneNumber = String(formData.get('phone_number') || '').trim();
-  const bonusBalance = String(formData.get('bonus_balance') || '0').trim();
-  const discountGroup = String(formData.get('discount_group') || 'Standard').trim();
+  try {
+    // 1. Извлекаем и очищаем текстовые данные
+    const userId = String(formData.get('user_id') || '').trim();
+    const firstName = String(formData.get('first_name') || '').trim();
+    const secondName = String(formData.get('second_name') || '').trim();
+    const email = String(formData.get('email') || '').trim();
+    const rawPhone = String(formData.get('phone_number') || '').trim();
+    const bonusBalance = String(formData.get('bonus_balance') || '0').trim();
+    const discountGroup = String(formData.get('discount_group') || 'Standard').trim();
 
-  if (!userId || !firstName || !secondName || !email || !phoneNumber) return;
+    // Очищаем телефон от маски (оставляем только цифры для сохранения в БД)
+    const phone = rawPhone.replace(/\D/g, "");
 
-  await sql`
-    UPDATE client_profiles
-    SET first_name = ${firstName},
-        second_name = ${secondName},
-        email = ${email},
-        phone_number = ${phoneNumber},
-        bonus_balance = ${bonusBalance},
-        discount_group = ${discountGroup}
-    WHERE user_id = ${userId}
-  `;
-  revalidatePath(customerPagePath);
+    // 2. Валидация на обязательные поля
+    if (!userId || !firstName || !secondName || !email || !phone) {
+      return { error: 'Не все обязательные поля заполнены корректно' };
+    }
+
+    // 3. Выполняем SQL-запрос обновления
+    await sql`
+      UPDATE client_profiles
+      SET first_name = ${firstName},
+          second_name = ${secondName},
+          email = ${email},
+          phone_number = ${phone},
+          bonus_balance = ${bonusBalance},
+          discount_group = ${discountGroup}
+      WHERE user_id = ${userId}
+    `;
+
+    // 4. Инвалидируем кэш страницы (используем вашу переменную пути или строку)
+    revalidatePath(customerPagePath);
+
+    // 5. Возвращаем признак успешного выполнения для активации StatusOverlay на клиенте
+    return { ok: true };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Ошибка внутри updateClientProfile:", error);
+    // Возвращаем объект ошибки для активации ErrorOverlay на клиенте
+    return { error: error?.message || "Не удалось обновить данные клиента" };
+  }
 }
+
+
+
+// export async function updateClientProfile(formData: FormData) {
+//   const userId = String(formData.get('user_id') || '').trim();
+//   const firstName = String(formData.get('first_name') || '').trim();
+//   const secondName = String(formData.get('second_name') || '').trim();
+//   const email = String(formData.get('email') || '').trim();
+//   const phoneNumber = String(formData.get('phone_number') || '').trim();
+//   const bonusBalance = String(formData.get('bonus_balance') || '0').trim();
+//   const discountGroup = String(formData.get('discount_group') || 'Standard').trim();
+
+//   if (!userId || !firstName || !secondName || !email || !phoneNumber) return;
+
+//   await sql`
+//     UPDATE client_profiles
+//     SET first_name = ${firstName},
+//         second_name = ${secondName},
+//         email = ${email},
+//         phone_number = ${phoneNumber},
+//         bonus_balance = ${bonusBalance},
+//         discount_group = ${discountGroup}
+//     WHERE user_id = ${userId}
+//   `;
+//   revalidatePath(customerPagePath);
+// }
 
 export async function deleteClientProfile(formData: FormData) {
   const userId = String(formData.get('user_id') || '').trim();
