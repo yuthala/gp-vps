@@ -49,7 +49,7 @@ let adminEmail: string;
 // Описываем структуру объекта, который возвращает база данных
 interface AuthorizedUser {
   id: string;
-  role: 'admin' | 'stuff' | 'customer';
+  role: 'admin' | 'staff' | 'customer';
   email: string;
 }
 
@@ -85,7 +85,7 @@ export async function syncUsersTableStructure(): Promise<void> {
   // Гарантируем наличие перечисления ENUM в схеме базы данных
   await sql`
     DO $$ BEGIN
-      CREATE TYPE user_role AS ENUM ('admin', 'stuff', 'customer');
+      CREATE TYPE user_role AS ENUM ('admin', 'staff', 'customer');
     EXCEPTION
       WHEN duplicate_object THEN NULL;
     END $$;
@@ -226,9 +226,9 @@ export async function GET(req: Request) {
 
     await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
      syncUsersTableStructure(),
-     seedClientProfiles(),
-     seedStaffProfiles(),
-     seedPersonalDataAConsents(),
+     //seedClientProfiles(),
+     //seedStaffProfiles(),
+     //seedPersonalDataAConsents(),
     ]);
 
     return Response.json({ success: true });

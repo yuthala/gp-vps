@@ -210,7 +210,7 @@ deliveryPointAdress: string
  */
 
 // Типы для ENUM-полей
-export type UserRole = 'admin' | 'stuff' | 'customer';
+export type UserRole = 'admin' | 'staff' | 'customer';
 export type AuditAction = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE';
 
 // Интерфейс пользователя из таблицы users

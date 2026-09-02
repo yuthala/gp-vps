@@ -23,10 +23,10 @@ export default async function StuffPage({
 
       <form method="GET" className="mt-4 flex items-center gap-2 md:mt-8">
         <input name="query" defaultValue={query} placeholder="Поиск сотрудников..." className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-blue-500 md:max-w-md" />
-        <button type="submit" className="h-10 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Найти</button>
+        <button type="submit" className="h-10 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500">Найти</button>
       </form>
 
-      <Link href="/dashboard/stuff/create" className="mt-6 flex h-10 w-fit items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-500">Добавить <PlusIcon className="h-5 w-5" /></Link>
+      <Link href="/dashboard/staff/create" className="mt-6 flex h-10 w-fit items-center gap-2 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-500">Добавить <PlusIcon className="h-5 w-5" /></Link>
 
       <div className="mt-6 flow-root">
         <div className="inline-block min-w-full align-middle">
@@ -65,7 +65,7 @@ function StaffForm({ member }: { member: Staff }) {
       <p className="text-sm text-gray-500">{member.email}</p>
       <p className="text-sm text-gray-500">{member.phone_number}</p>
       <p className="text-sm text-gray-500">{member.position}</p>
-      <Link href={`/dashboard/stuff/${member.user_id}/edit`} className="mt-2 inline-flex w-fit rounded-md border p-2 hover:bg-gray-100" title="Редактировать сотрудника"><PencilIcon className="w-5" /></Link>
+      <Link href={`/dashboard/staff/${member.user_id}/edit`} className="mt-2 inline-flex w-fit rounded-md border p-2 hover:bg-gray-100" title="Редактировать сотрудника"><PencilIcon className="w-5" /></Link>
     </div>
   );
 }
@@ -96,5 +96,5 @@ function StaffCard({ member }: { member: Staff }) {
 }
 
 function StaffActions({ member }: { member: Staff }) {
-  return <div className="flex justify-end gap-2"><Link href={`/dashboard/stuff/${member.user_id}/edit`} className="rounded-md border p-2 hover:bg-gray-100" title="Редактировать сотрудника"><PencilIcon className="w-5" /></Link><form action={deleteStaffProfile}><input type="hidden" name="user_id" value={member.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить сотрудника"><TrashIcon className="w-5" /></button></form></div>;
+  return <div className="flex justify-end gap-2"><Link href={`/dashboard/staff/${member.user_id}/edit`} className="rounded-md border p-2 hover:bg-gray-100" title="Редактировать сотрудника"><PencilIcon className="w-5" /></Link><form action={deleteStaffProfile}><input type="hidden" name="user_id" value={member.user_id} /><button type="submit" className="rounded-md border p-2 hover:bg-gray-100" title="Удалить сотрудника"><TrashIcon className="w-5" /></button></form></div>;
 }

@@ -13,7 +13,7 @@ import { headers } from 'next/headers'; // Используем Next.js headers 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 const customerPagePath = '/dashboard/customers';
-const staffPagePath = '/dashboard/stuff';
+const staffPagePath = '/dashboard/staff';
 
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 // 1. Получение меты регистрации через Next.js headers()
@@ -93,7 +93,7 @@ export async function getCurrentEmployeeId(): Promise<string | null> {
     JOIN users u ON u.id = s.user_id
     WHERE s.session_token = ${token}
       AND s.expires > NOW()
-      AND u.role IN ('admin', 'stuff')
+      AND u.role IN ('admin', 'staff')
     LIMIT 1
   `;
 
@@ -395,19 +395,6 @@ export async function deleteClientProfile(formData: FormData): Promise<{ ok?: bo
   }
 }
 
-
-// export async function deleteClientProfile(formData: FormData) {
-//   const userId = String(formData.get('user_id') || '').trim();
-//   if (!userId) return;
-
-//   await ensureCustomerAuditColumns();
-//   await sql.begin(async (transaction) => {
-//     await transaction`DELETE FROM client_profiles WHERE user_id = ${userId}`;
-//     await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
-//   });
-//   revalidatePath(customerPagePath);
-// }
-
 async function ensureStaffProfileTable() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
   await sql`
@@ -432,13 +419,15 @@ async function ensureStaffProfileTable() {
 export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]> {
   await ensureStaffProfileTable();
   const search = `%${query}%`;
+  
   const profiles = await sql<StaffProfileRow[]>`
     SELECT sp.user_id, sp.first_name, sp.second_name, sp.email,
            sp.phone_number, sp.position, sp.salary, sp.hire_date
     FROM staff_profiles sp
     JOIN users u ON u.id = sp.user_id
     WHERE u.date_deleted IS NULL
-      AND u.role = 'stuff'
+      /* ИСПРАВЛЕНО: ищем роли 'staff' (вместо 'stuff') и 'admin' */
+      AND u.role IN ('staff', 'admin') 
       AND (
         sp.first_name ILIKE ${search}
         OR sp.second_name ILIKE ${search}
@@ -463,6 +452,41 @@ export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]>
   return profiles;
 }
 
+
+// export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]> {
+//   await ensureStaffProfileTable();
+//   const search = `%${query}%`;
+//   const profiles = await sql<StaffProfileRow[]>`
+//     SELECT sp.user_id, sp.first_name, sp.second_name, sp.email,
+//            sp.phone_number, sp.position, sp.salary, sp.hire_date
+//     FROM staff_profiles sp
+//     JOIN users u ON u.id = sp.user_id
+//     WHERE u.date_deleted IS NULL
+//       AND u.role = 'staff'
+//       AND (
+//         sp.first_name ILIKE ${search}
+//         OR sp.second_name ILIKE ${search}
+//         OR sp.email ILIKE ${search}
+//         OR sp.phone_number ILIKE ${search}
+//         OR sp.position ILIKE ${search}
+//       )
+//     ORDER BY sp.second_name ASC, sp.first_name ASC
+//   `;
+
+//   const employeeId = await getCurrentEmployeeId();
+//   if (employeeId && profiles.length > 0) {
+//     const staffIds = profiles.map((profile) => profile.user_id);
+//     await sql`
+//       INSERT INTO pd_access_logs (employee_id, customer_id, action_type, accessed_at)
+//       SELECT ${employeeId}, u.id, 'SELECT', NOW()
+//       FROM users u
+//       WHERE u.id = ANY(${sql.array(staffIds)}::uuid[])
+//     `;
+//   }
+
+//   return profiles;
+// }
+
 export async function fetchStaffProfile(userId: string): Promise<StaffProfileRow | null> {
   const profiles = await sql<StaffProfileRow[]>`
     SELECT sp.user_id, sp.first_name, sp.second_name, sp.email,
@@ -473,27 +497,6 @@ export async function fetchStaffProfile(userId: string): Promise<StaffProfileRow
     LIMIT 1
   `;
   return profiles[0] ?? null;
-}
-
-export async function createStaffProfile(formData: FormData) {
-  const userId = String(formData.get('user_id') || '').trim();
-  const firstName = String(formData.get('first_name') || '').trim();
-  const secondName = String(formData.get('second_name') || '').trim();
-  const email = String(formData.get('email') || '').trim();
-  const phoneNumber = String(formData.get('phone_number') || '').trim();
-  const position = String(formData.get('position') || '').trim();
-  const salary = String(formData.get('salary') || '0').trim();
-  const hireDate = String(formData.get('hire_date') || '').trim();
-
-  if (!userId || !firstName || !secondName || !email || !phoneNumber || !position || !salary) return;
-  await ensureStaffProfileTable();
-
-  await sql`
-    INSERT INTO staff_profiles (user_id, first_name, second_name, email, phone_number, position, salary, hire_date)
-    SELECT ${userId}, ${firstName}, ${secondName}, ${email}, ${phoneNumber}, ${position}, ${salary}, COALESCE(NULLIF(${hireDate}, ''), CURRENT_DATE)
-    WHERE EXISTS (SELECT 1 FROM users WHERE id = ${userId} AND role = 'stuff' AND date_deleted IS NULL)
-  `;
-  revalidatePath(staffPagePath);
 }
 
 export async function updateStaffProfile(formData: FormData) {
@@ -526,4 +529,139 @@ export async function deleteStaffProfile(formData: FormData) {
     await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
   });
   revalidatePath(staffPagePath);
+}
+
+
+/**
+ * SERVER ACTION: Создание аккаунта сотрудника с отправкой письма верификации
+ */
+export async function createStaffProfile(formData: FormData): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    // Извлекаем и очищаем данные из формы
+    const role = String(formData.get('role') || 'staff').trim();
+    const firstName = String(formData.get('first_name') || '').trim();
+    const secondName = String(formData.get('second_name') || '').trim();
+    const email = String(formData.get('email') || '').trim();
+    const rawPhone = String(formData.get('phone_number') || '').trim();
+    const position = String(formData.get('position') || '').trim();
+    const salary = String(formData.get('salary') || '0').trim();
+    const hireDate = String(formData.get('hire_date') || '').trim();
+
+    // Очищаем телефон от маски
+    const phoneNumber = rawPhone.replace(/\D/g, "");
+
+    // Валидация полей
+    if (!firstName || !secondName || !email || !phoneNumber || !position || !salary) {
+      return { error: 'Не все обязательные поля заполнены' };
+    }
+
+    // Подготовка значения даты во избежание ошибки сопоставления типов COALESCE в Postgres
+    const finalHireDate = hireDate ? hireDate : new Date().toISOString().slice(0, 10);
+
+    await ensureStaffProfileTable();
+
+    // Проверяем, существует ли уже активный пользователь с таким email
+    const existingUser = await sql`
+      SELECT id 
+      FROM users 
+      WHERE LOWER(email) = LOWER(${email}) AND date_deleted IS NULL 
+      LIMIT 1
+    `;
+
+    if (existingUser[0]) {
+      return { error: 'Пользователь с таким E-mail уже зарегистрирован в системе' };
+    }
+
+    // Собираем метаданные регистрации
+    const { registration_ip, registration_device } = await getRegistrationMeta();
+    
+    // Генерируем пароль, хэш и токен
+    const password = generatePassword();
+    const hashed = await bcrypt.hash(password, 10);
+    const token = genToken();
+
+    // Формируем ссылки для отправки письма
+    const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const verifyUrl = `${base.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
+    const loginUrl = `${base.replace(/\/$/, '')}/login`;
+    const fullName = `${firstName} ${secondName}`.trim();
+
+    // Запускаем атомарную транзакцию
+    await sql.begin(async (transaction) => {
+      
+      // 1. Вставка в таблицу users (is_email_verified устанавливается в false, передаем токен)
+      const insertUserResult = await transaction`
+        INSERT INTO users (
+          role,
+          email,
+          password_hash,
+          is_email_verified,
+          email_verification_token,
+          email_verified_at,
+          registration_ip,
+          registration_device,
+          created_at
+        )
+        VALUES (
+          ${role},
+          ${email},
+          ${hashed},
+          false,
+          ${token},
+          NULL,
+          ${registration_ip},
+          ${registration_device},
+          NOW()
+        )
+        RETURNING id
+      `;
+
+      const generatedUserId = insertUserResult[0]?.id;
+      if (!generatedUserId) {
+        throw new Error('Не удалось создать учетную запись пользователя');
+      }
+
+      // 2. Вставка в таблицу staff_profiles с явным приведением даты ::date
+      await transaction`
+        INSERT INTO staff_profiles (
+          user_id,
+          first_name,
+          second_name,
+          email,
+          phone_number,
+          position,
+          salary,
+          hire_date
+        )
+        VALUES (
+          ${generatedUserId},
+          ${firstName},
+          ${secondName},
+          ${email},
+          ${phoneNumber},
+          ${position},
+          ${salary},
+          ${finalHireDate}::date
+        )
+      `;
+    });
+
+    // 3. Отправляем письмо с данными и ссылкой на верификацию после успешной транзакции
+    try {
+      await sendCredentialsEmail(email, fullName, password, loginUrl, verifyUrl);
+    } catch (sendError) {
+      console.error('Ошибка отправки письма сотруднику:', sendError);
+      // Не прерываем выполнение, так как запись в БД уже создана
+    }
+
+    // Сбрасываем кэш роута сотрудников
+    revalidatePath(staffPagePath);
+
+    return { ok: true };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Ошибка при создании сотрудника:", error);
+    return { error: error?.message || "Внутренняя ошибка сервера при создании сотрудника" };
+  }
 }
