@@ -184,7 +184,6 @@ export async function fetchClientProfile(userId: string): Promise<ClientProfileR
   return profiles[0] ?? null;
 }
 
-
   export async function createClientProfile(formData: FormData) {
   try {
     // Получаем и очищаем данные из переданного объекта FormData
@@ -357,32 +356,6 @@ export async function updateClientProfile(formData: FormData) {
     return { error: error?.message || "Не удалось обновить данные клиента" };
   }
 }
-
-
-
-// export async function updateClientProfile(formData: FormData) {
-//   const userId = String(formData.get('user_id') || '').trim();
-//   const firstName = String(formData.get('first_name') || '').trim();
-//   const secondName = String(formData.get('second_name') || '').trim();
-//   const email = String(formData.get('email') || '').trim();
-//   const phoneNumber = String(formData.get('phone_number') || '').trim();
-//   const bonusBalance = String(formData.get('bonus_balance') || '0').trim();
-//   const discountGroup = String(formData.get('discount_group') || 'Standard').trim();
-
-//   if (!userId || !firstName || !secondName || !email || !phoneNumber) return;
-
-//   await sql`
-//     UPDATE client_profiles
-//     SET first_name = ${firstName},
-//         second_name = ${secondName},
-//         email = ${email},
-//         phone_number = ${phoneNumber},
-//         bonus_balance = ${bonusBalance},
-//         discount_group = ${discountGroup}
-//     WHERE user_id = ${userId}
-//   `;
-//   revalidatePath(customerPagePath);
-// }
 
 export async function deleteClientProfile(formData: FormData) {
   const userId = String(formData.get('user_id') || '').trim();

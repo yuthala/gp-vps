@@ -22,7 +22,7 @@ export default function StatusOverlay({
       {/* СОСТОЯНИЕ: ЗАГРУЗКА */}
       {isPending && (
         <>
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-green-600 border-t-transparent"></div>
           <p className="mt-4 font-medium text-gray-700 animate-pulse">{pendingText}</p>
         </>
       )}

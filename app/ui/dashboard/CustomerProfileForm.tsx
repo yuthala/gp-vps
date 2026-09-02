@@ -323,7 +323,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
             value={formData.first_name}
             onChange={handleChange}
             placeholder="Иван"
-            className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" 
+            className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none" 
           />
           {errors.first_name && <p className="text-xs text-red-500 mt-1">{errors.first_name}</p>}
         </label>
@@ -336,7 +336,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
             value={formData.second_name}
             onChange={handleChange}
             placeholder="Иванов"
-            className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" 
+            className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none" 
           />
           {errors.second_name && <p className="text-xs text-red-500 mt-1">{errors.second_name}</p>}
         </label>
@@ -349,7 +349,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
             value={formData.email}
             onChange={handleChange}
             placeholder="example@domain.com"
-            className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" 
+            className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none" 
           />
           {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
         </label>
@@ -362,7 +362,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
             value={formData.phone_number}
             onChange={handleChange}
             placeholder="+7(999) 000 - 00 - 00"
-            className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" 
+            className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none" 
           />
           {errors.phone_number && <p className="text-xs text-red-500 mt-1">{errors.phone_number}</p>}
         </label>
@@ -378,7 +378,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
                 value={formData.bonus_balance}
                 onChange={handleChange}
                 placeholder="0.00"
-                className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" 
+                className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none" 
               />
             </label>
             
@@ -390,7 +390,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
                 value={formData.discount_group}
                 onChange={handleChange}
                 placeholder="VIP / Опт"
-                className="rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none" 
+                className="rounded-md border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none" 
               />
             </label>
           </>
@@ -401,7 +401,7 @@ export default function CustomerProfileForm({ customer, onClose }: { customer?: 
           <button 
             type="submit" 
             disabled={isPending}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors disabled:opacity-50"
+            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-500 transition-colors disabled:opacity-50"
           >
             {isEditing ? 'Сохранить' : 'Добавить'}
           </button>
