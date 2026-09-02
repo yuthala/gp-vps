@@ -111,7 +111,7 @@ export default function VerifyPage() {
           
           <div className="mt-8">
             <Link 
-              href="/auth/login" 
+              href="/login" 
               className="flex w-full justify-center rounded-2xl bg-gray-900 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800 hover:shadow-gray-900/20 active:scale-[0.98] transition-all duration-200"
             >
               Войти в личный кабинет
@@ -166,7 +166,7 @@ export default function VerifyPage() {
               Получить новую ссылку
             </Link>
             <Link 
-              href="/auth/login" 
+              href="/login" 
               className="flex w-full justify-center rounded-2xl bg-gray-50 px-5 py-4 text-sm font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98] transition-all duration-200"
             >
               На страницу входа
