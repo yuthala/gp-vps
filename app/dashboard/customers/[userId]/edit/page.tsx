@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import CustomerProfileForm from '@/app/ui/dashboard/CustomerProfileForm';
-import { fetchClientProfile } from '@/app/(seedDB)/users-seed/route';
+import { fetchClientProfile } from '@/app/lib/dbActions/usersDBactions';
 
 export default async function EditCustomerPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;

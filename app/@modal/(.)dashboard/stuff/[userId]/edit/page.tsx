@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import CustomerModal from '@/app/ui/dashboard/CustomerModal';
 import StaffProfileForm from '@/app/ui/dashboard/StaffProfileForm';
-import { fetchStaffProfile } from '@/app/(seedDB)/users-seed/route';
+import { fetchStaffProfile } from '@/app/lib/dbActions/usersDBactions';
 
 export default async function EditStaffModalPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;

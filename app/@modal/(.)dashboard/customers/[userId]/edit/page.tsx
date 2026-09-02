@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import CustomerModal from '@/app/ui/dashboard/CustomerModal';
 import CustomerProfileForm from '@/app/ui/dashboard/CustomerProfileForm';
-import { fetchClientProfile } from '@/app/(seedDB)/users-seed/route';
+import { fetchClientProfile } from '@/app/lib/dbActions/usersDBactions';
 
 export default async function EditCustomerModalPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = await params;

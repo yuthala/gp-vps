@@ -1,4 +1,4 @@
-import { createClientProfile, updateClientProfile } from '@/app/(seedDB)/users-seed/route';
+import { createClientProfile, updateClientProfile } from '@/app/lib/dbActions/usersDBactions';
 import ModalCancelButton from '@/app/ui/dashboard/ModalCancelButton';
 
 type Customer = {

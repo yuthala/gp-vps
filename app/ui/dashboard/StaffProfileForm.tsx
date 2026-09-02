@@ -1,4 +1,4 @@
-import { createStaffProfile, updateStaffProfile } from '@/app/(seedDB)/users-seed/route';
+import { createStaffProfile, updateStaffProfile } from '@/app/lib/dbActions/usersDBactions';
 import ModalCancelButton from '@/app/ui/dashboard/ModalCancelButton';
 
 type Staff = {
