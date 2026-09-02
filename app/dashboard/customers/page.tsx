@@ -4,7 +4,7 @@ import { lusitana } from '@/app/ui/fonts';
 import {
   deleteClientProfile,
   fetchClientProfiles,
-} from '@/app/(seedDB)/users-seed/route';
+} from '@/app/lib/dbActions/usersDBactions';
 
 type Customer = Awaited<ReturnType<typeof fetchClientProfiles>>[number];
 

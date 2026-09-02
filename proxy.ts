@@ -40,7 +40,7 @@ export async function proxy(req: NextRequest) {
       });
 
       if (!validateRes.ok) {
-        return NextResponse.redirect(new URL("/login-page", req.url));
+        return NextResponse.redirect(new URL("/login", req.url));
       }
 
       // Предполагаем, что ваш эндпоинт возвращает JSON с данными пользователя { email: "..." }
@@ -49,13 +49,13 @@ export async function proxy(req: NextRequest) {
 
     } catch (e) {
       console.error("Session validation error:", e);
-      return NextResponse.redirect(new URL("/login-page", req.url));
+      return NextResponse.redirect(new URL("/login", req.url));
     }
   }
 
   // Если после всех проверок email определить не удалось — отправляем на логин
   if (!userEmail) {
-    return NextResponse.redirect(new URL("/login-page", req.url));
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   // 3. Проверка прав и перенаправление (Роутинг)

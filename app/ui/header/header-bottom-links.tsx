@@ -41,13 +41,13 @@ export default function BottomHeaderLinks() {
                 // Add delay for UX
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
-                const destination = data.ok === true ? '/dashboard' : '/login-page';
+                const destination = data.ok === true ? '/dashboard' : '/login';
                 setShowSpinner(false);
                 router.push(destination);
             } catch (err) {
                 console.error('Error validating session:', err);
                 setShowSpinner(false);
-                router.push('/login-page');
+                router.push('/login');
             }
         }
     };

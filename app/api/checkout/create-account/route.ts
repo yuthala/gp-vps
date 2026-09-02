@@ -111,7 +111,7 @@ export async function POST(req: Request) {
       const token = genToken();
       const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
       const verifyUrl = `${base.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
-      const loginUrl = `${base.replace(/\/$/, '')}/login-page`;
+      const loginUrl = `${base.replace(/\/$/, '')}/login`;
 
       const insertResult = await sql`
         INSERT INTO users (

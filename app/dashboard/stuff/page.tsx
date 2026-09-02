@@ -4,7 +4,7 @@ import { lusitana } from '@/app/ui/fonts';
 import {
   deleteStaffProfile,
   fetchStaffProfiles,
-} from '@/app/(seedDB)/users-seed/route';
+} from '@/app/lib/dbActions/usersDBactions';
 
 type Staff = Awaited<ReturnType<typeof fetchStaffProfiles>>[number];
 

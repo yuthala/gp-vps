@@ -250,3 +250,24 @@ export interface ClientProfileDTO {
   bonus_balance: string; // Из БД тип numeric часто приходит строкой во избежание потери точности
   discount_group: string;
 }
+
+export type ClientProfileRow = {
+  user_id: string;
+  first_name: string;
+  second_name: string;
+  email: string;
+  phone_number: string;
+  bonus_balance: string;
+  discount_group: string;
+};
+
+export type StaffProfileRow = {
+  user_id: string;
+  first_name: string;
+  second_name: string;
+  email: string;
+  phone_number: string;
+  position: string;
+  salary: string;
+  hire_date: Date;
+};
