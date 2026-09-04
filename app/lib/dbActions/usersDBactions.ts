@@ -99,8 +99,8 @@ export async function getCurrentEmployeeId(): Promise<string | null> {
 
   return rows[0]?.id ?? null;
 }
-
-async function ensureCustomerAuditColumns() {
+// ФУНКЦИЯ БЫЛА НУЖНА ТОЛЬКО ДЛЯ МИГРАЦИИ БД
+//async function ensureCustomerAuditColumns() {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
   await sql`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key`;
   await sql`CREATE UNIQUE INDEX IF NOT EXISTS users_active_email_key ON users (LOWER(email)) WHERE date_deleted IS NULL`;
@@ -132,10 +132,10 @@ async function ensureCustomerAuditColumns() {
     EXCEPTION WHEN duplicate_object THEN NULL;
     END $$;
   `;
-}
+//}
 
 export async function fetchClientProfiles(query = ''): Promise<ClientProfileRow[]> {
-  await ensureCustomerAuditColumns();
+  //await ensureCustomerAuditColumns();
   const search = `%${query}%`;
   const profiles = await sql<ClientProfileRow[]>`
     SELECT
@@ -370,7 +370,7 @@ export async function deleteClientProfile(formData: FormData): Promise<{ ok?: bo
     }
 
     // Вызов функции проверки колонок аудита
-    await ensureCustomerAuditColumns();
+    //await ensureCustomerAuditColumns();
 
     // Выполнение операций внутри безопасной базы данных (Трансляция транзакции)
     await sql.begin(async (transaction) => {
@@ -395,29 +395,31 @@ export async function deleteClientProfile(formData: FormData): Promise<{ ok?: bo
   }
 }
 
-async function ensureStaffProfileTable() {
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
-  await sql`
-    CREATE TABLE IF NOT EXISTS staff_profiles (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-      first_name VARCHAR(255) NOT NULL,
-      second_name VARCHAR(255) NOT NULL,
-      phone_number TEXT NOT NULL,
-      email TEXT NOT NULL,
-      position VARCHAR(255) NOT NULL,
-      salary NUMERIC(12, 2) NOT NULL,
-      hire_date DATE DEFAULT CURRENT_DATE NOT NULL
-    )
-  `;
-  await sql`ALTER TABLE staff_profiles DROP CONSTRAINT IF EXISTS staff_profiles_email_key`;
-  await sql`ALTER TABLE staff_profiles DROP CONSTRAINT IF EXISTS staff_profiles_phone_number_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS staff_profiles_email_unique_idx ON staff_profiles (LOWER(email))`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS staff_profiles_phone_unique_idx ON staff_profiles (phone_number)`;
-}
+
+//ФУНКЦИЯ БЫЛА НУЖНА ТОЛЬКО ДЛЯ МИГРАЦИИ
+// async function ensureStaffProfileTable() {
+//   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
+//   await sql`
+//     CREATE TABLE IF NOT EXISTS staff_profiles (
+//       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+//       user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+//       first_name VARCHAR(255) NOT NULL,
+//       second_name VARCHAR(255) NOT NULL,
+//       phone_number TEXT NOT NULL,
+//       email TEXT NOT NULL,
+//       position VARCHAR(255) NOT NULL,
+//       salary NUMERIC(12, 2) NOT NULL,
+//       hire_date DATE DEFAULT CURRENT_DATE NOT NULL
+//     )
+//   `;
+//   await sql`ALTER TABLE staff_profiles DROP CONSTRAINT IF EXISTS staff_profiles_email_key`;
+//   await sql`ALTER TABLE staff_profiles DROP CONSTRAINT IF EXISTS staff_profiles_phone_number_key`;
+//   await sql`CREATE UNIQUE INDEX IF NOT EXISTS staff_profiles_email_unique_idx ON staff_profiles (LOWER(email))`;
+//   await sql`CREATE UNIQUE INDEX IF NOT EXISTS staff_profiles_phone_unique_idx ON staff_profiles (phone_number)`;
+// }
 
 export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]> {
-  await ensureStaffProfileTable();
+  //await ensureStaffProfileTable();
   const search = `%${query}%`;
   
   const profiles = await sql<StaffProfileRow[]>`
@@ -451,41 +453,6 @@ export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]>
 
   return profiles;
 }
-
-
-// export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]> {
-//   await ensureStaffProfileTable();
-//   const search = `%${query}%`;
-//   const profiles = await sql<StaffProfileRow[]>`
-//     SELECT sp.user_id, sp.first_name, sp.second_name, sp.email,
-//            sp.phone_number, sp.position, sp.salary, sp.hire_date
-//     FROM staff_profiles sp
-//     JOIN users u ON u.id = sp.user_id
-//     WHERE u.date_deleted IS NULL
-//       AND u.role = 'staff'
-//       AND (
-//         sp.first_name ILIKE ${search}
-//         OR sp.second_name ILIKE ${search}
-//         OR sp.email ILIKE ${search}
-//         OR sp.phone_number ILIKE ${search}
-//         OR sp.position ILIKE ${search}
-//       )
-//     ORDER BY sp.second_name ASC, sp.first_name ASC
-//   `;
-
-//   const employeeId = await getCurrentEmployeeId();
-//   if (employeeId && profiles.length > 0) {
-//     const staffIds = profiles.map((profile) => profile.user_id);
-//     await sql`
-//       INSERT INTO pd_access_logs (employee_id, customer_id, action_type, accessed_at)
-//       SELECT ${employeeId}, u.id, 'SELECT', NOW()
-//       FROM users u
-//       WHERE u.id = ANY(${sql.array(staffIds)}::uuid[])
-//     `;
-//   }
-
-//   return profiles;
-// }
 
 export async function fetchStaffProfile(userId: string): Promise<StaffProfileRow | null> {
   const profiles = await sql<StaffProfileRow[]>`
@@ -523,7 +490,7 @@ export async function updateStaffProfile(formData: FormData) {
 export async function deleteStaffProfile(formData: FormData) {
   const userId = String(formData.get('user_id') || '').trim();
   if (!userId) return;
-  await ensureStaffProfileTable();
+  //await ensureStaffProfileTable();
   await sql.begin(async (transaction) => {
     await transaction`DELETE FROM staff_profiles WHERE user_id = ${userId}`;
     await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
@@ -558,7 +525,7 @@ export async function createStaffProfile(formData: FormData): Promise<{ ok?: boo
     // Подготовка значения даты во избежание ошибки сопоставления типов COALESCE в Postgres
     const finalHireDate = hireDate ? hireDate : new Date().toISOString().slice(0, 10);
 
-    await ensureStaffProfileTable();
+    //await ensureStaffProfileTable();
 
     // Проверяем, существует ли уже активный пользователь с таким email
     const existingUser = await sql`
