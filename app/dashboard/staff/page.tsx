@@ -8,7 +8,7 @@ import {
 
 type Staff = Awaited<ReturnType<typeof fetchStaffProfiles>>[number];
 
-export default async function StuffPage({
+export default async function StaffPage({
   searchParams,
 }: {
   searchParams: Promise<{ query?: string }>;
