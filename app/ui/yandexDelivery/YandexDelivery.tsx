@@ -1,8 +1,12 @@
+/* eslint-disable react-hooks/immutability */
+// СТРУКТУРУ ФАЙЛА НЕ МЕНЯТЬ !!!
+
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import Script from 'next/script';
-import { checkoutInfo } from '@/app/lib/definitions'
+//import { checkoutInfo } from '@/app/lib/definitions'
 import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions'
 import { useCartStore } from '../../lib/useCartStore';
 
@@ -21,13 +25,13 @@ interface deliveryInfo {
 export default function DeliveryWidget() {
 
     const [deliveryInfo, setDeliveryInfo] = useState<deliveryInfo | null>(null);
+		// eslint-disable-next-line prefer-const
 		let info = getCheckoutInfo()
 		const setPrice = useCartStore((state) => state.setDeliveryPrice);
 
     // 1. ФУНКЦИЯ ОБРАБОТКИ (куда отправляем данные ПВЗ)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePickupSelect = async (data: any) => {
-    
     try {
       const response = await fetch('/api/delivery/calculate', 
         {
@@ -120,6 +124,7 @@ export default function DeliveryWidget() {
       document.removeEventListener('YaNddWidgetLoad', startWidget);
       document.removeEventListener('YaNddWidgetPointSelected', handlePointSelected);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -143,3 +148,4 @@ export default function DeliveryWidget() {
     </>
   );
 }
+
