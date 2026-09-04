@@ -36,7 +36,7 @@ export default function LoginForm({
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-3 outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-300 px-3 py-2 text-base outline-none focus:border-green-500 placeholder:text-gray-500"
                 id="name"
                 type="text"
                 name="name"
@@ -56,7 +56,7 @@ export default function LoginForm({
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-300 py-2.25 pl-10 text-base outline-none focus:border-green-500 placeholder:text-gray-500"
                 id="email"
                 type="email"
                 name="email"
@@ -75,7 +75,7 @@ export default function LoginForm({
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-300 py-2.25 pl-10 text-base outline-none focus:border-green-500 placeholder:text-gray-500"
                 id="password"
                 type="password"
                 name="password"
@@ -96,7 +96,7 @@ export default function LoginForm({
               </label>
               <div className="relative">
                 <input
-                  className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 outline-2 placeholder:text-gray-500"
+                  className="peer block w-full rounded-md border border-gray-300 py-2.25 pl-10 text-base outline-none focus:border-green-500 placeholder:text-gray-500"
                   id="confirmPassword"
                   type="password"
                   name="confirmPassword"
