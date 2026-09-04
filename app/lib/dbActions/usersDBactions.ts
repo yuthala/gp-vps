@@ -5,7 +5,6 @@ import { cookies } from 'next/headers';
 import type { ClientProfileRow } from '@/app/lib/definitions';
 import type { StaffProfileRow } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
-import { syncUsersTableStructure } from '@/app/(seedDB)/users-seed/route';
 import { sendCredentialsEmail } from '@/app/lib/email';
 import { headers } from 'next/headers'; // Используем Next.js headers API вместо req
 

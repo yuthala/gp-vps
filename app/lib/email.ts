@@ -1,3 +1,6 @@
+import nodemailer from 'nodemailer';
+import type { CartItem } from './definitions';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export async function sendVerificationEmail(to: string, verifyUrl: string, name?: string) {
   try {
@@ -154,7 +157,7 @@ export async function sendOrderDeliveryDetailsEmail({
   phone?: string;
   comment?: string;
   deliveryPointAddress?: string;
-  cartItems: Array<Record<string, unknown>>;
+  cartItems: CartItem[];
   goodsTotal: number;
   deliveryPrice: number;
   checkoutUrl: string;
@@ -273,4 +276,37 @@ export async function sendOrderDeliveryDetailsEmail({
     console.error('Order delivery email failed', e);
     throw new Error('Failed to send delivery details email. ' + (e instanceof Error ? e.message : 'Unknown error'));
   }
+}
+
+export async function sendPasswordResetEmail(to: string, resetUrl: string) {
+ const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: (process.env.SMTP_SECURE || 'false') === 'true',
+        auth: process.env.SMTP_USER
+          ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+          : undefined,
+        connectionTimeout: 10000,
+        greetingTimeout: 5000,
+        socketTimeout: 30000,
+        debug: process.env.NODE_ENV === 'development',
+        logger: process.env.NODE_ENV === 'development',
+      });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM || '"Ваш Сервис" <noreply@example.com>',
+    to,
+    subject: 'Восстановление пароля',
+    html: `
+      <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 8px;">
+        <h2 style="color: #111827; font-size: 20px; font-weight: bold;">Восстановление пароля</h2>
+        <p style="color: #4b5563; font-size: 14px; margin-top: 12px;">Вы получили это письмо, потому что запросили сброс пароля для вашей учетной записи.</p>
+        <p style="color: #4b5563; font-size: 14px;">Для установки нового пароля нажмите на кнопку ниже:</p>
+        <div style="margin: 24px 0;">
+          <a href="${resetUrl}" style="background-color: #16a34a; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500;">Сбросить пароль</a>
+        </div>
+        <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">Эта ссылка действительна в течение 1 часа. Если вы не запрашивали сброс пароля, просто проигнорируйте это письмо.</p>
+      </div>
+    `,
+  });
 }

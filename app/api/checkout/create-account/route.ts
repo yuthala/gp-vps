@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
-import { syncUsersTableStructure } from '@/app/(seedDB)/users-seed/route';
 import { sendCredentialsEmail } from '@/app/lib/email';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
