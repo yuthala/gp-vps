@@ -1,3 +1,3 @@
-export default function OrdersPage() {
+export default function Orders() {
   return <p>Здесь будет страница с информацие о заказах: Новый заказБ передан в доставку, в пути, полученные заказыб возврат заказов</p>;
 }
