@@ -289,7 +289,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen justify-center p-6 pt-20 md:pt-30 bg-gray-50">
+    <div className="flex min-h-screen justify-center items-start p-6 pt-20 md:pt-30">
       <div className="w-full max-w-md flex flex-col justify-center">
         
         {/* СКРЫТОЕ ПОЛЕ ДЛЯ ЗАЩИТЫ ОТ БОТОВ (HONEYPOT) */}
@@ -307,19 +307,19 @@ export default function LoginPage() {
         {/* УСЛОВНЫЙ РЕНДЕРИНГ ЭКРАНОВ */}
         {isForgotPasswordMode ? (
           /* ─── ЭКРАН 1: ВОССТАНОВЛЕНИЕ ПАРОЛЯ ─── */
-          <div className="rounded-lg bg-white p-6 shadow-md border border-gray-100">
+          <div className="rounded-lg bg-white p-6 shadow-md border border-gray-100 text-base">
             <h2 className="text-xl font-bold text-gray-900 mb-2">Восстановление пароля</h2>
-            <p className="text-sm text-gray-500 mb-4">Введите ваш E-mail, и мы отправим ссылку для сброса пароля.</p>
+            <p className="text-base text-gray-500 mb-4">Введите ваш E-mail, и мы отправим ссылку для сброса пароля.</p>
             
             {/* Эта форма вызывает строго предназначенный метод handleForgotPasswordSubmit */}
             <form onSubmit={handleForgotPasswordSubmit} className="grid gap-4">
-              <label className="grid gap-1 text-sm font-medium">
+              <label className="grid gap-1 text-base font-medium">
                 E-mail
                 <input 
                   name="email" 
                   type="email" 
                   required 
-                  className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-green-500" 
+                  className="rounded-md border border-gray-300 px-3 py-2 text-base outline-none focus:border-green-500" 
                   placeholder="email@domain.com"
                 />
               </label>
@@ -327,7 +327,7 @@ export default function LoginPage() {
               <button 
                 type="submit" 
                 disabled={forgotPasswordLoading}
-                className="w-full rounded-md bg-green-600 py-2 text-sm font-medium text-white hover:bg-green-500 disabled:opacity-50 transition-colors"
+                className="w-full rounded-md bg-green-600 py-2 text-base font-medium text-white hover:bg-green-500 disabled:opacity-50 transition-colors"
               >
                 {forgotPasswordLoading ? 'Отправка...' : 'Сбросить пароль'}
               </button>
@@ -339,7 +339,7 @@ export default function LoginPage() {
                   setInfo(null);
                   setIsForgotPasswordMode(false);
                 }}
-                className="text-xs text-gray-500 hover:text-gray-700 text-center underline mt-1"
+                className="text-base text-gray-500 hover:text-gray-700 text-center underline mt-1"
               >
                 Вернуться к авторизации
               </button>
@@ -348,22 +348,15 @@ export default function LoginPage() {
         ) : (
           /* ─── ЭКРАН 2: ВХОД И РЕГИСТРАЦИЯ (ОСНОВНОЙ) ─── */
           <div className="relative">
-            <LoginForm onSubmit={handleSubmit} onSignUp={handleSignUp} />
-            
-            {/* Ссылка "Забыли пароль?" поверх формы */}
-            <div className="absolute top-[166px] right-0 z-10"> 
-              <button
-                type="button"
-                onClick={() => {
-                  setError(null);
-                  setInfo(null);
-                  setIsForgotPasswordMode(true);
-                }}
-                className="text-xs text-green-600 hover:text-green-500 underline"
-              >
-                Забыли пароль?
-              </button>
-            </div>
+            <LoginForm 
+							onSubmit={handleSubmit} 
+							onSignUp={handleSignUp}
+							onForgotPassword={() => {
+								setError(null);
+								setInfo(null);
+								setIsForgotPasswordMode(true);
+							}}
+						/>
           </div>
         )}
 

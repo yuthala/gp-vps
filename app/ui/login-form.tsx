@@ -12,9 +12,11 @@ import { Button } from './button-login';
 export default function LoginForm({
   onSubmit,
   onSignUp,
+	onForgotPassword, 
 }: {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
   onSignUp?: (e: React.FormEvent<HTMLFormElement>) => void;
+	onForgotPassword?: () => void;
 }) {
   const [isSignUp, setIsSignUp] = React.useState(false);
 
@@ -27,14 +29,14 @@ export default function LoginForm({
         {isSignUp && (
           <div>
             <label
-              className="py-2 block text-sm font-medium text-foreground"
+              className="py-2 block font-medium text-foreground"
               htmlFor="name"
             >
               Ваше имя
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-3 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-3 outline-2 placeholder:text-gray-500"
                 id="name"
                 type="text"
                 name="name"
@@ -44,17 +46,17 @@ export default function LoginForm({
             </div>
           </div>
         )}
-        <div className="w-full pt-4">
+        <div className="w-full pt-4 text-base">
           <div>
             <label
-              className="py-2 block text-sm font-medium text-foreground"
+              className="py-2 block font-medium text-foreground"
               htmlFor="email"
             >
               Электронная почта
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 outline-2 placeholder:text-gray-500"
                 id="email"
                 type="email"
                 name="email"
@@ -66,14 +68,14 @@ export default function LoginForm({
           </div>
           <div className="pt-4">
             <label
-              className="py-2 block text-sm font-medium text-foreground"
+              className="py-2 block font-medium text-foreground"
               htmlFor="password"
             >
               Пароль
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 outline-2 placeholder:text-gray-500"
                 id="password"
                 type="password"
                 name="password"
@@ -87,14 +89,14 @@ export default function LoginForm({
           {isSignUp && (
             <div className="pt-4">
               <label
-                className="py-2 block text-sm font-medium text-foreground"
+                className="py-2 block font-medium text-foreground"
                 htmlFor="confirmPassword"
               >
                 Подтверждение пароля
               </label>
               <div className="relative">
                 <input
-                  className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                  className="peer block w-full rounded-md border border-gray-200 py-2.25 pl-10 outline-2 placeholder:text-gray-500"
                   id="confirmPassword"
                   type="password"
                   name="confirmPassword"
@@ -107,17 +109,29 @@ export default function LoginForm({
             </div>
           )}
         </div>
-				<div className="pt-8">
-					<Button type="submit" className="w-full">
-          	{isSignUp ? 'Зарегистрироваться' : 'Войти'}
-          <ArrowRightIcon className="pl-auto h-5 w-5 text-gray-50" />
-        </Button>
+
+				{/* "Забыли пароль?" placed between password wrapper and submit button wrapper */}
+				<div className="flex pt-4">
+					<button
+						type="button"
+						onClick={() => onForgotPassword?.()}
+						className="text-base text-green-600 hover:text-green-500 underline"
+					>
+						Забыли пароль?
+					</button>
 				</div>
-        <div className="pt-3 text-center text-sm">
+
+				<div className="pt-8">
+					<Button type="submit" className="w-full text-lg font-medium flex items-center justify-center gap-2">
+						<span className="text-lg font-semibold">{isSignUp ? 'Зарегистрироваться' : 'Войти'}</span>
+						<ArrowRightIcon className="h-5 w-5 text-gray-50" />
+					</Button>
+				</div>
+        <div className="pt-3 text-center text-base">
           <button
             type="button"
             onClick={() => setIsSignUp((s) => !s)}
-            className="text-green-600 hover:underline"
+            className="text-green-600 hover:underline font-semibold"
           >
             {isSignUp ? 'Назад на страницу входа' : 'Зарегистрироваться'}
           </button>
