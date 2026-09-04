@@ -49,39 +49,6 @@ function genToken() {
   }
 }
 
-async function ensureClientProfileTable() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS client_profiles (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-      first_name VARCHAR(255) NOT NULL,
-      second_name VARCHAR(255) NOT NULL,
-      phone_number TEXT NOT NULL,
-      email TEXT NOT NULL,
-      bonus_balance NUMERIC(10, 2) DEFAULT 0.00 NOT NULL,
-      discount_group VARCHAR(100) DEFAULT 'Standard' NOT NULL
-    )
-  `;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS first_name VARCHAR(255);`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS second_name VARCHAR(255);`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS phone_number TEXT;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS email TEXT;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS bonus_balance NUMERIC(10, 2) DEFAULT 0.00;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS discount_group VARCHAR(100) DEFAULT 'Standard';`;
-  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS date_deleted`;
-  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS last_name`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
-  await sql`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS users_active_email_key ON users (LOWER(email)) WHERE date_deleted IS NULL`;
-  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_email_key`;
-  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_phone_number_key`;
-  await sql`DROP INDEX IF EXISTS client_profiles_active_email_key`;
-  await sql`DROP INDEX IF EXISTS client_profiles_active_phone_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_email_unique_idx ON client_profiles (LOWER(email))`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_phone_unique_idx ON client_profiles (phone_number)`;
-}
-
 export async function getCurrentEmployeeId(): Promise<string | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get('session_token')?.value;
@@ -99,43 +66,10 @@ export async function getCurrentEmployeeId(): Promise<string | null> {
 
   return rows[0]?.id ?? null;
 }
-// ФУНКЦИЯ БЫЛА НУЖНА ТОЛЬКО ДЛЯ МИГРАЦИИ БД
-//async function ensureCustomerAuditColumns() {
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
-  await sql`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS users_active_email_key ON users (LOWER(email)) WHERE date_deleted IS NULL`;
-  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS date_deleted`;
-  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS last_name`;
-  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_email_key`;
-  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_phone_number_key`;
-  await sql`DROP INDEX IF EXISTS client_profiles_active_email_key`;
-  await sql`DROP INDEX IF EXISTS client_profiles_active_phone_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_email_unique_idx ON client_profiles (LOWER(email))`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_phone_unique_idx ON client_profiles (phone_number)`;
-  await sql`
-    CREATE TABLE IF NOT EXISTS pd_access_logs (
-      id BIGSERIAL PRIMARY KEY,
-      employee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      customer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      action_type VARCHAR(20) NOT NULL,
-      accessed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
-    )
-  `;
-  await sql`ALTER TABLE pd_access_logs ADD COLUMN IF NOT EXISTS accessed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP`;
-  await sql`ALTER TABLE pd_access_logs ADD COLUMN IF NOT EXISTS action_type VARCHAR(20)`;
-  await sql`ALTER TABLE pd_access_logs DROP CONSTRAINT IF EXISTS pd_access_logs_customer_id_fkey`;
-  await sql`
-    DO $$ BEGIN
-      ALTER TABLE pd_access_logs
-        ADD CONSTRAINT pd_access_logs_customer_id_fkey
-        FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE;
-    EXCEPTION WHEN duplicate_object THEN NULL;
-    END $$;
-  `;
-//}
+
 
 export async function fetchClientProfiles(query = ''): Promise<ClientProfileRow[]> {
-  //await ensureCustomerAuditColumns();
+ 
   const search = `%${query}%`;
   const profiles = await sql<ClientProfileRow[]>`
     SELECT
@@ -198,10 +132,6 @@ export async function fetchClientProfile(userId: string): Promise<ClientProfileR
     if (!email || !firstName || !secondName || !phone) {
       return { error: 'Не все обязательные поля заполнены' };
     }
-
-    // Запускаем синхронизацию таблиц
-    await syncUsersTableStructure();
-    await ensureClientProfileTable();
 
     // Удаляем старые мягко-удаленные дубликаты
     await sql`
@@ -369,9 +299,6 @@ export async function deleteClientProfile(formData: FormData): Promise<{ ok?: bo
       return { error: 'Идентификатор пользователя не найден или пуст' };
     }
 
-    // Вызов функции проверки колонок аудита
-    //await ensureCustomerAuditColumns();
-
     // Выполнение операций внутри безопасной базы данных (Трансляция транзакции)
     await sql.begin(async (transaction) => {
       // 1. Полностью удаляем профиль из client_profiles
@@ -396,30 +323,8 @@ export async function deleteClientProfile(formData: FormData): Promise<{ ok?: bo
 }
 
 
-//ФУНКЦИЯ БЫЛА НУЖНА ТОЛЬКО ДЛЯ МИГРАЦИИ
-// async function ensureStaffProfileTable() {
-//   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
-//   await sql`
-//     CREATE TABLE IF NOT EXISTS staff_profiles (
-//       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-//       user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-//       first_name VARCHAR(255) NOT NULL,
-//       second_name VARCHAR(255) NOT NULL,
-//       phone_number TEXT NOT NULL,
-//       email TEXT NOT NULL,
-//       position VARCHAR(255) NOT NULL,
-//       salary NUMERIC(12, 2) NOT NULL,
-//       hire_date DATE DEFAULT CURRENT_DATE NOT NULL
-//     )
-//   `;
-//   await sql`ALTER TABLE staff_profiles DROP CONSTRAINT IF EXISTS staff_profiles_email_key`;
-//   await sql`ALTER TABLE staff_profiles DROP CONSTRAINT IF EXISTS staff_profiles_phone_number_key`;
-//   await sql`CREATE UNIQUE INDEX IF NOT EXISTS staff_profiles_email_unique_idx ON staff_profiles (LOWER(email))`;
-//   await sql`CREATE UNIQUE INDEX IF NOT EXISTS staff_profiles_phone_unique_idx ON staff_profiles (phone_number)`;
-// }
-
 export async function fetchStaffProfiles(query = ''): Promise<StaffProfileRow[]> {
-  //await ensureStaffProfileTable();
+  
   const search = `%${query}%`;
   
   const profiles = await sql<StaffProfileRow[]>`
@@ -490,7 +395,7 @@ export async function updateStaffProfile(formData: FormData) {
 export async function deleteStaffProfile(formData: FormData) {
   const userId = String(formData.get('user_id') || '').trim();
   if (!userId) return;
-  //await ensureStaffProfileTable();
+  
   await sql.begin(async (transaction) => {
     await transaction`DELETE FROM staff_profiles WHERE user_id = ${userId}`;
     await transaction`UPDATE users SET date_deleted = NOW() WHERE id = ${userId} AND date_deleted IS NULL`;
@@ -524,8 +429,6 @@ export async function createStaffProfile(formData: FormData): Promise<{ ok?: boo
 
     // Подготовка значения даты во избежание ошибки сопоставления типов COALESCE в Postgres
     const finalHireDate = hireDate ? hireDate : new Date().toISOString().slice(0, 10);
-
-    //await ensureStaffProfileTable();
 
     // Проверяем, существует ли уже активный пользователь с таким email
     const existingUser = await sql`

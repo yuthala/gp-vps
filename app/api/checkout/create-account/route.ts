@@ -17,40 +17,6 @@ function getRegistrationMeta(request: Request) {
   };
 }
 
-async function ensureClientProfileTable() {
-  await sql`
-    CREATE TABLE IF NOT EXISTS client_profiles (
-      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-      user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-      first_name VARCHAR(255) NOT NULL,
-      second_name VARCHAR(255) NOT NULL,
-      phone_number TEXT NOT NULL,
-      email TEXT NOT NULL,
-      bonus_balance NUMERIC(10, 2) DEFAULT 0.00 NOT NULL,
-      discount_group VARCHAR(100) DEFAULT 'Standard' NOT NULL
-    )
-  `;
-
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS first_name VARCHAR(255);`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS second_name VARCHAR(255);`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS phone_number TEXT;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS email TEXT;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS bonus_balance NUMERIC(10, 2) DEFAULT 0.00;`;
-  await sql`ALTER TABLE client_profiles ADD COLUMN IF NOT EXISTS discount_group VARCHAR(100) DEFAULT 'Standard';`;
-  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS date_deleted`;
-  await sql`ALTER TABLE client_profiles DROP COLUMN IF EXISTS last_name`;
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS date_deleted TIMESTAMP WITH TIME ZONE`;
-  await sql`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS users_active_email_key ON users (LOWER(email)) WHERE date_deleted IS NULL`;
-  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_email_key`;
-  await sql`ALTER TABLE client_profiles DROP CONSTRAINT IF EXISTS client_profiles_phone_number_key`;
-  await sql`DROP INDEX IF EXISTS client_profiles_active_email_key`;
-  await sql`DROP INDEX IF EXISTS client_profiles_active_phone_key`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_email_unique_idx ON client_profiles (LOWER(email))`;
-  await sql`CREATE UNIQUE INDEX IF NOT EXISTS client_profiles_phone_unique_idx ON client_profiles (phone_number)`;
-}
-
 function generatePassword(length = 12) {
   const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=';
   let password = '';
@@ -78,9 +44,6 @@ export async function POST(req: Request) {
     if (!email || !firstName || !lastName || !phone) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-
-    await syncUsersTableStructure();
-    await ensureClientProfileTable();
 
     await sql`
       DELETE FROM client_profiles cp

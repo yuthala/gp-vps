@@ -29,23 +29,7 @@ let adminEmail: string;
   }
 
   //ПОЛУЧЕНИЕ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ
-//   async function getAuthorizedUser(req: Request) {
-//   const cookie = req.headers.get('cookie') || '';
-//   const match = cookie.match(/session_token=([^;]+)/);
-//   const token = match ? match[1] : null;
-//   if (!token) return null;
 
-//   const now = new Date().toISOString();
-//   const rows = await sql`
-//     SELECT u.id, u.name, u.email
-//     FROM sessions s
-//     JOIN users u ON u.id = s.user_id
-//     WHERE s.session_token = ${token}
-//     AND s.expires > ${now}
-//     LIMIT 1
-//   `;
-//   return rows[0] || null;
-// }
 // Описываем структуру объекта, который возвращает база данных
 interface AuthorizedUser {
   id: string;
@@ -225,7 +209,7 @@ export async function GET(req: Request) {
     }
 
     await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-     syncUsersTableStructure(),
+     //syncUsersTableStructure(),
      //seedClientProfiles(),
      //seedStaffProfiles(),
      //seedPersonalDataAConsents(),
@@ -245,21 +229,3 @@ export async function GET(req: Request) {
   }
 }
 
-// export async function GET(req: Request) {
-//   try {
-//      const user = await getAuthorizedUser(req);
-//     if (!user || user.email  !== adminEmail) {
-//       //return forbiddenPage();
-//       redirect('/forbidden');
-//     }
-    
-//     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-//      syncUsersTableStructure()
-//     ]);
-
-//     return Response.json({ message: 'Database seeded successfully', result });
-//   } catch (error) {
-//     console.error('Seed route error', error);
-//     return Response.json({ error: 'Server error' }, { status: 500 });
-//   }
-// }
