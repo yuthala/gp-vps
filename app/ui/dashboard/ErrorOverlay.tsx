@@ -72,14 +72,14 @@ export default function ErrorOverlay({
           </svg>
         </div>
         
-        <p className="mt-4 font-bold text-gray-900 text-lg">Ошибка операции</p>
-        <p className="mt-2 text-sm text-gray-500 max-w-xs">{error}</p>
+        <h1 className="mt-4 text-2xl font-semibold text-foreground">Ошибка операции</h1>
+        <p className="mt-2 text-base text-gray-800 max-w-xs">{error}</p>
         
         <div className="mt-6 flex w-full flex-col gap-2">
           <button
             type="button"
             onClick={onRetry}
-            className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white hover:bg-gray-800 transition-colors shadow-sm"
+            className="w-full rounded-lg bg-(--secondary) py-2.5 text-base font-bold text-white hover:bg-green-400 transition-colors shadow-sm"
           >
             Попробовать снова
           </button>

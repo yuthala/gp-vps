@@ -72,11 +72,11 @@ export default function StatusOverlay({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
       
       {/* Вытянутое модальное окно (min-h-[450px]) */}
-      <div className="w-full max-w-sm min-h-[450px] rounded-xl bg-white px-6 py-12 shadow-2xl border border-gray-100 flex flex-col items-center justify-between text-center animate-fade-in">
+      <div className="w-full max-w-sm min-h-112.5 rounded-xl bg-white px-6 py-12 shadow-2xl border border-gray-100 flex flex-col items-center justify-between text-center animate-fade-in">
         
         {/* СОСТОЯНИЕ 1: ИДЕТ ЗАГРУЗКА */}
         {isPending && (
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex flex-col items-center justify-center">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-green-600 border-t-transparent"></div>
             <p className="mt-6 font-medium text-gray-800 animate-pulse">{pendingText}</p>
           </div>
@@ -99,7 +99,7 @@ export default function StatusOverlay({
             <button
               type="button"
               onClick={onClose}
-              className="w-24 rounded-lg bg-green-600 py-2.5 text-sm font-medium text-white hover:bg-green-500 transition-colors shadow-sm active:scale-[0.98]"
+              className="w-full rounded-lg bg-green-600 py-2.5 text-base font-bold text-white hover:bg-green-500 transition-colors shadow-sm active:scale-[0.98]"
             >
               Готово
             </button>

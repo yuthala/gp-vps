@@ -88,31 +88,31 @@ export default function VerifyPage() {
   const status = searchParams.get('status');
 
   // Общие стили для контейнера карточки
-  const cardStyles = "w-full max-w-md transform rounded-3xl bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-xl border border-gray-100/80 text-center transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] animate-[fadeIn_0.4s_ease-out]";
+  const cardStyles = "h-fit w-full max-w-md transform rounded-lg border border-gray-300 bg-white/80 p-8 shadow-lg backdrop-blur-xl text-center transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] animate-[fadeIn_0.4s_ease-out]";
 
   // 1. СОСТОЯНИЕ УСПЕШНОЙ ВЕРИФИКАЦИИ
   if (status === 'success') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-50/40 via-gray-50 to-gray-100/50 px-4">
+      <div className="flex min-h-screen justify-center px-4 pt-20">
         <div className={cardStyles}>
           {/* Иконка Успеха */}
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500 ring-4 ring-emerald-50/50 animate-bounce [animation-iteration-count:1] [animation-duration:1s]">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500 ring-4 ring-emerald-50/50 animate-bounce [animation-iteration-count:1] [animation-duration:1s] mb-8">
             <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           
-          <h2 className="mt-8 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+          <h1 className="pb-3 text-2xl font-semibold text-foreground">
             Почта подтверждена!
-          </h2>
-          <p className="mt-3 text-base text-gray-500 leading-relaxed px-2">
+          </h1>
+          <p className="text-base text-gray-700 leading-relaxed px-2">
             Ваш аккаунт успешно активирован. Все функции платформы теперь доступны.
           </p>
           
           <div className="mt-8">
             <Link 
               href="/login" 
-              className="flex w-full justify-center rounded-2xl bg-gray-900 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800 hover:shadow-gray-900/20 active:scale-[0.98] transition-all duration-200"
+              className="flex w-full justify-center rounded-xl bg-(--secondary) px-5 py-3 font-bold text-white text-base shadow-lg shadow-gray-900/10 hover:bg-green-400 hover:shadow-gray-900/20 active:scale-[0.98] transition-all duration-200"
             >
               Войти в личный кабинет
             </Link>
@@ -125,7 +125,7 @@ export default function VerifyPage() {
   // 2. СОСТОЯНИЕ ОШИБКИ: ТОКЕН ИСТЕК ИЛИ НЕВАЛИДЕН
   if (status === 'expired' || status === 'missing_token') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-rose-50/30 via-gray-50 to-gray-100/50 px-4">
+      <div className="flex min-h-screen justify-center bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-rose-50/30 via-gray-50 to-gray-100/50 px-4 pt-20">
         <div className={cardStyles}>
           {/* Иконка Ошибки */}
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-rose-50 text-rose-500 ring-4 ring-rose-50/50 animate-[shake_0.5s_ease-in-out]">
@@ -134,9 +134,9 @@ export default function VerifyPage() {
             </svg>
           </div>
           
-          <h2 className="mt-8 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+          <h1 className="mt-8 pb-3 text-2xl font-semibold text-foreground">
             Ссылка устарела
-          </h2>
+          </h1>
           <p className="mt-3 text-base text-gray-500 leading-relaxed px-2">
             {status === 'missing_token' 
               ? 'Токен верификации не найден в запросе.' 
@@ -151,7 +151,7 @@ export default function VerifyPage() {
               </svg>
               <div>
                 <h4 className="text-xs font-bold text-amber-900">Безопасность прежде всего</h4>
-                <p className="mt-1 text-xs text-amber-800/90 leading-relaxed">
+                <p className="mt-1 text-base text-amber-800/90 leading-relaxed">
                   Ссылки подтверждения активны короткое время. Вы можете мгновенно запросить новую.
                 </p>
               </div>
@@ -161,13 +161,13 @@ export default function VerifyPage() {
           <div className="mt-8 space-y-3">
             <Link 
               href="/auth/resend-verification" 
-              className="flex w-full justify-center rounded-2xl bg-blue-600 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-blue-600/10 hover:bg-blue-500 hover:shadow-blue-600/20 active:scale-[0.98] transition-all duration-200"
+              className="flex w-full justify-center rounded-2xl bg-blue-600 px-5 py-4 text-base font-bold text-white shadow-lg shadow-blue-600/10 hover:bg-blue-500 hover:shadow-blue-600/20 active:scale-[0.98] transition-all duration-200"
             >
               Получить новую ссылку
             </Link>
             <Link 
               href="/login" 
-              className="flex w-full justify-center rounded-2xl bg-gray-50 px-5 py-4 text-sm font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98] transition-all duration-200"
+              className="flex w-full justify-center rounded-2xl bg-gray-50 px-5 py-4 text-base font-semibold text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98] transition-all duration-200"
             >
               На страницу входа
             </Link>
@@ -179,7 +179,7 @@ export default function VerifyPage() {
 
   // 3. СОСТОЯНИЕ КРИТИЧЕСКОЙ ОШИБКИ СЕРВЕРА
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-100 via-gray-50 to-gray-200/50 px-4">
+    <div className="flex min-h-screen justify-center bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-gray-100 via-gray-50 to-gray-200/50 px-4 pt-20">
       <div className={cardStyles}>
         {/* Иконка Предупреждения */}
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-100 text-gray-500 ring-4 ring-gray-100/50">
@@ -188,9 +188,9 @@ export default function VerifyPage() {
           </svg>
         </div>
         
-        <h2 className="mt-8 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+        <h1 className="mt-8 pb-3 text-2xl font-semibold text-foreground">
           Ошибка сервера
-        </h2>
+        </h1>
         <p className="mt-3 text-base text-gray-500 leading-relaxed px-2">
           Не удалось связаться с базой данных. Сервис временно недоступен, мы уже чиним его.
         </p>
@@ -198,7 +198,7 @@ export default function VerifyPage() {
         <div className="mt-8">
           <Link 
             href="/" 
-            className="flex w-full justify-center rounded-2xl bg-gray-900 px-5 py-4 text-sm font-bold text-white shadow-lg shadow-gray-900/10 hover:bg-gray-800 hover:shadow-gray-900/20 active:scale-[0.98] transition-all duration-200"
+            className="flex w-full justify-center rounded-2xl bg-(--secondary) px-5 py-3 text-base font-bold text-white shadow-lg shadow-gray-900/10 hover:bg-green-400 hover:shadow-gray-900/20 active:scale-[0.98] transition-all duration-200"
           >
             Вернуться на главную
           </Link>
