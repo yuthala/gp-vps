@@ -24,79 +24,73 @@ export default async function ProductCard({ product }: ProductProps) {
 	//const products = (await getProductCard(pathName || "random")).res;
 
 	return (
-  <div className="w-full flex justify-center">
-    <div className="w-full max-w-7xl min-w-xs flex flex-col justify-center">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center"> */}
-          {/* {products.map((product, index) => { */}
-            {/* return ( */}
-              <div className="flex w-full justify-center">
-                {/* Product Card - with equal height */}
-                <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 w-full max-w-90 flex flex-col h-full border border-[#064929]/20">
-                  {/* Image - fixed dimensions 360x230 */}
-                  <div className="relative h-48 w-full mb-4 bg-slate-100 rounded-t-lg overflow-hidden shrink-0">
-                    <Image
-                      src={product.imageSrc[0]}
-                      width={360}
-                      height={230}
-                      alt={product.pathName}
-                      className="object-cover w-full h-full"
-											priority={false}
-                    />
-										{/* The Tint Layer */}
-  										<div className="absolute inset-0 bg-slate-900/5 mix-blend-multiply transition-opacity duration-300 group-hover:opacity-0" />
-                  </div>
-                  
-                  {/* Card Content - flex-grow to fill remaining space */}
-                  <div className="p-4 flex flex-col grow">
-                    {/* Short Description */}
-                    <Heading level={6} className="h-20 mb-2 line-clamp-3 shrink-0">
-                      {product.description || 'Здесь должно быть описание товара'}
-                    </Heading>
+	  <div className="w-full min-w-0">
+	    <div className="w-full min-w-0 flex flex-col justify-center">
+	      <div className="w-full min-w-0 p-4">
+				<div className="flex w-full justify-center">
+					{/* Product Card - with equal height */}
+					<div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 w-full min-w-0 flex flex-col h-full border border-[#064929]/20">
+						{/* Image - fixed dimensions 360x230 */}
+						<div className="relative h-48 w-full mb-4 bg-slate-100 rounded-t-lg overflow-hidden shrink-0">
+							<Image
+								src={product.imageSrc[0]}
+								width={360}
+								height={230}
+								alt={product.pathName}
+								className="object-cover w-full h-full"
+								priority={false}
+							/>
+							{/* The Tint Layer */}
+								<div className="absolute inset-0 bg-slate-900/5 mix-blend-multiply transition-opacity duration-300 group-hover:opacity-0" />
+						</div>
+						
+						{/* Card Content - flex-grow to fill remaining space */}
+						<div className="p-4 flex flex-col grow">
+							{/* Short Description */}
+							<Heading level={6} className="h-20 mb-2 line-clamp-3 shrink-0">
+								{product.description || 'Здесь должно быть описание товара'}
+							</Heading>
 
-										<OnStock onStockStatus={product.onStockStatus}/>
-                    
-                    {/* Spacer to push content down if needed */}
-                    <div className="grow"></div>
+							<OnStock onStockStatus={product.onStockStatus}/>
+							
+							{/* Spacer to push content down if needed */}
+							<div className="grow"></div>
 
-										<div className={clsx(
-											'pb-2',
-											product.onStockStatus === 'available' ? 'text-[#40AD52]' : 'text-gray-400'
-										)}>
-											<div className="flex justify-between">
-												<Pricing
-													containerClassName="text-2xl font-semibold"
-													value={product.price} 
-													prefix="Цена:" 
-												>
-												</Pricing>
-											</div>
-											<div className="text-xl font-light">за {product.measureUnit} г</div>
-										</div>
-                    
-                    {/* Button */}
-										<Link href={`/catalog/${product.pathName}/${product.cropName}`} passHref>
-											<Button 
-												className={clsx(
-													"w-full py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shrink-0 uppercase",
-													{
-														'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400': product.onStockStatus !== 'available',
-														'bg-[--accent] hover:scale-[1.02] text-[--foreground] focus:ring-lime-500': product.onStockStatus === 'available'
-													}
-												)}
-												disabled={product.onStockStatus !== 'available'}
-											>
-												<span className="text--foreground font-extrabold">
-													{product.onStockStatus !== 'available' ? 'Нет в наличии' : 'Купить'}
-												</span>
-											</Button>
-										</Link>
-                  </div>
-                </div>
-              </div>
-            {/* ); */}
-          {/* })} */}
-        {/* </div> */}
+							<div className={clsx(
+								'pb-2',
+								product.onStockStatus === 'available' ? 'text-[#40AD52]' : 'text-gray-400'
+							)}>
+								<div className="flex justify-between">
+									<Pricing
+										containerClassName="text-2xl font-semibold"
+										value={product.price} 
+										prefix="Цена:" 
+									>
+									</Pricing>
+								</div>
+								<div className="text-xl font-light">за {product.measureUnit} г</div>
+							</div>
+							
+							{/* Button */}
+							<Link href={`/catalog/${product.pathName}/${product.cropName}`} passHref>
+								<Button 
+									className={clsx(
+										"w-full py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shrink-0 uppercase",
+										{
+											'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400': product.onStockStatus !== 'available',
+											'bg-[--accent] hover:scale-[1.02] text-[--foreground] focus:ring-lime-500': product.onStockStatus === 'available'
+										}
+									)}
+									disabled={product.onStockStatus !== 'available'}
+								>
+									<span className="text--foreground font-extrabold">
+										{product.onStockStatus !== 'available' ? 'Нет в наличии' : 'Купить'}
+									</span>
+								</Button>
+							</Link>
+						</div>
+					</div>
+				</div>
       </div>
     </div>
   </div>

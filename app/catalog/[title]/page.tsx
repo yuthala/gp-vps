@@ -14,7 +14,7 @@ export default async function CatalogCards({ params }: PageProps) {
 	const products: ProductCard[]  = await fetchProductsByPathNameTitle(title)
 
 	return (
-		<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 justify-items-center">
+		<div className="mx-auto grid w-full max-w-7xl grid-cols-1 justify-items-center gap-4 pt-12 pb-20 md:grid-cols-2 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
 				{products.map((product, index) => (
 				/* The loop index is safely accessible right here */
 				<div 

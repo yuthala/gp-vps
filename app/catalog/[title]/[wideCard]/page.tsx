@@ -11,9 +11,9 @@ export default async function WideCardPage(props: { params: Promise<{ title: str
   const data = await fetchProductsByPathAndCropName(title, wideCard)
 
 	return (
-  <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 p-4">
+  <div className="min-h-screen flex p-4 pt-20 justify-center">
     <div className="max-w-7xl w-full">
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
         <div className="flex flex-col lg:flex-row">
           {/* Left side - Image gallery with its own background */}
           <div className="lg:w-1/2 p-8 flex items-center justify-center">
