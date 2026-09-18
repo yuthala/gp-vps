@@ -1,6 +1,7 @@
 //import { getProductCard } from "../../lib/actions";
 import clsx from 'clsx';
-import  OnStock  from "./status";
+import type { ProductCard as ProductCardType } from '@/app/lib/definitions';
+import OnStock from "./status";
 import Image from "next/image";
 import Button from "../Button";
 import Link from "next/link";
@@ -8,18 +9,11 @@ import Pricing from "../Pricing";
 import Heading from "../Heading";
 
 interface ProductProps {
-  product: {
-    pathName: string;
-		cropName: string;
-    imageSrc: string[];
-    description: string;
-		onStockStatus: string;
-		price: number;
-		measureUnit: number;
-  };
+  product: ProductCardType;
 }
 
 export default async function ProductCard({ product }: ProductProps) {
+  const productImage = product.imageSrc?.[0] ?? '/images/placeholder.png';
 
 	//const products = (await getProductCard(pathName || "random")).res;
 
@@ -33,7 +27,7 @@ export default async function ProductCard({ product }: ProductProps) {
 						{/* Image - fixed dimensions 360x230 */}
 						<div className="relative h-48 w-full mb-4 bg-slate-100 rounded-t-lg overflow-hidden shrink-0">
 							<Image
-								src={product.imageSrc[0]}
+								src={productImage}
 								width={360}
 								height={230}
 								alt={product.pathName}
