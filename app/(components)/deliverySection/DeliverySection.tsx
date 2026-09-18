@@ -13,7 +13,7 @@ const deliveryCards: Delivery[] = [
 
 export default function DeliverySection() {
 	return (
-		<section className="w-full pb-8 md:pb-16">
+		<section id="delivery" className="w-full pb-8 md:pb-16 scroll-mt-[160px]">
 			<div className="max-w-7xl mx-auto grid justify-center">
 				<Heading level={2} className="text-3xl md:text-4xl font-bold text-center pb-8 lg:pb-12">Доставка, оплата и возврат</Heading>
 				{/* <!-- 3-Column Grid --> */}

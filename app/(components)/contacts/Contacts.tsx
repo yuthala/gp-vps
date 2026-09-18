@@ -5,7 +5,7 @@ import ContactForm from "./ContactForm";
 
 export default function Contacts() {
 	return(
-		<section className="w-full pb-8 md:pb-16">
+		<section id="contacts" className="w-full pb-8 md:pb-16 scroll-mt-40">
 				<div className="max-w-7xl flex flex-col items-center mx-auto">
 					<Heading level={2} className="pb-8 text-center">Контакты</Heading>
 						<div className="flex flex-col lg:flex-row sm:justify-around items-start lg:items-center gap-4 w-full pb-8 sm:pb-12 px-4">
@@ -16,7 +16,7 @@ export default function Contacts() {
 									height={37}
 									alt='tg logo'
 								/>
-								<Link href="htts://LukiChesnoki_bot" className="text-lg sm:text-xl font-bold text-foreground underline" target="_blank">Telegram</Link>
+								<Link href="https://t.me/LukiChesnoki_bot" className="text-lg sm:text-xl font-bold text-foreground underline" target="_blank">Telegram</Link>
 							</div>
 
 							<div className="w-20 md:w-px h-px md:h-9.25 bg-gray-400 mx-auto lg:block hidden"></div>
