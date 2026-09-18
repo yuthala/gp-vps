@@ -12,9 +12,9 @@ const links = [
     {name: 'Главная' , href:'/'},
     {name: 'Каталог' , href:'/catalog'},
     {name: 'Культуры' , href:'/crops'},
-    {name: 'Доставка и оплата' , href:'/delivery'},
+    {name: 'Доставка и оплата' , href:'/#delivery'},
     {name: 'Забронировать' , href:'/reserve'},
-    {name: 'Контакты' , href:'/contacts'},
+    {name: 'Контакты' , href:'/#contacts'},
 ]
 
 export default function TopHeaderLinks({ mobile = false, onLinkClick }: { mobile?: boolean; onLinkClick?: () => void }) {
