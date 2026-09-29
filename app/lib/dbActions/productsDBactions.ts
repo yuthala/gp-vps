@@ -65,19 +65,26 @@ async function generateUniqueSkuId(product: ProductInput, currentInternalId?: st
 
 // 1. Описываем структуру входящего товара (заменяем any)
 export interface NewProductInput {
-  imageSrc: string[];
-  description: string;
-  descriptionDetails: string;
-  cropSort: string;
-  cropName: string;
-  tags: string[];
-  packageSize: number[];
-  cropSize: string;
-  pathName: string;
-  onStockStatus: 'available' | 'not_available' | 'expected'; // Строгие литеральные типы
-  price: number;
-  measureUnit: number;
-  estimatedOnStockDate: string;
+  internalId: string;
+  cropSort?: string;
+  cropName?: string;
+  price?: number;
+  cropSize?: string;
+  pathName?: string;
+  onStockStatus?: 'available' | 'not_available' | 'expected';
+  measureUnit?: number;
+  estimatedOnStockDate?: string | null;
+  description?: string;
+  descriptionDetails?: string | null;
+  tags?: string[];
+  packageSize?: number[];
+  imageSrc?: string[];
+  
+  // Добавляем новые типы для логистики
+  dx?: number[];
+  dy?: number[];
+  dz?: number[];
+  weight?: number[];
 }
 
 // Интерфейс для обновления товара (все поля становятся опциональными, кроме internal_id)
@@ -86,35 +93,93 @@ export interface UpdateProductInput extends Partial<NewProductInput> {
 }
 
 // 2. Используем созданный интерфейс в параметрах функции
+// export async function addNewProduct(rawProduct: NewProductInput): Promise<{ success: boolean; sku?: string; error?: string }> {
+//   // Генерируем гарантированно уникальный SKU
+//   const uniqueSku = await generateUniqueSkuId(rawProduct);
+
+//   try {
+//     await sql`
+//       INSERT INTO products (
+//         id, image_src, description, description_details, crop_sort, 
+//         crop_name_eng, tags, package_size, crop_size, path_name_eng, 
+//         on_stock_status, price, measure_unit, estimated_on_stock_date
+//       ) VALUES (
+//         ${uniqueSku}, 
+//         ${rawProduct.imageSrc}, 
+//         ${rawProduct.description}, 
+//         ${rawProduct.descriptionDetails}, 
+//         ${rawProduct.cropSort}, 
+//         ${rawProduct.cropName}, 
+//         ${rawProduct.tags}, 
+//         ${rawProduct.packageSize}, 
+//         ${rawProduct.cropSize}, 
+//         ${rawProduct.pathName}, 
+//         ${rawProduct.onStockStatus}, 
+//         ${rawProduct.price}, 
+//         ${rawProduct.measureUnit}, 
+//         ${rawProduct.estimatedOnStockDate}
+//       );
+//     `;
+//     console.log(`[Успех] Товар добавлен с SKU: ${uniqueSku}`);
+//     revalidatePath('/catalog', 'page'); // Обнуление cache страниц /catalog/...
+//     return { success: true, sku: uniqueSku };
+
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   } catch (error: any) {
+//     console.error('[Ошибка] Не удалось сохранить товар:', error);
+//     return { success: false, error: error.message || 'Не удалось сохранить' };
+//   }
+// }
 export async function addNewProduct(rawProduct: NewProductInput): Promise<{ success: boolean; sku?: string; error?: string }> {
+  
+  // 1. Гарантируем отсутствие undefined для генератора SKU
+  const productForSkuGen = {
+    cropSort: rawProduct.cropSort || '',
+    cropName: rawProduct.cropName || '',
+    tags: rawProduct.tags || [],
+    packageSize: rawProduct.packageSize || [],
+    pathName: rawProduct.pathName || '',
+  };
+
   // Генерируем гарантированно уникальный SKU
-  const uniqueSku = await generateUniqueSkuId(rawProduct);
+  const uniqueSku = await generateUniqueSkuId(productForSkuGen);
 
   try {
+    // 2. Выполняем SQL-запрос, строго заменяя все возможные undefined на дефолтные типы или null
     await sql`
       INSERT INTO products (
         id, image_src, description, description_details, crop_sort, 
         crop_name_eng, tags, package_size, crop_size, path_name_eng, 
-        on_stock_status, price, measure_unit, estimated_on_stock_date
+        on_stock_status, price, measure_unit, estimated_on_stock_date,
+        dx, dy, dz, weight
       ) VALUES (
         ${uniqueSku}, 
-        ${rawProduct.imageSrc}, 
-        ${rawProduct.description}, 
-        ${rawProduct.descriptionDetails}, 
-        ${rawProduct.cropSort}, 
-        ${rawProduct.cropName}, 
-        ${rawProduct.tags}, 
-        ${rawProduct.packageSize}, 
-        ${rawProduct.cropSize}, 
-        ${rawProduct.pathName}, 
-        ${rawProduct.onStockStatus}, 
-        ${rawProduct.price}, 
-        ${rawProduct.measureUnit}, 
-        ${rawProduct.estimatedOnStockDate}
+        ${rawProduct.imageSrc || []}, 
+        ${rawProduct.description || ''}, 
+        ${rawProduct.descriptionDetails || null}, 
+        ${productForSkuGen.cropSort}, 
+        ${productForSkuGen.cropName}, 
+        ${productForSkuGen.tags}, 
+        ${productForSkuGen.packageSize}, 
+        ${rawProduct.cropSize || ''}, 
+        ${productForSkuGen.pathName}, 
+        ${rawProduct.onStockStatus || 'not_available'}, 
+        ${rawProduct.price ?? 0.0}, 
+        ${rawProduct.measureUnit ?? 1}, 
+        ${rawProduct.estimatedOnStockDate || null},
+        
+        -- Поля логистики Яндекс Доставки (гарантируем массив):
+        ${rawProduct.dx || []}, 
+        ${rawProduct.dy || []}, 
+        ${rawProduct.dz || []}, 
+        ${rawProduct.weight || []}
       );
     `;
     console.log(`[Успех] Товар добавлен с SKU: ${uniqueSku}`);
-    revalidatePath('/catalog', 'page'); // Обнуление cache страниц /catalog/...
+    
+    revalidatePath('/dashboard/product-cards');
+    revalidatePath('/catalog', 'page'); 
+    
     return { success: true, sku: uniqueSku };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,6 +188,7 @@ export async function addNewProduct(rawProduct: NewProductInput): Promise<{ succ
     return { success: false, error: error.message || 'Не удалось сохранить' };
   }
 }
+
 
 /**
  * Функция редактирования товара по его внутреннему internal_id
@@ -154,7 +220,7 @@ export async function updateProduct(updatedFields: UpdateProductInput): Promise<
     // Генерируем уникальный SKU с учетом исключения текущего товара из дубликатов
     const newSku = await generateUniqueSkuId(productForSkuGen, internalId);
 
-    // 3. Выполняем динамическое обновление полей, которые были переданы
+    // 3. Выполняем динамическое обновление полей, включая новые логистические массивы
     await sql`
       UPDATE products SET
         id = ${newSku},
@@ -170,7 +236,12 @@ export async function updateProduct(updatedFields: UpdateProductInput): Promise<
         on_stock_status = ${fields.onStockStatus ?? sql`on_stock_status`},
         price = ${fields.price ?? sql`price`},
         measure_unit = ${fields.measureUnit ?? sql`measure_unit`},
-        estimated_on_stock_date = ${fields.estimatedOnStockDate ?? sql`estimated_on_stock_date`}
+        estimated_on_stock_date = ${fields.estimatedOnStockDate ?? sql`estimated_on_stock_date`},
+        
+        dx = ${fields.dx ?? sql`dx`},
+        dy = ${fields.dy ?? sql`dy`},
+        dz = ${fields.dz ?? sql`dz`},
+        weight = ${fields.weight ?? sql`weight`}
       WHERE internal_id = ${internalId}
     `;
 
@@ -178,8 +249,8 @@ export async function updateProduct(updatedFields: UpdateProductInput): Promise<
 
     // Сбрасываем кэш страниц, чтобы администратор и пользователи сразу увидели изменения
     revalidatePath('/dashboard/product-cards');
-    revalidatePath(`/dashboard/products/${internalId}`); // Если у вас есть страница редактирования конкретного товара
-    revalidatePath('/catalog', 'page'); // Обнуление cache страниц /catalog/...
+    revalidatePath(`/dashboard/products/${internalId}`); 
+    revalidatePath('/catalog', 'page'); 
 
     return { success: true, sku: newSku };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
