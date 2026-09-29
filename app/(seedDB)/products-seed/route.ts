@@ -47,6 +47,7 @@ async function getAuthorizedUser(req: Request) {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function seedProducts() {
     // 1. Создание в БД алгоритмов UUID (если еще не созданы)
     await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
@@ -114,7 +115,60 @@ async function seedProducts() {
 }
 
 /*
---> поместить данные из массива товаров в БД
+Таблица Products с изменениями от 29.09.26 --> добавлено dx dy dz and weight для передачи в доставку
+ */
+
+async function seedProducts_1() {
+    // 1. Создание в БД алгоритмов UUID
+    await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
+    // 2. Создание таблицы товаров с типами данных под ваши требования
+    await sql`
+    CREATE TABLE IF NOT EXISTS products (
+      internal_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      id VARCHAR(100) NOT NULL UNIQUE,
+      image_src TEXT[] NOT NULL DEFAULT '{}',
+      description TEXT NOT NULL,
+      description_details TEXT,
+      crop_sort VARCHAR(255),
+      crop_name_eng VARCHAR(255) NOT NULL,
+      tags TEXT[] DEFAULT '{}',
+      package_size DOUBLE PRECISION[] DEFAULT '{}', -- Ваш существующий массив фасовок
+      crop_size VARCHAR(100),
+      path_name_eng VARCHAR(255) NOT NULL,
+      on_stock_status VARCHAR(50) NOT NULL DEFAULT 'not_available' 
+        CHECK (on_stock_status IN ('available', 'not_available', 'expected')),
+      price DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+      measure_unit INT NOT NULL DEFAULT 1,
+      estimated_on_stock_date DATE,
+      
+      -- НОВЫЕ ПОЛЯ КАК МАССИВЫ (для первичного создания таблицы):
+      dx DOUBLE PRECISION[] DEFAULT '{}',     -- Массив длин (в см)
+      dy DOUBLE PRECISION[] DEFAULT '{}',     -- Массив ширин (в см)
+      dz DOUBLE PRECISION[] DEFAULT '{}',     -- Массив высот (в см)
+      weight DOUBLE PRECISION[] DEFAULT '{}', -- Массив весов брутто (в граммах)
+
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    `;
+
+    // 3. МИГРАЦИЯ: Добавляем колонки-массивы, если таблица УЖЕ БЫЛА создана ранее
+    await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS dx DOUBLE PRECISION[] DEFAULT '{}';`;
+    await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS dy DOUBLE PRECISION[] DEFAULT '{}';`;
+    await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS dz DOUBLE PRECISION[] DEFAULT '{}';`;
+    await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS weight DOUBLE PRECISION[] DEFAULT '{}';`;
+
+    // 4. Индексы
+    await sql`CREATE INDEX IF NOT EXISTS idx_products_sku ON products(id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_products_path ON products(path_name_eng);`;
+    
+    console.log('Таблица products успешно обновлена: добавлены массивы габаритов dx, dy, dz и weight.');
+}
+
+
+/*
+--> поместить данные из mock массива товаров в БД
  */
 export async function seedProductsArray() {
   try {
@@ -190,8 +244,10 @@ export async function GET(req: Request) {
       redirect('/forbidden'); // Вызывает внутреннее исключение Next.js
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
      //syncUsersTableStructure()
+     seedProducts_1()
     ]);
 
     return Response.json({ success: true });
