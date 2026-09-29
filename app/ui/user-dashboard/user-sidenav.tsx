@@ -29,7 +29,7 @@ export default function SideNav() {
   };
 
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
+    <div className="flex h-full flex-col px-4 pb-4 md:px-6">
       {/* <Link
         className="mb-2 flex h-20 items-end justify-start rounded-md bg-blue-600 p-4 md:h-40"
         href="/"
@@ -45,7 +45,7 @@ export default function SideNav() {
           <button
             type="submit"
             disabled={isLoading}
-            className="flex h-12 w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 disabled:opacity-50 md:flex-none md:justify-start md:p-2 md:px-3"
+            className="flex h-12 w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-foreground disabled:opacity-50 md:flex-none md:justify-start md:p-2 md:px-3"
           >
             <PowerIcon className="w-6" />
             <div className="hidden md:block">Sign Out</div>

@@ -25,14 +25,14 @@ export const metadata = {
 
 export default function DashboardPage() {
   return (
-    <main className="max-w-2xl mx-auto px-4 py-8">
-      <Heading level={2} className="mb-6 normal-case text-center">
+    <div className="w-full mx-auto p-4 pt-0 md:px-6">
+      <Heading level={2} className="mb-6">
         Личный кабинет
       </Heading>
       
       <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
         <DashboardForm />
       </div>
-    </main>
+    </div>
   );
 }
