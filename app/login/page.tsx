@@ -289,7 +289,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen justify-center items-start p-6 pt-20 md:pt-30">
+    <div className="flex min-h-screen justify-center items-start p-6 pt-8 md:pt-20">
       <div className="w-full sm:w-95 flex flex-col justify-center">
         
         {/* СКРЫТОЕ ПОЛЕ ДЛЯ ЗАЩИТЫ ОТ БОТОВ (HONEYPOT) */}
