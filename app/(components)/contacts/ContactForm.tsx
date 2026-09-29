@@ -86,7 +86,7 @@ export default function ContactForm() {
                   onChange={handleChange}
                   required
                   className="bg-white border border-gray-400 p-2 rounded w-full outline-none focus:border-green-500"
-                  placeholder="Ваш адрес электронной почты"
+                  placeholder="Электронной почты"
                 />
               </div>
 
