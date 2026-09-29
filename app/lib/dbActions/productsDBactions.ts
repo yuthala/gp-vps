@@ -22,45 +22,139 @@ interface ProductInput {
  * Опциональный параметр currentInternalId позволяет исключить текущий редактируемый 
  * товар из проверки уникальности (чтобы он не конфликтовал сам с собой, если SKU не менялся).
  */
-async function generateUniqueSkuId(product: ProductInput, currentInternalId?: string): Promise<string> {
-  // 1. Формируем базовую структуру артикула
-  let cropCode = 'CRP';
-  const hasGarlic = product.tags.some(tag => tag.toLowerCase().includes('чеснок'));
-  if (hasGarlic || product.cropName.toLowerCase().includes('garlic')) {
-    cropCode = 'GAR';
-  }
+// async function generateUniqueSkuId(product: ProductInput, currentInternalId?: string): Promise<string> {
+//   // 1. Формируем базовую структуру артикула
+//   let cropCode = 'CRP';
+//   const hasGarlic = product.tags.some(tag => tag.toLowerCase().includes('чеснок'));
+//   if (hasGarlic || product.cropName.toLowerCase().includes('garlic')) {
+//     cropCode = 'GAR';
+//   }
 
-  const sortCode = product.cropName.substring(0, 3).toUpperCase();
-  const typeCode = product.pathName.substring(0, 3).toUpperCase();
+//   const sortCode = product.cropName.substring(0, 3).toUpperCase();
+//   const typeCode = product.pathName.substring(0, 3).toUpperCase();
   
-  const weight = product.packageSize[0] ?? 0;
-  const weightCode = `${weight.toString().replace('.', '')}K`;
+//   const weight = product.packageSize[0] ?? 0;
+//   const weightCode = `${weight.toString().replace('.', '')}K`;
 
-  // Базовый артикул, например: GAR-LYU-ZUB-25K
-  const baseSku = `${cropCode}-${sortCode}-${typeCode}-${weightCode}`;
+//   // Базовый артикул, например: GAR-LYU-ZUB-25K
+//   const baseSku = `${cropCode}-${sortCode}-${typeCode}-${weightCode}`;
   
-  let finalSku = baseSku;
-  let counter = 1;
-  let isUnique = false;
+//   let finalSku = baseSku;
+//   let counter = 1;
+//   let isUnique = false;
 
-  // 2. Цикл проверки уникальности в PostgreSQL
-  while (!isUnique) {
-    // Проверяем, занят ли SKU кем-то другим, кроме текущего редактируемого товара
-    const existing = currentInternalId 
-      ? await sql`SELECT id FROM products WHERE id = ${finalSku} AND internal_id != ${currentInternalId} LIMIT 1`
-      : await sql`SELECT id FROM products WHERE id = ${finalSku} LIMIT 1`;
+//   // 2. Цикл проверки уникальности в PostgreSQL
+//   while (!isUnique) {
+//     // Проверяем, занят ли SKU кем-то другим, кроме текущего редактируемого товара
+//     const existing = currentInternalId 
+//       ? await sql`SELECT id FROM products WHERE id = ${finalSku} AND internal_id != ${currentInternalId} LIMIT 1`
+//       : await sql`SELECT id FROM products WHERE id = ${finalSku} LIMIT 1`;
 
-    // Если товар с таким SKU не найден, значит артикул свободен
-    if (existing.length === 0) {
-      isUnique = true;
-    } else {
-      // Если дубликат найден, добавляем счетчик: GAR-LYU-ZUB-25K-1
-      finalSku = `${baseSku}-${counter}`;
-      counter++;
-    }
-  }
-  return finalSku;
+//     // Если товар с таким SKU не найден, значит артикул свободен
+//     if (existing.length === 0) {
+//       isUnique = true;
+//     } else {
+//       // Если дубликат найден, добавляем счетчик: GAR-LYU-ZUB-25K-1
+//       finalSku = `${baseSku}-${counter}`;
+//       counter++;
+//     }
+//   }
+//   return finalSku;
+// }
+
+
+// 1. Описываем строгий интерфейс входящих данных товара
+
+
+// Описываем структуру ответа из базы данных PostgreSQL
+
+interface ProductSkuRow {
+  id: string;
 }
+
+/**
+ * Генерирует уникальный SKU для товара на основе его свойств с проверкой в БД
+ * @param product Объект с характеристиками товара
+ * @param currentInternalId ID текущего товара (используется при редактировании, чтобы не проверять самого себя)
+ */
+export async function generateUniqueSkuId(
+  product: ProductInput, 
+  currentInternalId?: string
+): Promise<string> {
+  try {
+    // ЗАЩИТА: Гарантируем наличие строк и массивов, убирая возможные undefined/null
+    const cropNameClean: string = (product.cropName || 'UNKNOWN').trim().toLowerCase();
+    const pathNameClean: string = (product.pathName || 'UNK').trim().toUpperCase();
+    const tagsClean: string[] = product.tags || [];
+
+    // Определяем код культуры
+    let cropCode: string = 'CRP';
+    const hasGarlic: boolean = tagsClean.some((tag: string) => tag.toLowerCase().includes('чеснок'));
+    if (hasGarlic || cropNameClean.includes('garlic')) {
+      cropCode = 'GAR';
+    }
+
+    // Генерируем коды компонентов артикула
+    const sortCode: string = cropNameClean.substring(0, 3).toUpperCase();
+    const typeCode: string = pathNameClean.substring(0, 3);
+    
+    // Безопасно получаем вес первой фасовки
+    const weight: number = product.packageSize && product.packageSize.length > 0 ? product.packageSize[0] : 0;
+    const weightCode: string = `${weight.toString().replace('.', '')}K`;
+
+    // Базовый артикул, например: GAR-LYU-ZUB-25K
+    const baseSku: string = `${cropCode}-${sortCode}-${typeCode}-${weightCode}`;
+    
+    let finalSku: string = baseSku;
+    let counter: number = 1;
+    let isUnique: boolean = false;
+    
+    // Предохранитель от бесконечного цикла
+    const MAX_ATTEMPTS: number = 100; 
+
+    // 2. Цикл проверки уникальности в PostgreSQL
+    while (!isUnique) {
+      if (counter > MAX_ATTEMPTS) {
+        throw new Error(`Превышено максимальное число попыток (${MAX_ATTEMPTS}) генерации уникального SKU для базового ключа ${baseSku}`);
+      }
+
+      try {
+        // Указываем generic-тип <ProductSkuRow[]> для типизации ответа драйвера БД
+        const existing = currentInternalId 
+          ? await sql<ProductSkuRow[]>`SELECT id FROM products WHERE id = ${finalSku} AND internal_id != ${currentInternalId} LIMIT 1`
+          : await sql<ProductSkuRow[]>`SELECT id FROM products WHERE id = ${finalSku} LIMIT 1`;
+
+        // Если товар с таким SKU не найден, артикул свободен
+        if (!existing || existing.length === 0) {
+          isUnique = true;
+        } else {
+          // Если дубликат найден, добавляем счетчик к базовому артикулу
+          finalSku = `${baseSku}-${counter}`;
+          counter++;
+        }
+      } catch (dbError: unknown) {
+        // Безопасное приведение типов ошибок в TypeScript
+        const message = dbError instanceof Error ? dbError.message : String(dbError);
+        console.error(`[Ошибка БД при проверке SKU ${finalSku}]:`, message);
+        throw new Error(`Сбой базы данных при валидации артикула: ${message}`);
+      }
+    }
+
+    return finalSku;
+
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Критическая ошибка функции generateUniqueSkuId]:', errorMessage);
+    
+    // Аварийный режим: генерируем временный SKU на основе таймстампа, если всё упало
+    const fallbackTimestamp: string = Date.now().toString().slice(-6);
+    const fallbackSku: string = `ERR-SKU-${fallbackTimestamp}`;
+    
+    console.warn(`[Внимание] Выдан запасной артикул (Fallback): ${fallbackSku}`);
+    return fallbackSku;
+  }
+}
+
 
 
 // 1. Описываем структуру входящего товара (заменяем any)
