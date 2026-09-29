@@ -74,17 +74,29 @@ export async function createOrder(input: CreateOrderInput) {
 // ==========================================
 
 // Получение списка всех заказов с фильтрацией по статусу (для админки)
-export async function fetchFilteredOrders(statusQuery?: string) {
+// Получение списка заказов с текстовым поиском по имени, телефону или номеру (для админки)
+export async function fetchFilteredOrders(query: string) {
   try {
-    const orders = statusQuery
-      ? await sql`SELECT * FROM orders WHERE status = ${statusQuery} ORDER BY created_at DESC`
-      : await sql`SELECT * FROM orders ORDER BY created_at DESC`;
-    return orders;
+    const cleanQuery = query.trim();
+    if (!cleanQuery) {
+      return await sql`SELECT * FROM orders ORDER BY created_at DESC`;
+    }
+
+    // Ищем совпадения по имени, телефону или по текстовому представлению номера заказа
+    return await sql`
+      SELECT * FROM orders 
+      WHERE 
+        customer_name ILIKE ${'%' + cleanQuery + '%'} OR 
+        customer_phone ILIKE ${'%' + cleanQuery + '%'} OR
+        order_number::text ILIKE ${'%' + cleanQuery + '%'}
+      ORDER BY created_at DESC
+    `;
   } catch (error) {
-    console.error('[Ошибка] Не удалось получить список заказов:', error);
+    console.error('[Ошибка] Не удалось получить отфильтрованный список заказов:', error);
     return [];
   }
 }
+
 
 // Полные детали заказа + весь список его товаров (для карточки заказа)
 export async function fetchOrderDetailsById(orderId: string) {
