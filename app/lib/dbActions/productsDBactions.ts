@@ -701,7 +701,7 @@ export async function fetchAllProducts(): Promise<ProductCard[]> {
     cropSort: row.crop_sort || '',
     cropSize: row.crop_size || undefined,
     cropName: row.crop_name_eng || '',
-    pathName: row.path_name || 'zubok',
+    pathName: row.path_name_eng || 'zubok',
     tags: row.tags ? parseArray(row.tags) : [],
     packageSize: parseArray(row.package_size).map(Number),
     onStockStatus: row.on_stock_status as 'available' | 'not_available' | 'expected', 
@@ -716,6 +716,25 @@ export async function fetchAllProducts(): Promise<ProductCard[]> {
     console.error('Ошибка при получении полного списка товаров из БД:', error);
     throw new Error('Не удалось загрузить все товары.');
   }
+}
+
+export async function searchProducts(query: string): Promise<ProductCard[]> {
+  const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return [];
+
+  const products = await fetchAllProducts();
+  return products.filter((product) => {
+    const searchableText = [
+      product.description,
+      product.descriptionDetails,
+      product.cropSort,
+      product.cropName,
+      product.pathName,
+      ...(product.tags ?? []),
+    ].join(' ').toLocaleLowerCase();
+
+    return terms.every((term) => searchableText.includes(term));
+  });
 }
 
 
@@ -787,5 +806,4 @@ export async function fetchRandomProducts(): Promise<ProductCard[]> {
     return []
   }
 }
-
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import GreenPatoLogo from '@/app/ui/gp-logo';
 import { PhoneIcon } from '@heroicons/react/24/outline';
 import TopHeaderLinks from '@/app/ui/header/header-top-liks';
@@ -11,13 +11,13 @@ import Search from '@/app/ui/search';
 import Link from 'next/link';
 
 export default function Header() {
-    const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
 
-    useEffect(() => {
-      // close mobile menu on route change
-      setMobileOpen(false);
-    }, [pathname]);
+    return <HeaderContent key={pathname} />;
+}
+
+function HeaderContent() {
+    const [mobileOpen, setMobileOpen] = useState(false);
 
 	return (
 		<header className="fixed z-2 top-0 left-0 w-full font-bold">
@@ -66,7 +66,7 @@ export default function Header() {
 							<div className="hidden lg:flex lg:gap-4 w-1/2">
 								<Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-34 h-12 border border-[#064929]/30 
 								transition-all duration-200 hover:opacity-90 hover:shadow-md active:opacity-100">Каталог</Link>
-								<Search placeholder="Поиск товаров..." />
+								<Search placeholder="Поиск товаров..." clearToHome action="/search" />
 							</div>
 							<BottomHeaderLinks />
 						</div>
@@ -75,7 +75,7 @@ export default function Header() {
 			</div>	
 			{/* mobile */}
 			<div className="flex flex-col gap-4 lg:hidden w-full bg-(--light-main) px-4 pb-4 shadow-lg">
-				<Search placeholder="Поиск товаров..." />
+				<Search placeholder="Поиск товаров..." clearToHome action="/search" />
 				<Link href="/catalog" className="bg-(--accent) flex justify-center items-center rounded-sm text-foreground w-full h-12">Каталог</Link>
 			</div>
 		</header>
