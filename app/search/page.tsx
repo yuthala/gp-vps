@@ -19,8 +19,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       </Heading>
       {products.length > 0 ? (
         <div className="grid grid-cols-1 justify-items-center gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6 xl:grid-cols-4">
-          {products.map((product) => (
-            <div key={product.id} className="flex w-full justify-center">
+          {products.map((product, index) => (
+            <div key={`${product.id}-${index}`} className="flex w-full justify-center">
               <ProductCardUI product={product} />
             </div>
           ))}
