@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // ФАЙЛ ДЛЯ СОЗДАНИЯ И РАБОТЫ С ТАБЛИЦЕЙ INVENTORY (ОСТАТКИ НА СКЛАДАХ)
 
 'use server';
@@ -76,6 +77,7 @@ export async function createInventoryTable() {
     
     console.log('Таблица inventory успешно создана или уже существует.');
 }
+
 
 export async function GET(req: Request) {
   try {
