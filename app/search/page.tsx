@@ -27,7 +27,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </div>
       ) : (
         <p className="text-center text-gray-600">
-          {query ? 'По вашему запросу товары не найдены.' : 'Введите название товара в строку поиска.'}
+          {query ? 'По вашему запросу товары не найдены или нет в наличии. Воспользуйтесь каталогом' : 'Введите название товара в строку поиска.'}
         </p>
       )}
     </section>
