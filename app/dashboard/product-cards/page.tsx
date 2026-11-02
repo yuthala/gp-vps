@@ -246,8 +246,9 @@
 //import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, Plus, Edit2, Trash2, CheckCircle2, Clock, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, CheckCircle2, Clock, AlertTriangle, ChevronLeft, ChevronRight, PackagePlus } from 'lucide-react';
 import { fetchFilteredProducts, fetchProductsPages, ProductRow } from '@/app/lib/dbActions/productsDBactions';
+import { getInventoryStocks } from '@/app/lib/dbActions/inventoryDBActions';
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -282,6 +283,13 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     fetchFilteredProducts(query, currentPage),
     fetchProductsPages(query),
   ]);
+  const inventoryStocks = await getInventoryStocks(products.map((product) => product.id));
+  const stocksByProduct = new Map<string, typeof inventoryStocks>();
+  for (const stock of inventoryStocks) {
+    const productStocks = stocksByProduct.get(stock.product_id) ?? [];
+    productStocks.push(stock);
+    stocksByProduct.set(stock.product_id, productStocks);
+  }
 
   // Функция для безопасной генерации ссылок пагинации с сохранением поискового запроса query
   const createPageURL = (pageNumber: number | string) => {
@@ -319,18 +327,21 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                 <th className="py-4 px-4">SKU / ID</th>
                 <th className="py-4 px-4">Price</th>
                 <th className="py-4 px-4">Estimated Date</th>
+                <th className="py-4 px-4">Stock</th>
                 <th className="py-4 px-4">Status</th>
                 <th className="py-4 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
               {products.length === 0 ? (
-                <tr><td colSpan={6} className="py-10 text-center text-gray-400">Товары не найдены</td></tr>
+                <tr><td colSpan={7} className="py-10 text-center text-gray-400">Товары не найдены</td></tr>
               ) : (
                 products.map((product) => {
                   const statusInfo = getStatusConfig(product.on_stock_status);
                   const hasImage = product.image_src && product.image_src.length > 0;
                   const firstImage = hasImage ? product.image_src[0] : null;
+                  const productStocks = (stocksByProduct.get(product.id) ?? [])
+                    .filter((stock) => stock.quantity > 0);
                   
                   return (
                     <tr key={product.internal_id} className="hover:bg-gray-50/50 transition-colors">
@@ -347,10 +358,32 @@ export default async function ProductsPage({ searchParams }: PageProps) {
                       <td className="py-4 px-4 font-medium text-gray-900">{formatCurrency(product.price)}</td>
                       <td className="py-4 px-4 text-gray-500">{product.estimated_on_stock_date ? new Date(product.estimated_on_stock_date).toLocaleDateString('ru-RU') : '—'}</td>
                       <td className="py-4 px-4">
+                        {productStocks.length > 0 ? (
+                          <div className="space-y-1">
+                            {productStocks.map((stock) => (
+                              <div key={stock.warehouse_id} className="whitespace-nowrap text-xs">
+                                <span className="text-gray-500">{stock.warehouse_id}:</span>{' '}
+                                <span className="font-semibold text-gray-800">{stock.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">Нет остатков</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusInfo.className}`}>{statusInfo.text} {statusInfo.icon}</span>
                       </td>
                       <td className="py-4 px-4 text-right">
                         <div className="inline-flex items-center gap-2">
+                          <Link
+                            href={`/dashboard/product-cards/stock/${encodeURIComponent(product.id)}`}
+                            aria-label={`Добавить товар ${product.crop_sort} на склад`}
+                            title="Добавить на склад"
+                            className="p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 rounded-lg border border-gray-200 bg-white transition-all"
+                          >
+                            <PackagePlus className="w-4 h-4" />
+                          </Link>
                           <Link href={`/dashboard/products/${product.internal_id}/edit`} className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg border border-gray-200 bg-white transition-all">
                             <Edit2 className="w-4 h-4" />
                           </Link>

@@ -724,6 +724,10 @@ export async function searchProducts(query: string): Promise<ProductCard[]> {
 
   const products = await fetchAllProducts();
   return products.filter((product) => {
+    if (product.onStockStatus !== 'available') {
+      return false;
+    }
+
     const searchableText = [
       product.description,
       product.descriptionDetails,
@@ -806,4 +810,3 @@ export async function fetchRandomProducts(): Promise<ProductCard[]> {
     return []
   }
 }
-
