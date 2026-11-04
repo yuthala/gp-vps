@@ -86,7 +86,6 @@ export async function GET(req: Request) {
       redirect('/forbidden'); // Вызывает внутреннее исключение Next.js
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
      createInventoryTable()
     ]);
