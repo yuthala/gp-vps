@@ -472,6 +472,7 @@ export async function fetchProductsByPathNameTitle(pathNameEng: string): Promise
 
       return {
         id: safeId,
+        productId: String(row.id),
         imageSrc: parseArray(row.image_src),
         description: row.description || '',
         descriptionDetails: row.description_details || '',
@@ -550,6 +551,7 @@ export async function fetchProductsByPathAndCropName(
 
     return {
       id: safeId,
+      productId: String(row.id),
       imageSrc: parseArray(row.image_src),
       description: row.description || '',
       descriptionDetails: row.description_details || '',
@@ -695,6 +697,7 @@ export async function fetchAllProducts(): Promise<ProductCard[]> {
 
   return {
     id: safeId, // Теперь здесь точно никогда не будет NaN
+    productId: String(row.id),
     imageSrc: parseArray(row.image_src),
     description: row.description || '',
     descriptionDetails: row.description_details || '',

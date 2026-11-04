@@ -128,6 +128,7 @@ export type CatalogCard = {
 }
 
 export type ProductCard = {
+	productId?: string;
 	imageSrc: string[];
 	description: string;
 	descriptionDetails: string;
@@ -169,6 +170,7 @@ export type ShoppingCart = {
 }
 
 export type CartItem = {
+	productId?: string;
 	id: number;
 	imageSrc: string;
 	description: string;

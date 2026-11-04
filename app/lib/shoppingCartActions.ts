@@ -5,6 +5,7 @@ import { ProductCard, CartItem, ShoppingCart } from "./definitions";
 export async function createCartItem (data: ProductCard, packageSize: number, qty: number) {
 	const cartItem = {
 		id: data.id,
+		productId: data.productId ?? String(data.id),
 		imageSrc: data.imageSrc[0],
 		description: data.description,
 		packageSize: packageSize,
@@ -21,7 +22,10 @@ export async function createShoppingCart(cartItem: CartItem) {
 	const savedCartData = localStorage.getItem('cartKey');
 	if (savedCartData) {
 		const parsedCart: ShoppingCart = JSON.parse(savedCartData);
-		const existingItemIndex = parsedCart.cartItems.findIndex(item => item.id === cartItem.id && item.packageSize === cartItem.packageSize);
+		const existingItemIndex = parsedCart.cartItems.findIndex(item =>
+			(item.productId ?? String(item.id)) === cartItem.productId &&
+			item.packageSize === cartItem.packageSize
+		);
 
 		if (existingItemIndex != -1) {
 				//check if an identical item already exists in the cart
