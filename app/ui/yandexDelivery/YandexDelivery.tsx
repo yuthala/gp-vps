@@ -96,7 +96,8 @@ export default function DeliveryWidget() {
           },
            source_platform_station: "019bdf90b35574099e55239ae3fe8d91",  // Станция отгрузки
                     physical_dims_weight_gross: 500,                    // Вес отправления
-                    delivery_price: (price: number) => Math.round(price) + " руб",    // Стоимость доставки
+                    //delivery_price: (price: number) => Math.round(price) + " руб",    // Стоимость доставки
+                    delivery_price: "",
                     delivery_term: "от 2 дня",                                     // Срок доставки
                     show_select_button: true,
           filter: {
@@ -152,11 +153,10 @@ export default function DeliveryWidget() {
 
   return (
     <>
-      <Script 
-        src="https://ndd-widget.landpro.site/widget.js" 
+      <Script
+        src="https://widget-pvz.dostavka.yandex.net/widget.js?v=2"
         strategy="afterInteractive"
       />
-      
       <div 
         id="delivery-widget" 
         style={{ width: '100%', minHeight: '450px' }} 

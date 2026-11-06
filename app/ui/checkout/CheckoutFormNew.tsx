@@ -800,6 +800,7 @@ export default function CheckoutForm() {
   const isNextButtonEnabled = isStep1Valid && isChecked && !isLoggingConsent && !isCreatingAccount;
     return (
     <form onSubmit={handleSubmit}>
+      <link rel="preconnect" href="https://widget-pvz.dostavka.yandex.net" />
       {/* ШАГ 1: ПОЛУЧАТЕЛЬ */}
       <section className="pb-4">
         <div className="flex items-center gap-3">
