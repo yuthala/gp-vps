@@ -4,6 +4,7 @@ import { ProductCard, CartItem, ShoppingCart } from "./definitions";
 // Корзина
 export async function createCartItem (data: ProductCard, packageSize: number, qty: number) {
 	const cartItem = {
+		productSku: data.productSku,
 		id: data.id,
 		imageSrc: data.imageSrc[0],
 		description: data.description,
@@ -26,6 +27,7 @@ export async function createShoppingCart(cartItem: CartItem) {
 		if (existingItemIndex != -1) {
 				//check if an identical item already exists in the cart
 					parsedCart.cartItems[existingItemIndex].qty += cartItem.qty //increase qty
+					parsedCart.cartItems[existingItemIndex].productSku = cartItem.productSku;
 					parsedCart.cartItems[existingItemIndex].totalSum = parsedCart.cartItems[existingItemIndex].qty * parsedCart.cartItems[existingItemIndex].price //update totalSum
 					localStorage.setItem('cartKey', JSON.stringify(parsedCart)); //save the updated cart back to localStorage
 		} else { //if an identical item doesn't exist in the cart

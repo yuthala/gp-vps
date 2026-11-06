@@ -33,17 +33,40 @@ export default function DeliveryWidget() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePickupSelect = async (data: any) => {
     try {
+      const savedCart = localStorage.getItem('cartKey');
+      const cartItems = savedCart
+        ? (JSON.parse(savedCart) as {
+            cartItems: {
+              productSku?: string;
+              description: string;
+              packageSize: number;
+              qty: number;
+            }[];
+          }).cartItems.map(({ productSku, description, packageSize, qty }) => ({
+            productSku,
+            description,
+            packageSize,
+            qty,
+          }))
+        : [];
+
       const response = await fetch('/api/delivery/calculate', 
         {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           pickupPointId: data.id, // Это ID выбранного ПВЗ
-          weight: 500
+          cartItems,
         }),
       }
     );
-      const result = await response.json(); // Цена от Яндекс приходит как строка
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || 'Не удалось рассчитать стоимость доставки.');
+      }
+      console.log('Places sent to delivery calculator:', result.places);
+
+      // Цена от Яндекс приходит как строка
 			const priceString: string = result.price.replace(' RUB', ''); //  Убрали RUB из строки
 			const priceNumber = Math.round(parseFloat(priceString)) // Округлили до целого числа
 			
@@ -148,4 +171,3 @@ export default function DeliveryWidget() {
     </>
   );
 }
-

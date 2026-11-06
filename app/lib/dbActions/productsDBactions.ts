@@ -549,6 +549,7 @@ export async function fetchProductsByPathAndCropName(
     const safeId = Number.isNaN(parsedId) ? 0 : parsedId;
 
     return {
+      productSku: row.id,
       id: safeId,
       imageSrc: parseArray(row.image_src),
       description: row.description || '',
