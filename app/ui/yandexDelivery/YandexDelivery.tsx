@@ -64,7 +64,7 @@ export default function DeliveryWidget() {
       if (!response.ok) {
         throw new Error(result.error || 'Не удалось рассчитать стоимость доставки.');
       }
-      console.log('Places sent to delivery calculator:', result.places);
+      // console.log('Places sent to delivery calculator:', result.places);
 
       // Цена от Яндекс приходит как строка
 			const priceString: string = result.price.replace(' RUB', ''); //  Убрали RUB из строки

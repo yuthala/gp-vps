@@ -128,7 +128,7 @@ export async function POST(req: Request) {
       (total, place) => total + place.physical_dims.weight_gross,
       0
     );
-    console.log('Places sent to delivery calculator:', JSON.stringify(places, null, 2));
+    // console.log('Places sent to delivery calculator:', JSON.stringify(places, null, 2));
 
     const response = await fetch('https://b2b.taxi.yandex.net/api/b2b/platform/pricing-calculator?is_oversized=false', {
       method: 'POST',
