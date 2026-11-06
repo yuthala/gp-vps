@@ -679,7 +679,7 @@ export default function CheckoutForm() {
               <ChevronDownIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none right-2.5 md:right-[calc(50%+10px)]" />
             </div>
 
-            {selectedDelivery === 'yandex' && <DeliveryWidget />}
+            {selectedDelivery === 'yandex' && <DeliveryWidget boxes={[]} />}
           </section>
 
           {/* ШАГ 3: ОПЛАТА */}

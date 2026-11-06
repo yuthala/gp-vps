@@ -7,6 +7,7 @@ declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     YaDelivery: any;
+    YaNddWidgetReady?: boolean;
   }
 }
 
@@ -50,7 +51,7 @@ export default function DeliveryWidget() {
                     physical_dims_weight_gross: 500,                    // Вес отправления
                     //delivery_price: (price: number) => "от " + price.toFixed() + " руб",    // Стоимость доставки
                     delivery_price: "от 200 руб",
-                    delivery_term: "от 2 дня",                                     // Срок доставки
+                    delivery_term: 0,                                     // Срок доставки
                     show_select_button: true,
           filter: {
             type: ["pickup_point", "terminal"],
@@ -80,18 +81,20 @@ export default function DeliveryWidget() {
      
     };
 
-    // 1. Инициализация виджета
-    if (window.YaDelivery) {
+    const handleWidgetLoad = () => {
+      window.YaNddWidgetReady = true;
       startWidget();
-    }
-    document.addEventListener('YaNddWidgetLoad', startWidget);
+    };
+
+    document.addEventListener('YaNddWidgetLoad', handleWidgetLoad);
+    if (window.YaNddWidgetReady) startWidget();
 
     // 2. Подписка на выбор точки
     document.addEventListener('YaNddWidgetPointSelected', handlePointSelected);
 
     // Очистка при размонтировании компонента
     return () => {
-      document.removeEventListener('YaNddWidgetLoad', startWidget);
+      document.removeEventListener('YaNddWidgetLoad', handleWidgetLoad);
       document.removeEventListener('YaNddWidgetPointSelected', handlePointSelected);
     };
   }, []);

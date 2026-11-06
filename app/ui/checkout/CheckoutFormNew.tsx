@@ -501,12 +501,13 @@ import { useState, useEffect, useRef } from "react";
 import Heading from "../../ui/Heading";
 import Button from "../../ui/Button";
 import PaymentOptions from "@/app/ui/checkout/PaymentSelector";
-import DeliveryWidget from "../yandexDelivery/YandexDelivery";
+import DeliveryWidget, { type BoxDimensions } from "../yandexDelivery/YandexDelivery";
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Link from "next/link";
 import clsx from "clsx";
 import { z } from "zod";
 import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions';
+import { useCartStore } from "@/app/lib/useCartStore";
 
 // Импортируем созданные ранее подкомпоненты
 import ReceiverStep from "@/app/ui/checkout/checkoutFormSteps/ReceiverStep";
@@ -528,7 +529,11 @@ type FormData = z.infer<typeof checkoutSchema>;
 
 export default function CheckoutForm() {
   const phoneInputRef = useRef<HTMLInputElement>(null);
+  const checkoutReloadStarted = useRef(false);
   const [selectedDelivery, setSelectedDelivery] = useState("");
+  const [deliveryBoxes, setDeliveryBoxes] = useState<BoxDimensions[] | null>(null);
+  const [deliveryDimensionsError, setDeliveryDimensionsError] = useState<string | null>(null);
+  const setDeliveryPrice = useCartStore((state) => state.setDeliveryPrice);
 
   const [formData, setFormData] = useState({
     lastName: "",
@@ -548,6 +553,117 @@ export default function CheckoutForm() {
   const [isLoggingConsent, setIsLoggingConsent] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   //const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+
+  useEffect(() => {
+    const snapshotKey = "checkoutCartSnapshot";
+
+    const refreshIfCartChanged = () => {
+      if (checkoutReloadStarted.current) return;
+
+      try {
+        const savedCart = localStorage.getItem("cartKey");
+        const parsedCart = savedCart
+          ? JSON.parse(savedCart) as { cartItems?: {
+              productSku?: string;
+              id: number;
+              description: string;
+              packageSize: number;
+              qty: number;
+            }[] }
+          : null;
+        const signature = JSON.stringify((parsedCart?.cartItems ?? []).map((item) => ({
+          productSku: item.productSku,
+          id: item.id,
+          description: item.description,
+          packageSize: item.packageSize,
+          qty: item.qty,
+        })));
+        const previousSignature = sessionStorage.getItem(snapshotKey);
+
+        if (previousSignature === null) {
+          sessionStorage.setItem(snapshotKey, signature);
+          return;
+        }
+
+        if (previousSignature === signature) return;
+
+        checkoutReloadStarted.current = true;
+        console.info("[Checkout] Cart changed since the previous checkout visit; refreshing checkout.");
+        sessionStorage.setItem(snapshotKey, signature);
+        setDeliveryPrice(0);
+        const checkoutInfo = getCheckoutInfo();
+        checkoutInfo.deliveryPrice = "";
+        checkoutInfo.deliveryPointID = "";
+        checkoutInfo.deliveryPointAdress = "";
+        updateCheckoutInfo(checkoutInfo);
+        window.location.reload();
+      } catch (error) {
+        console.error("[Checkout] Could not verify the saved cart before refresh:", error);
+      }
+    };
+
+    refreshIfCartChanged();
+    window.addEventListener("focus", refreshIfCartChanged);
+    window.addEventListener("pageshow", refreshIfCartChanged);
+    window.addEventListener("storage", refreshIfCartChanged);
+
+    return () => {
+      window.removeEventListener("focus", refreshIfCartChanged);
+      window.removeEventListener("pageshow", refreshIfCartChanged);
+      window.removeEventListener("storage", refreshIfCartChanged);
+    };
+  }, [setDeliveryPrice]);
+
+  useEffect(() => {
+    if (!showRemainingSteps || selectedDelivery !== "yandex") return;
+
+    let cancelled = false;
+    const loadDeliveryBoxes = async () => {
+      try {
+        const savedCart = localStorage.getItem("cartKey");
+        const cart = savedCart ? JSON.parse(savedCart) as { cartItems?: {
+          productSku?: string;
+          description: string;
+          packageSize: number;
+          qty: number;
+        }[] } : null;
+        const cartItems = cart?.cartItems ?? [];
+        console.info("[Yandex delivery] Cart read from local storage:", cartItems);
+
+        const response = await fetch("/api/delivery/dimensions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cartItems }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "Не удалось получить габариты товаров.");
+        }
+        if (!Array.isArray(result.boxes)) {
+          throw new Error("Сервер вернул неверный формат габаритов товаров.");
+        }
+
+        console.info("[Yandex delivery] Dimensions loaded from product table:", result.boxes);
+        if (!cancelled) {
+          setDeliveryBoxes(result.boxes as BoxDimensions[]);
+          setDeliveryDimensionsError(null);
+        }
+      } catch (error) {
+        console.error("[Yandex delivery] Failed to load parcel dimensions:", error);
+        if (!cancelled) {
+          setDeliveryBoxes(null);
+          setDeliveryDimensionsError(
+            error instanceof Error ? error.message : "Не удалось получить габариты товаров."
+          );
+        }
+      }
+    };
+
+    void loadDeliveryBoxes();
+    return () => {
+      cancelled = true;
+    };
+  }, [showRemainingSteps, selectedDelivery]);
 
   const isStep1Valid = checkoutSchema.safeParse(formData).success;
   // Автозаполнение
@@ -877,7 +993,11 @@ export default function CheckoutForm() {
             <div className="relative">
               <select 
                 value={selectedDelivery} 
-                onChange={(e) => setSelectedDelivery(e.target.value)} 
+                onChange={(e) => {
+                  setSelectedDelivery(e.target.value);
+                  setDeliveryBoxes(null);
+                  setDeliveryDimensionsError(null);
+                }}
                 className="appearance-none border p-3 rounded w-full md:w-1/2 bg-gray-50 border-gray-300"
               >
                 <option value="">Выберите...</option>
@@ -889,7 +1009,15 @@ export default function CheckoutForm() {
               <ChevronDownIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none right-2.5 md:right-[calc(50%+10px)]" />
             </div>
 
-            {selectedDelivery === 'yandex' && <DeliveryWidget />}
+            {selectedDelivery === 'yandex' && (
+              deliveryDimensionsError ? (
+                <p className="text-red-600" role="alert">{deliveryDimensionsError}</p>
+              ) : deliveryBoxes ? (
+                <DeliveryWidget boxes={deliveryBoxes} />
+              ) : (
+                <p>Загружаем габариты товаров...</p>
+              )
+            )}
           </section>
 
           {/* ШАГ 3: ОПЛАТА */}

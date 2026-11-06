@@ -2,14 +2,15 @@
 
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import Heading from "@/app/ui/Heading";
-import DeliveryWidget from "@/app/ui/yandexDelivery/YandexDelivery";
+import DeliveryWidget, { type BoxDimensions } from "@/app/ui/yandexDelivery/YandexDelivery";
 
 interface DeliveryStepProps {
   selectedDelivery: string;
   setSelectedDelivery: (value: string) => void;
+  boxes: BoxDimensions[];
 }
 
-export default function DeliveryStep({ selectedDelivery, setSelectedDelivery }: DeliveryStepProps) {
+export default function DeliveryStep({ selectedDelivery, setSelectedDelivery, boxes }: DeliveryStepProps) {
   return (
     <section className="flex flex-col gap-4 pb-4">
       <div className="flex items-center gap-3">
@@ -32,7 +33,7 @@ export default function DeliveryStep({ selectedDelivery, setSelectedDelivery }: 
         <ChevronDownIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none right-2.5 md:right-[calc(50%+10px)]" />
       </div>
 
-      {selectedDelivery === 'yandex' && <DeliveryWidget />}
+      {selectedDelivery === 'yandex' && <DeliveryWidget boxes={boxes} />}
     </section>
   );
 }

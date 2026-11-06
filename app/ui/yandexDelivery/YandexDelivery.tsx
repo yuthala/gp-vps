@@ -10,11 +10,74 @@ import Script from 'next/script';
 import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions'
 import { useCartStore } from '../../lib/useCartStore';
 
+export interface BoxDimensions {
+  weight_gross: number;
+  dx: number;
+  dy: number;
+  dz: number;
+}
+
+export interface VirtualDimensions {
+  dx: number;
+  dy: number;
+  dz: number;
+  weight: number;
+}
+
+interface DeliveryWidgetProps {
+  boxes: BoxDimensions[];
+}
+
+export function calculateSmart3DBox(boxes: BoxDimensions[]): VirtualDimensions {
+  if (!boxes || boxes.length === 0) {
+    return { dx: 10, dy: 10, dz: 10, weight: 0 };
+  }
+
+  let totalVolume = 0;
+  let totalWeight = 0;
+  let maxDx = 0;
+  let maxDy = 0;
+  let maxDz = 0;
+
+  boxes.forEach((box, index) => {
+    const boxVolume = box.dx * box.dy * box.dz;
+    totalVolume += boxVolume;
+    totalWeight += box.weight_gross;
+    maxDx = Math.max(maxDx, box.dx);
+    maxDy = Math.max(maxDy, box.dy);
+    maxDz = Math.max(maxDz, box.dz);
+    console.info('[Yandex delivery] Box processed:', {
+      index: index + 1,
+      box,
+      volume: boxVolume,
+      totalVolume,
+      totalWeight,
+    });
+  });
+
+  const cubeSide = Math.ceil(Math.cbrt(totalVolume));
+  const dimensions = {
+    dx: Math.max(maxDx, Math.ceil(cubeSide * 1.2)),
+    dy: Math.max(maxDy, Math.ceil(cubeSide * 1.1)),
+    dz: Math.max(maxDz, Math.ceil(cubeSide * 1.1)),
+    weight: totalWeight,
+  };
+  console.info('[Yandex delivery] Final box dimensions:', dimensions);
+  return dimensions;
+}
+
 declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     YaDelivery: any;
+    YaNddWidgetReady?: boolean;
   }
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('YaNddWidgetLoad', () => {
+    window.YaNddWidgetReady = true;
+  });
 }
 
 interface deliveryInfo {
@@ -22,7 +85,7 @@ interface deliveryInfo {
 	days: string
 }
 
-export default function DeliveryWidget() {
+export default function DeliveryWidget({ boxes }: DeliveryWidgetProps) {
 
     const [deliveryInfo, setDeliveryInfo] = useState<deliveryInfo | null>(null);
 		// eslint-disable-next-line prefer-const
@@ -84,34 +147,63 @@ export default function DeliveryWidget() {
     }
   };
 
-  const startWidget = () => {
-    if (window.YaDelivery) {
-      window.YaDelivery.createWidget({
-        containerId: 'delivery-widget',
-        params: {
-          city: "Москва",
-          size: {
-            "height": "450px",
-            "width": "100%"
-          },
-           source_platform_station: "019bdf90b35574099e55239ae3fe8d91",  // Станция отгрузки
-                    physical_dims_weight_gross: 500,                    // Вес отправления
-                    //delivery_price: (price: number) => Math.round(price) + " руб",    // Стоимость доставки
-                    delivery_price: "",
-                    delivery_term: "от 2 дня",                                     // Срок доставки
-                    show_select_button: true,
-          filter: {
-            type: ["pickup_point", "terminal"],
-            is_yandex_branded: false,
-            payment_methods: ["already_paid"],
-            payment_methods_filter: "or"
-          }
-        },
-      });
-    }
-  };
-
   useEffect(() => {
+    console.info('[Yandex delivery] Boxes received by widget:', boxes);
+    let disposed = false;
+    let started = false;
+
+    const startWidget = () => {
+      if (disposed || started) return;
+      if (!window.YaDelivery) {
+        console.error('[Yandex delivery] Ready event fired without the YaDelivery API.');
+        return;
+      }
+
+      const container = document.getElementById('delivery-widget');
+      if (!container) {
+        console.error('[Yandex delivery] Widget container was not found.');
+        return;
+      }
+
+      started = true;
+      const dimensions = calculateSmart3DBox(boxes);
+      console.info('[Yandex delivery] Initializing ready widget with dimensions:', dimensions);
+      try {
+        window.YaDelivery.createWidget({
+          containerId: 'delivery-widget',
+          params: {
+            city: "Москва",
+            size: {
+              "height": "450px",
+              "width": "100%"
+            },
+            source_platform_station: "019bdf90b35574099e55239ae3fe8d91",
+            physical_dims_weight_gross: dimensions.weight,
+            physical_dims_dx: dimensions.dx,
+            physical_dims_dy: dimensions.dy,
+            physical_dims_dz: dimensions.dz,
+            delivery_price: (price: number) => Math.round(price) + " руб",
+            delivery_term: 0,
+            show_select_button: true,
+            filter: {
+              type: ["pickup_point", "terminal"],
+              is_yandex_branded: false,
+              payment_methods: ["already_paid"],
+              payment_methods_filter: "or"
+            }
+          },
+        });
+      } catch (error) {
+        started = false;
+        console.error('[Yandex delivery] Widget initialization failed:', error);
+      }
+    };
+
+    const handleWidgetReady = () => {
+      window.YaNddWidgetReady = true;
+      console.info('[Yandex delivery] Yandex widget and map APIs are ready.');
+      startWidget();
+    };
 
     // Обработчик выбора точки
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,28 +226,28 @@ export default function DeliveryWidget() {
 		
 		};
 
-    // 1. Инициализация виджета
-    if (window.YaDelivery) {
+    document.addEventListener('YaNddWidgetLoad', handleWidgetReady);
+
+    document.addEventListener('YaNddWidgetPointSelected', handlePointSelected);
+    if (window.YaNddWidgetReady) {
       startWidget();
     }
-    document.addEventListener('YaNddWidgetLoad', startWidget);
-
-    // 2. Подписка на выбор точки
-    document.addEventListener('YaNddWidgetPointSelected', handlePointSelected);
 
     // Очистка при размонтировании компонента
     return () => {
-      document.removeEventListener('YaNddWidgetLoad', startWidget);
+      disposed = true;
+      document.removeEventListener('YaNddWidgetLoad', handleWidgetReady);
       document.removeEventListener('YaNddWidgetPointSelected', handlePointSelected);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [boxes]);
 
   return (
     <>
       <Script
         src="https://widget-pvz.dostavka.yandex.net/widget.js?v=2"
         strategy="afterInteractive"
+        onError={() => console.error('[Yandex delivery] Failed to load the widget script.')}
       />
       <div 
         id="delivery-widget" 
