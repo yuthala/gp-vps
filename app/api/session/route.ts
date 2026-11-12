@@ -1,6 +1,7 @@
 import postgres from 'postgres';
 import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
+import { invalidateSessionValidationCache } from '@/app/lib/redis';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -94,6 +95,7 @@ export async function DELETE(req: Request) {
     const token = match ? match[1] : null;
     if (token) {
       await sql`DELETE FROM sessions WHERE session_token = ${token}`;
+      await invalidateSessionValidationCache(token);
     }
     const res = NextResponse.json({ ok: true });
     res.cookies.set('session_token', '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 0 });

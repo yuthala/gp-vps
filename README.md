@@ -43,6 +43,11 @@ Product and inventory changes invalidate the cached list. PostgreSQL remains the
 source of truth; if Redis is not configured or is unavailable, the app reads
 directly from PostgreSQL.
 
+Successful `/api/session/validate` responses are cached for at most 15 seconds.
+The Redis key contains a SHA-256 hash of the session token, not the token itself,
+and logout invalidates that entry. A session or account revoked elsewhere may
+remain accepted for up to 15 seconds.
+
 On the VPS, configure the app's runtime environment with a Redis URL. For Redis
 running on the same VPS with its default port:
 
