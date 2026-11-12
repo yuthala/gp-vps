@@ -35,3 +35,20 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # gp-vps
+
+## Redis product cache
+
+The homepage's random product list is cached in Redis for up to two minutes.
+Product and inventory changes invalidate the cached list. PostgreSQL remains the
+source of truth; if Redis is not configured or is unavailable, the app reads
+directly from PostgreSQL.
+
+On the VPS, configure the app's runtime environment with a Redis URL. For Redis
+running on the same VPS with its default port:
+
+```env
+REDIS_URL=redis://127.0.0.1:6379
+```
+
+Keep Redis bound to localhost (or a private network), not exposed publicly. Restart
+the Next.js app after setting `REDIS_URL`.

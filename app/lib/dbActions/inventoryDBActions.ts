@@ -1,6 +1,7 @@
 'use server'
 import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
+import { invalidateHomeRandomProductsCache } from '../redis';
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 const INVENTORY_WAREHOUSES = ['Парфёнки', 'Юго-Северная'];
@@ -18,6 +19,7 @@ async function updateProductStockStatus(productId: string) {
         END
         WHERE id = ${productId};
     `;
+    await invalidateHomeRandomProductsCache();
     revalidatePath('/dashboard/product-cards');
 }
 

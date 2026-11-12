@@ -3,6 +3,56 @@
 import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
 import type { ProductCard } from '../definitions';
+import { getRedisClient, invalidateHomeRandomProductsCache, HOME_RANDOM_PRODUCTS_CACHE_KEY } from '../redis';
+
+const HOME_RANDOM_PRODUCTS_CACHE_TTL_SECONDS = 120;
+const PRODUCT_PATH_NAMES = [
+  'zubok',
+  'odnozubok',
+  'bulb',
+  'luksevok',
+  'luckshernushka',
+  'shalotsevok',
+  'shalotchernushka',
+] as const;
+const PRODUCT_CROP_SIZES = ['мелкая', 'средняя', 'крупная', '4-9 мм'] as const;
+const PRODUCT_STOCK_STATUSES = ['available', 'not_available', 'expected'] as const;
+
+function isOneOf(value: unknown, options: readonly string[]): boolean {
+  return typeof value === 'string' && options.includes(value);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item: unknown) => typeof item === 'string');
+}
+
+function isNumberArray(value: unknown): value is number[] {
+  return Array.isArray(value) && value.every((item: unknown) => typeof item === 'number');
+}
+
+function isProductCard(value: unknown): value is ProductCard {
+  if (typeof value !== 'object' || value === null) return false;
+  const product = value as Record<string, unknown>;
+
+  return (
+    typeof product.id === 'number' &&
+    isStringArray(product.imageSrc) &&
+    typeof product.description === 'string' &&
+    typeof product.descriptionDetails === 'string' &&
+    typeof product.cropSort === 'string' &&
+    (product.cropSize === undefined || isOneOf(product.cropSize, PRODUCT_CROP_SIZES)) &&
+    typeof product.cropName === 'string' &&
+    isOneOf(product.pathName, PRODUCT_PATH_NAMES) &&
+    (product.tags === undefined || isStringArray(product.tags)) &&
+    isNumberArray(product.packageSize) &&
+    isOneOf(product.onStockStatus, PRODUCT_STOCK_STATUSES) &&
+    (product.estimatedOnStockDate === undefined ||
+      typeof product.estimatedOnStockDate === 'string') &&
+    typeof product.price === 'number' &&
+    typeof product.measureUnit === 'number' &&
+    (product.productSku === undefined || typeof product.productSku === 'string')
+  );
+}
 
 // Инициализируем подключение к базе данных
 const sql = postgres(process.env.DATABASE_URL!);
@@ -270,7 +320,8 @@ export async function addNewProduct(rawProduct: NewProductInput): Promise<{ succ
       );
     `;
     console.log(`[Успех] Товар добавлен с SKU: ${uniqueSku}`);
-    
+
+    await invalidateHomeRandomProductsCache();
     revalidatePath('/dashboard/product-cards');
     revalidatePath('/catalog', 'page'); 
     
@@ -341,6 +392,7 @@ export async function updateProduct(updatedFields: UpdateProductInput): Promise<
 
     console.log(`[Успех] Товар c ID ${internalId} успешно обновлен. Новый SKU: ${newSku}`);
 
+    await invalidateHomeRandomProductsCache();
     // Сбрасываем кэш страниц, чтобы администратор и пользователи сразу увидели изменения
     revalidatePath('/dashboard/product-cards');
     revalidatePath(`/dashboard/products/${internalId}`); 
@@ -607,6 +659,7 @@ export async function deleteProduct(internalId: string): Promise<{ success: bool
       DELETE FROM products WHERE internal_id = ${internalId}
     `;
     
+    await invalidateHomeRandomProductsCache();
     // Сбрасываем кэш Next.js для этой страницы, чтобы таблица сразу обновилась
     revalidatePath('/dashboard/product-cards');
     revalidatePath('/catalog', 'page'); // Обнуление cache страниц /catalog/...
@@ -750,6 +803,20 @@ export async function searchProducts(query: string): Promise<ProductCard[]> {
 // Загрузка восьми случайных элементов из БД для главной страницы
 export async function fetchRandomProducts(): Promise<ProductCard[]> {
   try {
+    const redis = await getRedisClient();
+    if (redis) {
+      try {
+        const cached = await redis.get(HOME_RANDOM_PRODUCTS_CACHE_KEY);
+        if (cached) {
+          const products: unknown = JSON.parse(cached);
+          if (Array.isArray(products) && products.every(isProductCard)) return products;
+          console.error('Homepage product cache contained invalid data; querying PostgreSQL.');
+        }
+      } catch (error) {
+        console.error('Failed to read the homepage product cache:', error);
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const products = await sql<any[]>`
       SELECT 
@@ -773,7 +840,7 @@ export async function fetchRandomProducts(): Promise<ProductCard[]> {
       LIMIT 8
     `;
 
-    return products.map((row, index) => {
+    const productCards = products.map((row, index) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const parseArray = (val: any) => {
         if (Array.isArray(val)) return val;
@@ -803,6 +870,20 @@ export async function fetchRandomProducts(): Promise<ProductCard[]> {
         measureUnit: Number(row.measure_unit || 1),
       };
     });
+
+    if (redis) {
+      try {
+        await redis.set(
+          HOME_RANDOM_PRODUCTS_CACHE_KEY,
+          JSON.stringify(productCards),
+          { EX: HOME_RANDOM_PRODUCTS_CACHE_TTL_SECONDS }
+        );
+      } catch (error) {
+        console.error('Failed to write the homepage product cache:', error);
+      }
+    }
+
+    return productCards;
 
   } catch (error) {
     console.error('Ошибка при получении случайных товаров из БД:', error);
