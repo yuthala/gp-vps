@@ -13,7 +13,7 @@ export default function CheckoutPage() {
 			</Link>
         <Heading level={2} className="py-4">Оформление заказа</Heading>
       </div>
-			<CheckoutComponent />
+			<CheckoutComponent mockPaymentEnabled={process.env.NODE_ENV !== 'production'} />
     </div>
 	)
 }

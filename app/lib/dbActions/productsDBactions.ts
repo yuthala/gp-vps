@@ -36,6 +36,7 @@ function isProductCard(value: unknown): value is ProductCard {
 
   return (
     typeof product.id === 'number' &&
+    typeof product.productSku === 'string' &&
     isStringArray(product.imageSrc) &&
     typeof product.description === 'string' &&
     typeof product.descriptionDetails === 'string' &&
@@ -523,6 +524,7 @@ export async function fetchProductsByPathNameTitle(pathNameEng: string): Promise
       const safeId = Number.isNaN(parsedId) ? index : parsedId;
 
       return {
+        productSku: row.id,
         id: safeId,
         imageSrc: parseArray(row.image_src),
         description: row.description || '',
@@ -748,6 +750,7 @@ export async function fetchAllProducts(): Promise<ProductCard[]> {
   const safeId = Number.isNaN(parsedId) ? index : parsedId;
 
   return {
+    productSku: row.id,
     id: safeId, // Теперь здесь точно никогда не будет NaN
     imageSrc: parseArray(row.image_src),
     description: row.description || '',
@@ -854,6 +857,7 @@ export async function fetchRandomProducts(): Promise<ProductCard[]> {
       const safeId = Number.isNaN(parsedId) ? index : parsedId;
 
       return {
+        productSku: row.id,
         id: safeId,
         imageSrc: parseArray(row.image_src),
         description: row.description || '',

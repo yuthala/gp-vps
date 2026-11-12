@@ -1,23 +1,22 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import type { CartItem } from '@/app/lib/definitions';
-import { clearShoppingCart } from '@/app/lib/shoppingCartActions';
 import { useCartStore } from '../../lib/useCartStore';
 import Button from '../Button';
 import Link from 'next/link';
-import { getCheckoutInfo } from '../../lib/checkoutActions';
 
-export default function CheckoutTotal() {
-  const router = useRouter();
+interface CheckoutTotalProps {
+  isSubmittingOrder: boolean;
+  orderNumber: string | null;
+  mockPaymentEnabled: boolean;
+}
+
+export default function CheckoutTotal({ isSubmittingOrder, orderNumber, mockPaymentEnabled }: CheckoutTotalProps) {
   const deliveryPrice = useCartStore((state) => state.deliveryPrice);
   const setDeliveryPrice = useCartStore((state) => state.setDeliveryPrice);
-  const clearCookies = useCartStore((state) => state.clearData);
 
   const [shoppingCart, setShoppingCart] = useState<{ cartItems: CartItem[] }>({ cartItems: [] });
-  const [deliveryRequestMessage, setDeliveryRequestMessage] = useState<string | null>(null);
-  const [isSendingDeliveryRequest, setIsSendingDeliveryRequest] = useState(false);
 
   useEffect(() => {
     const cartData = localStorage.getItem('cartKey');
@@ -33,59 +32,11 @@ export default function CheckoutTotal() {
     };
   }, [setDeliveryPrice]);
 
-  const cartTotal = useMemo(
-    () => shoppingCart.cartItems.reduce((sum, item) => sum + item.price * item.qty, 0),
-    [shoppingCart.cartItems]
-  );
+  const visibleCartItems = orderNumber === null ? shoppingCart.cartItems : [];
+  const cartTotal = visibleCartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   const totalSum = cartTotal + deliveryPrice;
-  const canCheckout = deliveryPrice !== 0;
-
-  const sendDeliveryDetails = async () => {
-    if (isSendingDeliveryRequest) return false;
-
-    const checkoutInfo = getCheckoutInfo();
-    if (!checkoutInfo.e_mail) {
-      setDeliveryRequestMessage('Укажите email в форме получателя, чтобы отправить детали заказа.');
-      return false;
-    }
-
-    setIsSendingDeliveryRequest(true);
-    setDeliveryRequestMessage(null);
-
-    try {
-      const response = await fetch('/api/order/delivery-details', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: checkoutInfo.e_mail,
-          name: `${checkoutInfo.userName} ${checkoutInfo.userSecondName}`.trim(),
-          phone: checkoutInfo.phoneNumber,
-          comment: checkoutInfo.userComments,
-          deliveryPointAddress: checkoutInfo.deliveryPointAdress,
-          cartItems: shoppingCart.cartItems,
-          goodsTotal: cartTotal,
-          deliveryPrice,
-          checkoutUrl: typeof window !== 'undefined' ? window.location.href : '',
-        }),
-      });
-
-      const body = await response.json().catch(() => null);
-      if (!response.ok) {
-        setDeliveryRequestMessage(body?.error || 'Не удалось отправить детали заказа. Попробуйте позже.');
-        return false;
-      }
-
-      setDeliveryRequestMessage('Детали заказа отправлены на вашу почту.');
-      return true;
-    } catch (error) {
-      console.error('Delivery details request error', error);
-      setDeliveryRequestMessage('Ошибка при отправке письма. Попробуйте позже.');
-      return false;
-    } finally {
-      setIsSendingDeliveryRequest(false);
-    }
-  };
+  const canCheckout = mockPaymentEnabled && deliveryPrice > 0 && visibleCartItems.length > 0;
 
   return (
     <div className='py-4 md:py-8'>
@@ -105,37 +56,29 @@ export default function CheckoutTotal() {
           <p className='text-right pt-8 md:pt-12 pb-8 text-green-600 text-2xl md:text-3xl font-extrabold'>{totalSum} р.</p>
         </div>
 
-        {deliveryRequestMessage && (
-          <div className='rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-900'>
-            {deliveryRequestMessage}
+        {orderNumber !== null && (
+          <div className='rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-900' role='status'>
+            Заказ №{orderNumber} создан. Оплата имитирована для тестирования; первый оффер Яндекс.Доставки подтвержден.
           </div>
         )}
 
         <Button
-          onClick={async () => {
-            if (isSendingDeliveryRequest) return;
-
-            const emailSent = await sendDeliveryDetails();
-            if (!emailSent) return;
-
-            if (!canCheckout) return;
-
-            try {
-              router.push('/modal-checkout', { scroll: false });
-              clearShoppingCart();
-              clearCookies();
-            } catch (error) {
-              console.error('Failed to checkout:', error);
-            }
-          }}
+          type="submit"
+          form="checkout-form"
           height={58}
           color='#064929'
           backgroundColor='#D3D34F'
           borderColor='#064929'
-          className={`uppercase text-xl font-extrabold w-full transition-all duration-200 ${isSendingDeliveryRequest ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 hover:shadow-md active:opacity-100'}`}
-          disabled={isSendingDeliveryRequest}
+          className={`uppercase text-xl font-extrabold w-full transition-all duration-200 ${isSubmittingOrder || !canCheckout || orderNumber !== null ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90 hover:shadow-md active:opacity-100'}`}
+          disabled={isSubmittingOrder || !canCheckout || orderNumber !== null}
         >
-          {isSendingDeliveryRequest ? 'Отправка...' : 'Оформить заказ'}
+          {!mockPaymentEnabled
+            ? 'ТЕСТОВАЯ ОПЛАТА НЕДОСТУПНА'
+            : isSubmittingOrder
+              ? 'ОФОРМЛЕНИЕ...'
+              : orderNumber !== null
+                ? 'ЗАКАЗ ОФОРМЛЕН'
+                : 'ОФОРМИТЬ ЗАКАЗ'}
         </Button>
 
         <div className='pt-4 text-foreground text-sm'>

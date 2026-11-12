@@ -2,10 +2,11 @@
 
 import React from 'react';
 import OrderActions from '@/app/dashboard/orders/OrderActions'; // Импортируем наши кнопки из отдельного файла
+import type { AdminOrderListItem } from '@/app/lib/dbActions/ordersDBActions/ordersTypes';
+import YandexRequestInfo from '@/app/ui/orders/YandexRequestInfo';
 
 interface OrdersTableProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  orders: any[];
+  orders: AdminOrderListItem[];
 }
 
 const getStatusBadge = (status: string) => {
@@ -51,9 +52,25 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
               <p className="text-xs text-gray-400 font-mono">{order.customer_phone}</p>
               <p className="text-sm font-black text-gray-900 mt-1">{order.total_price} ₽</p>
               <div className="mt-1">{getStatusBadge(order.status)}</div>
+              {order.yandex_request_id ? (
+                <YandexRequestInfo
+                  orderId={order.order_id}
+                  requestId={order.yandex_request_id}
+                  initialInfo={order.yandex_request_info}
+                  cancellationStatus={order.yandex_cancellation_status}
+                  className="mt-2"
+                />
+              ) : (
+                <p className="mt-2 text-sm text-gray-500">Статус доставки: —</p>
+              )}
             </div>
             <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-50">
-              <OrderActions orderId={order.order_id} orderNumber={order.order_number} />
+              <OrderActions
+                orderId={order.order_id}
+                orderNumber={order.order_number}
+                yandexRequestId={order.yandex_request_id}
+                yandexCancellationStatus={order.yandex_cancellation_status}
+              />
             </div>
           </div>
         ))}
@@ -68,6 +85,7 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
             <th className="px-4 py-4">Телефон</th>
             <th className="px-4 py-4">Сумма</th>
             <th className="px-4 py-4">Статус</th>
+            <th className="px-4 py-4">Статус доставки</th>
             <th className="px-4 py-4">Дата создания</th>
             <th className="px-6 py-4 text-right"><span className="sr-only">Действия</span></th>
           </tr>
@@ -80,6 +98,19 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
               <td className="px-4 py-4 text-gray-500 font-mono text-xs">{order.customer_phone}</td>
               <td className="px-4 py-4 font-bold text-gray-900">{order.total_price} ₽</td>
               <td className="px-4 py-4">{getStatusBadge(order.status)}</td>
+              <td className="px-4 py-4">
+                {order.yandex_request_id ? (
+                  <YandexRequestInfo
+                    orderId={order.order_id}
+                    requestId={order.yandex_request_id}
+                    initialInfo={order.yandex_request_info}
+                    cancellationStatus={order.yandex_cancellation_status}
+                    className="min-w-44"
+                  />
+                ) : (
+                  <span className="text-gray-500">—</span>
+                )}
+              </td>
               <td className="px-4 py-4 text-gray-400 text-xs">
                 {new Date(order.created_at).toLocaleDateString('ru-RU', {
                   hour: '2-digit',
@@ -87,7 +118,12 @@ export default function OrdersTable({ orders }: OrdersTableProps) {
                 })}
               </td>
               <td className="py-4 px-6 text-right">
-                <OrderActions orderId={order.order_id} orderNumber={order.order_number} />
+                <OrderActions
+                  orderId={order.order_id}
+                  orderNumber={order.order_number}
+                  yandexRequestId={order.yandex_request_id}
+                  yandexCancellationStatus={order.yandex_cancellation_status}
+                />
               </td>
             </tr>
           ))}

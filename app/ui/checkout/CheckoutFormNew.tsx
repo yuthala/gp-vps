@@ -508,6 +508,10 @@ import clsx from "clsx";
 import { z } from "zod";
 import { getCheckoutInfo, updateCheckoutInfo } from '@/app/lib/checkoutActions';
 import { useCartStore } from "@/app/lib/useCartStore";
+import { clearShoppingCart } from "@/app/lib/shoppingCartActions";
+import type { CartItem } from "@/app/lib/definitions";
+import CheckoutModal from "@/app/ui/checkout/CheckoutModal";
+import CheckoutNotification from "@/app/ui/checkout/CheckoutNotification";
 
 // Импортируем созданные ранее подкомпоненты
 import ReceiverStep from "@/app/ui/checkout/checkoutFormSteps/ReceiverStep";
@@ -527,13 +531,46 @@ const checkoutSchema = z.object({
 
 type FormData = z.infer<typeof checkoutSchema>;
 
-export default function CheckoutForm() {
+type CheckoutOffer = {
+  offer_id: string;
+  expires_at?: string | number;
+  offer_details?: {
+    pricing?: string;
+    pricing_total?: string;
+  };
+};
+
+const checkoutOrderResponseSchema = z.object({
+  ok: z.literal(true),
+  orderNumber: z.string(),
+  totalPrice: z.number(),
+  yandexRequestId: z.string().nullable().optional(),
+  offers: z.array(z.object({
+    offer_id: z.string(),
+    expires_at: z.union([z.string(), z.number()]).optional(),
+    offer_details: z.object({
+      pricing: z.string().optional(),
+      pricing_total: z.string().optional(),
+    }).optional(),
+  })),
+});
+
+interface CheckoutFormProps {
+  mockPaymentEnabled: boolean;
+  onOrderProgress: (isSubmitting: boolean, orderNumber?: string) => void;
+}
+
+export default function CheckoutForm({ mockPaymentEnabled, onOrderProgress }: CheckoutFormProps) {
   const phoneInputRef = useRef<HTMLInputElement>(null);
   const checkoutReloadStarted = useRef(false);
+  const checkoutRequestId = useRef<string | null>(null);
   const [selectedDelivery, setSelectedDelivery] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'sbp' | 'card'>('sbp');
   const [deliveryBoxes, setDeliveryBoxes] = useState<BoxDimensions[] | null>(null);
   const [deliveryDimensionsError, setDeliveryDimensionsError] = useState<string | null>(null);
   const setDeliveryPrice = useCartStore((state) => state.setDeliveryPrice);
+  const deliveryPrice = useCartStore((state) => state.deliveryPrice);
+  const clearCartData = useCartStore((state) => state.clearData);
 
   const [formData, setFormData] = useState({
     lastName: "",
@@ -552,7 +589,15 @@ export default function CheckoutForm() {
   const [accountError, setAccountError] = useState<string | null>(null);
   const [isLoggingConsent, setIsLoggingConsent] = useState(false);
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
-  //const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [emailWarning, setEmailWarning] = useState<string | null>(null);
+  const [orderResult, setOrderResult] = useState<{
+    orderNumber: string;
+    totalPrice: number;
+    offers: CheckoutOffer[];
+    yandexRequestId?: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const snapshotKey = "checkoutCartSnapshot";
@@ -730,7 +775,7 @@ export default function CheckoutForm() {
 
       const body = await resp.json().catch(() => null);
       if (!resp.ok) {
-        setAccountError(body?.error || 'Не удалось создать аккаунт. Попробуйте позже.');
+        setAccountError(body?.error || 'Не удалось подготовить аккаунт. Попробуйте снова.');
         return false;
       }
       if (body?.error) {
@@ -741,12 +786,12 @@ export default function CheckoutForm() {
       if (body?.created) {
         setAccountMessage('Пользователь создан. Данные для входа отправлены на email.');
       } else {
-        setAccountMessage('Найден существующий аккаунт. Продолжайте оформление заказа.');
+        setAccountMessage('Найден аккаунт с таким email. Заказ будет привязан к нему.');
       }
       return true;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      setAccountError('Серверная ошибка при создании аккаунта. Попробуйте позже.');
+      setAccountError('Не удалось подготовить аккаунт. Попробуйте снова.');
       return false;
     } finally {
       setIsCreatingAccount(false);
@@ -850,8 +895,8 @@ export default function CheckoutForm() {
 
     if (!isStep1Valid || !isChecked || isLoggingConsent || isCreatingAccount) return;
 
-    const accountOk = await createOrEnsureAccount();
-    if (!accountOk) return;
+    const accountReady = await createOrEnsureAccount();
+    if (!accountReady) return;
 
     const consentOk = await sendConsentLog();
     if (!consentOk) return;
@@ -861,6 +906,7 @@ export default function CheckoutForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingOrder || orderResult) return;
 
     if (formData.comment && formData.comment.trim() !== "") {
       console.warn("Honeypot triggered (Submit). Bot detected.");
@@ -877,45 +923,125 @@ export default function CheckoutForm() {
       return;
     }
 
-    if (!selectedDelivery) {
-      alert("Пожалуйста, выберите способ доставки");
+    if (!mockPaymentEnabled) {
+      setOrderError("В рабочем режиме оформление будет доступно после подключения платежного провайдера.");
       return;
     }
 
-    //setIsSubmittingOrder(true);
+    if (!showRemainingSteps || !isChecked) {
+      setOrderError("Сначала заполните данные получателя и подтвердите согласие.");
+      return;
+    }
 
-    const submissionPayload = {
-      lastName: result.data.lastName,
-      firstName: result.data.firstName,
-      email: result.data.email,
-      phone: result.data.phone,
-      deliveryMethod: selectedDelivery,
-    };
+    if (selectedDelivery !== "yandex") {
+      setOrderError("Сейчас оформление доступно только с доставкой Яндекс.");
+      return;
+    }
 
+    const checkoutInfo = getCheckoutInfo();
+    if (!checkoutInfo.deliveryPointID || deliveryPrice <= 0) {
+      setOrderError("Выберите пункт выдачи Яндекса и дождитесь расчета доставки.");
+      return;
+    }
+
+    const savedCart = localStorage.getItem("cartKey");
     try {
+      const cartItems = savedCart
+        ? (JSON.parse(savedCart) as { cartItems?: CartItem[] }).cartItems ?? []
+        : [];
+      if (cartItems.length === 0) {
+        setOrderError("Корзина пуста.");
+        return;
+      }
+
+      const requestId = checkoutRequestId.current ?? crypto.randomUUID();
+      checkoutRequestId.current = requestId;
+      setIsSubmittingOrder(true);
+      setOrderError(null);
+      setEmailWarning(null);
+      onOrderProgress(true);
+
       const resp = await fetch('/api/checkout/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submissionPayload),
+        body: JSON.stringify({
+          checkoutRequestId: requestId,
+          firstName: result.data.firstName,
+          lastName: result.data.lastName,
+          email: result.data.email,
+          phone: result.data.phone,
+          deliveryMethod: selectedDelivery,
+          deliveryPointId: checkoutInfo.deliveryPointID,
+          deliveryPointAddress: checkoutInfo.deliveryPointAdress,
+          deliveryPrice,
+          paymentMethod: selectedPaymentMethod,
+          cartItems: cartItems.map(({ productSku, description, packageSize, qty }) => ({
+            productSku,
+            description,
+            packageSize,
+            qty,
+          })),
+        }),
       });
+      const responseBody: unknown = await resp.json().catch(() => null);
 
       if (!resp.ok) {
-        const body = await resp.json().catch(() => null);
-        throw new Error(body?.error || 'Ошибка при оформлении заказа');
+        const errorMessage =
+          typeof responseBody === 'object' &&
+          responseBody !== null &&
+          'error' in responseBody &&
+          typeof responseBody.error === 'string'
+            ? responseBody.error
+            : 'Ошибка при оформлении заказа';
+        throw new Error(errorMessage);
       }
 
-      console.log('Order submitted successfully:', submissionPayload);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setConsentLogError(error.message || 'Серверная ошибка при оформлении заказа.');
+      const parsedResponse = checkoutOrderResponseSchema.safeParse(responseBody);
+      if (!parsedResponse.success) {
+        throw new Error("Сервер вернул некорректный ответ о заказе.");
+      }
+
+      try {
+        const goodsTotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const emailResponse = await fetch('/api/order/delivery-details', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: result.data.email,
+            name: `${result.data.firstName} ${result.data.lastName}`.trim(),
+            phone: result.data.phone,
+            deliveryPointAddress: checkoutInfo.deliveryPointAdress,
+            cartItems,
+            goodsTotal,
+            deliveryPrice,
+            checkoutUrl: window.location.href,
+          }),
+        });
+        if (!emailResponse.ok) {
+          setEmailWarning("Заказ создан, но письмо с деталями отправить не удалось.");
+        }
+      } catch (error) {
+        console.error("Order confirmation email failed:", error);
+        setEmailWarning("Заказ создан, но письмо с деталями отправить не удалось.");
+      }
+
+      setOrderResult(parsedResponse.data);
+      onOrderProgress(false, parsedResponse.data.orderNumber);
+      await clearShoppingCart();
+      clearCartData();
+      setDeliveryPrice(0);
+    } catch (error) {
+      setOrderError(error instanceof Error ? error.message : 'Серверная ошибка при оформлении заказа.');
+      onOrderProgress(false);
     } finally {
-      //setIsSubmittingOrder(false);
+      setIsSubmittingOrder(false);
     }
   };
 
   const isNextButtonEnabled = isStep1Valid && isChecked && !isLoggingConsent && !isCreatingAccount;
     return (
-    <form onSubmit={handleSubmit}>
+      <>
+    <form id="checkout-form" onSubmit={handleSubmit}>
       <link rel="preconnect" href="https://widget-pvz.dostavka.yandex.net" />
       {/* ШАГ 1: ПОЛУЧАТЕЛЬ */}
       <section className="pb-4">
@@ -1001,9 +1127,9 @@ export default function CheckoutForm() {
                 className="appearance-none border p-3 rounded w-full md:w-1/2 bg-gray-50 border-gray-300"
               >
                 <option value="">Выберите...</option>
-                <option value="5post">5POST</option>
-                <option value="ozon">ОЗОН Доставка</option>
-                <option value="russian_post">Почта России</option>
+                <option value="5post" disabled>5POST (скоро)</option>
+                <option value="ozon" disabled>ОЗОН Доставка (скоро)</option>
+                <option value="russian_post" disabled>Почта России (скоро)</option>
                 <option value="yandex">Яндекс Доставка</option>
               </select>
               <ChevronDownIcon className="absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none right-2.5 md:right-[calc(50%+10px)]" />
@@ -1026,10 +1152,34 @@ export default function CheckoutForm() {
               <div className="text-green-600 text-lg font-bold w-8 h-8 rounded-md border border-green-400 flex items-center justify-center">3</div>
               <Heading level={6} className="py-6 normal-case">Способ оплаты</Heading>
             </div>
-            <PaymentOptions />
+            <PaymentOptions
+              selectedMethod={selectedPaymentMethod}
+              onChange={setSelectedPaymentMethod}
+              disabled={!mockPaymentEnabled}
+            />
+            <p className={`mt-3 text-sm ${mockPaymentEnabled ? 'text-amber-700' : 'text-gray-600'}`}>
+              {mockPaymentEnabled
+                ? 'Тестовый режим: оплата будет имитирована, деньги не списываются.'
+                : 'Тестовая оплата отключена в рабочем режиме. Для оформления нужен платежный провайдер.'}
+            </p>
           </section>
         </>
       )}
+
+      {orderError && <p className="mt-4 text-red-600" role="alert">{orderError}</p>}
+      {emailWarning && <p className="mt-4 text-amber-700" role="status">{emailWarning}</p>}
     </form>
+      {orderResult && (
+        <CheckoutModal>
+          <CheckoutNotification
+            orderNumber={orderResult.orderNumber}
+            customerEmail={formData.email}
+            totalPrice={orderResult.totalPrice}
+            yandexRequestId={orderResult.yandexRequestId}
+            emailWarning={emailWarning}
+          />
+        </CheckoutModal>
+      )}
+    </>
   );
 }

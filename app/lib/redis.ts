@@ -8,7 +8,7 @@ type RedisGlobal = typeof globalThis & {
 };
 
 const redisGlobal = globalThis as RedisGlobal;
-const HOME_RANDOM_PRODUCTS_CACHE_KEY = 'home:random-products:v1';
+const HOME_RANDOM_PRODUCTS_CACHE_KEY = 'home:random-products:v2';
 const SESSION_VALIDATION_CACHE_PREFIX = 'session:validated:v1:';
 export const SESSION_VALIDATION_CACHE_TTL_SECONDS = 15;
 

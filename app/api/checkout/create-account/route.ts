@@ -2,6 +2,11 @@ import bcrypt from 'bcrypt';
 import postgres from 'postgres';
 import { NextResponse } from 'next/server';
 import { sendCredentialsEmail } from '@/app/lib/email';
+import {
+  CHECKOUT_CUSTOMER_COOKIE,
+  checkoutCustomerCookieOptions,
+  createCheckoutCustomerToken,
+} from '@/app/lib/checkoutCustomerToken';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -54,17 +59,29 @@ export async function POST(req: Request) {
 
     const fullName = (name || `${firstName} ${lastName}`.trim()).trim();
 
-    const existingUser = await sql`
-      SELECT id, is_email_verified
-      FROM users
-      WHERE LOWER(email) = LOWER(${email}) AND date_deleted IS NULL
+    const existingUser = await sql<{ id: string }[]>`
+      SELECT u.id
+      FROM users u
+      LEFT JOIN client_profiles cp ON cp.user_id = u.id
+      WHERE (LOWER(u.email) = LOWER(${email}) OR LOWER(cp.email) = LOWER(${email}))
+        AND u.role = 'customer'
+        AND u.date_deleted IS NULL
       LIMIT 1
     `;
 
     let userId: string | null = existingUser[0]?.id ?? null;
     let generatedPassword: string | null = null;
+    let verifyUrl: string | null = null;
+    let loginUrl: string | null = null;
 
     if (!existingUser[0]) {
+      if (process.env.NODE_ENV === 'production' && !process.env.NEXTAUTH_SECRET) {
+        return NextResponse.json(
+          { error: 'Checkout account linking is not configured.' },
+          { status: 500 }
+        );
+      }
+
       const { registration_ip, registration_device } = getRegistrationMeta(req);
       const password = generatePassword();
       const hashed = await bcrypt.hash(password, 10);
@@ -72,8 +89,8 @@ export async function POST(req: Request) {
 
       const token = genToken();
       const base = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      const verifyUrl = `${base.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
-      const loginUrl = `${base.replace(/\/$/, '')}/login`;
+      verifyUrl = `${base.replace(/\/$/, '')}/api/auth/verify?token=${token}`;
+      loginUrl = `${base.replace(/\/$/, '')}/login`;
 
       const insertResult = await sql`
         INSERT INTO users (
@@ -103,7 +120,39 @@ export async function POST(req: Request) {
 
       userId = insertResult[0]?.id ?? null;
 
-      if (userId) {
+    }
+
+    if (userId) {
+      if (existingUser[0]) {
+        const insertedProfiles = await sql`
+          INSERT INTO client_profiles (
+            user_id,
+            first_name,
+            second_name,
+            email,
+            phone_number,
+            bonus_balance,
+            discount_group
+          )
+          VALUES (
+            ${userId},
+            ${firstName},
+            ${lastName},
+            ${email},
+            ${phone},
+            0.00,
+            'Standard'
+          )
+          ON CONFLICT DO NOTHING
+          RETURNING user_id
+        `;
+        const profiles = insertedProfiles.length > 0
+          ? insertedProfiles
+          : await sql`SELECT user_id FROM client_profiles WHERE user_id = ${userId} LIMIT 1`;
+        if (profiles.length === 0) {
+          throw new Error('Unable to create a client profile for this account.');
+        }
+      } else {
         await sql`
           INSERT INTO client_profiles (
             user_id,
@@ -130,7 +179,9 @@ export async function POST(req: Request) {
             phone_number = EXCLUDED.phone_number
         `;
       }
+    }
 
+    if (generatedPassword && verifyUrl && loginUrl) {
       try {
         await sendCredentialsEmail(email, fullName, generatedPassword, loginUrl, verifyUrl);
       } catch (sendError) {
@@ -138,7 +189,16 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ ok: true, created: Boolean(generatedPassword), userId });
+    const created = Boolean(generatedPassword);
+    const response = NextResponse.json({ ok: true, created, userId });
+    if (created && userId) {
+      response.cookies.set(
+        CHECKOUT_CUSTOMER_COOKIE,
+        createCheckoutCustomerToken(userId),
+        checkoutCustomerCookieOptions
+      );
+    }
+    return response;
   } catch (error) {
     console.error('Checkout create-account error', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

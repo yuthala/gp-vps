@@ -7,7 +7,7 @@ export default function CheckoutModal({ children }: { children: ReactNode }) {
 	const router = useRouter();
 
 	const handleClose = () => {
-		router.back(); // Закрывает модальное окно, возвращаясь к предыдущему маршруту
+		router.push('/');
 	};
 
 	return (

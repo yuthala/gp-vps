@@ -1,6 +1,7 @@
 'use server'
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
+import { migrateOrderNumbers } from '@/app/lib/dbActions/ordersDBActions/orderNumberMigration';
 
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -44,36 +45,14 @@ let adminEmail: string;
   return rows[0] || null;
 }
 
-// MIGRATION: Добавлено в таблицу orders поле order_number
-async function addOrderNumberToDatabase() {
-    // 1. Создаем последовательность, которая стартует с 100001
-    await sql`
-        CREATE SEQUENCE IF NOT EXISTS order_number_seq START WITH 100001;
-    `;
-
-    // 2. Добавляем колонку order_number в таблицу orders. 
-    // Она автоматически будет брать следующее значение из последовательности.
-    await sql`
-        ALTER TABLE orders 
-        ADD COLUMN IF NOT EXISTS order_number INT 
-        DEFAULT nextval('order_number_seq') NOT NULL UNIQUE;
-    `;
-
-    console.log('Генерация номеров заказов успешно настроена.');
-}
-
-
   export async function GET(req: Request) {
     try {
       const user = await getAuthorizedUser(req);
-      if (!user || user.email !== adminEmail) {
+      if (!user || user.role !== 'admin' || user.email !== adminEmail) {
         redirect('/forbidden'); // Вызывает внутреннее исключение Next.js
       }
   
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const result = await sql.begin(() => [ // убрал аргумент sql из функции sql.begin(sql) 
-       addOrderNumberToDatabase()
-      ]);
+      await migrateOrderNumbers();
   
       return Response.json({ success: true });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

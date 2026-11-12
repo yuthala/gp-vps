@@ -1,6 +1,9 @@
 import React from 'react';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchFilteredOrders } from '@/app/lib/dbActions/ordersDBActions/ordersDBActions';
+import { isAuthorizedAdminSession } from '@/app/lib/adminAuth';
 
 // Импортируем новый клиентский компонент таблицы, который мы создадим на Шаге 2
 import OrdersTable from '@/app/dashboard/orders/OrdersTable';
@@ -10,6 +13,11 @@ interface PageProps {
 }
 
 export default async function OrdersPage({ searchParams }: PageProps) {
+  const cookieStore = await cookies();
+  if (!await isAuthorizedAdminSession(cookieStore.get('session_token')?.value)) {
+    redirect('/login');
+  }
+
   const params = await searchParams;
   const query = params.query ?? '';
   

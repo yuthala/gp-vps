@@ -2,7 +2,7 @@
 
 import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
-import { CreateOrderInput, UpdateOrderInput } from './ordersTypes';
+import { AdminOrderListItem, CreateOrderInput, UpdateOrderInput } from './ordersTypes';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -10,30 +10,75 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 // 1. CREATE (Создание заказа и его состава)
 // ==========================================
 export async function createOrder(input: CreateOrderInput) {
+  const confirmation = input.yandexOffersResponse.confirmation;
+  const yandexRequestId =
+    typeof confirmation === 'object' &&
+    confirmation !== null &&
+    'request_id' in confirmation &&
+    typeof confirmation.request_id === 'string'
+      ? confirmation.request_id.trim()
+      : '';
+  if (!yandexRequestId) {
+    const error = 'A confirmed Yandex delivery request is required before saving an order.';
+    console.error('[Ошибка] Невозможно сохранить заказ без подтверждения Яндекс.Доставки.');
+    return { success: false, error };
+  }
+
   try {
     // Используем транзакцию, чтобы если упадет запись товаров, сам заказ тоже не создался
     const result = await sql.begin(async (sql) => {
-      
+      const [numberCounter] = await sql<{
+        order_date_code: string;
+        last_number: string | number;
+      }[]>`
+        INSERT INTO order_number_counters (order_date, last_number)
+        VALUES ((NOW() AT TIME ZONE 'Europe/Moscow')::date, 1)
+        ON CONFLICT (order_date) DO UPDATE
+        SET last_number = order_number_counters.last_number + 1
+        RETURNING TO_CHAR(order_date, 'YYMMDD') AS order_date_code, last_number
+      `;
+      const orderNumber = `${numberCounter.order_date_code}-${String(numberCounter.last_number).padStart(3, '0')}`;
+
       // 1. Вставляем общую информацию о заказе в таблицу orders (Статус по умолчанию 'new')
       const [order] = await sql`
         INSERT INTO orders (
+          order_number,
           customer_name, 
           customer_phone, 
           customer_email, 
+          customer_user_id,
           delivery_platform_station_id, 
+          delivery_point_address,
+          customer_comment,
           delivery_price, 
           total_price,
-          status
+          status,
+          checkout_request_id,
+          payment_method,
+          payment_reference,
+          yandex_operator_request_id,
+          yandex_request_id,
+          yandex_offers_response
         ) VALUES (
+          ${orderNumber},
           ${input.customerName}, 
           ${input.customerPhone}, 
           ${input.customerEmail || null}, 
+          ${input.customerUserId || null},
           ${input.deliveryPlatformStationId || null}, 
+          ${input.deliveryPointAddress || null},
+          ${input.customerComment || null},
           ${input.deliveryPrice}, 
           ${input.totalPrice},
-          'new'
+          'paid',
+          ${input.checkoutRequestId},
+          ${input.paymentMethod},
+          ${input.paymentReference},
+          ${input.yandexOperatorRequestId},
+          ${yandexRequestId},
+          ${JSON.stringify(input.yandexOffersResponse)}::jsonb
         )
-        RETURNING order_id, order_number;
+        RETURNING order_id, order_number::text AS order_number;
       `;
 
       // 2. Циклом записываем все товары из корзины в связующую таблицу order_items
@@ -75,16 +120,41 @@ export async function createOrder(input: CreateOrderInput) {
 
 // Получение списка всех заказов с фильтрацией по статусу (для админки)
 // Получение списка заказов с текстовым поиском по имени, телефону или номеру (для админки)
-export async function fetchFilteredOrders(query: string) {
+export async function fetchFilteredOrders(query: string): Promise<AdminOrderListItem[]> {
   try {
     const cleanQuery = query.trim();
     if (!cleanQuery) {
-      return await sql`SELECT * FROM orders ORDER BY created_at DESC`;
+      return await sql<AdminOrderListItem[]>`
+        SELECT
+          order_id,
+          order_number::text AS order_number,
+          customer_name,
+          customer_phone,
+          total_price,
+          status,
+          created_at,
+          COALESCE(yandex_request_id, yandex_offers_response->'confirmation'->>'request_id') AS yandex_request_id,
+          yandex_offers_response->'cancellation'->>'status' AS yandex_cancellation_status,
+          yandex_offers_response->'request_info' AS yandex_request_info
+        FROM orders
+        ORDER BY created_at DESC
+      `;
     }
 
     // Ищем совпадения по имени, телефону или по текстовому представлению номера заказа
-    return await sql`
-      SELECT * FROM orders 
+    return await sql<AdminOrderListItem[]>`
+      SELECT
+        order_id,
+        order_number::text AS order_number,
+        customer_name,
+        customer_phone,
+        total_price,
+        status,
+        created_at,
+        COALESCE(yandex_request_id, yandex_offers_response->'confirmation'->>'request_id') AS yandex_request_id,
+        yandex_offers_response->'cancellation'->>'status' AS yandex_cancellation_status,
+        yandex_offers_response->'request_info' AS yandex_request_info
+      FROM orders
       WHERE 
         customer_name ILIKE ${'%' + cleanQuery + '%'} OR 
         customer_phone ILIKE ${'%' + cleanQuery + '%'} OR

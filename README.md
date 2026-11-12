@@ -57,3 +57,30 @@ REDIS_URL=redis://127.0.0.1:6379
 
 Keep Redis bound to localhost (or a private network), not exposed publicly. Restart
 the Next.js app after setting `REDIS_URL`.
+
+## Checkout and Yandex Delivery
+
+Checkout simulates payment outside production, requests Yandex Delivery offers,
+and automatically confirms the first returned self-pickup offer. Confirmation
+books a real shipment in the Yandex production environment. Mock payment is
+disabled when `NODE_ENV=production`.
+
+```env
+YANDEX_DELIVERY_TOKEN=...
+YANDEX_SOURCE_STATION_ID=...
+```
+
+Run the admin-protected `/orders-seed` migration against the database before
+testing so the order and order-item tables have the required checkout columns.
+This migration also adds `orders.yandex_request_id` and backfills it from saved
+Yandex confirmations. Keep the API token server-side; never put it in a
+`NEXT_PUBLIC_*` variable.
+
+Administrators can send cancellation requests for booked Yandex deliveries from
+`/dashboard/orders`. Yandex cancellation responses with status `CREATED` are
+shown as pending; the local order is marked cancelled only after Yandex returns
+`SUCCESS`.
+
+Order numbers use `YYMMDD-NNN` (for example, `261112-015`) with a daily counter
+based on Moscow time. Run the admin-protected `/orders-seed` migration once to
+convert existing numeric order numbers and initialize the counters.
